@@ -49,23 +49,21 @@ export default function ProductCard({ product, onShowToast }) {
           referrerPolicy="no-referrer"
         />
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-          {product.isNew && (
-            <span className="px-2.5 py-1 bg-orange-500 text-white font-black text-[10px] uppercase tracking-wider rounded-md shadow-lg border border-orange-400/30">
-              NEW RUNWAY
-            </span>
-          )}
-          {hasDiscount && (
+        {/* Badges - Render at most one chip based on priority */}
+        <div className="absolute top-3 left-3 z-10">
+          {hasDiscount ? (
             <span className="px-2.5 py-1 bg-red-600/90 text-white font-black text-[10px] uppercase tracking-wider rounded-md shadow-lg border border-red-500/30">
               -{discountPercent}% OFF
             </span>
-          )}
-          {product.stockCount <= 10 && (
+          ) : product.isNew ? (
+            <span className="px-2.5 py-1 bg-orange-500 text-white font-black text-[10px] uppercase tracking-wider rounded-md shadow-lg border border-orange-400/30">
+              NEW RUNWAY
+            </span>
+          ) : product.stockCount <= 10 ? (
             <span className="px-2.5 py-1 bg-black/70 text-orange-300 backdrop-blur-md text-[10px] font-mono border border-orange-500/30 rounded-md">
               ONLY {product.stockCount} LEFT
             </span>
-          )}
+          ) : null}
         </div>
 
         {/* Wishlist Button */}
