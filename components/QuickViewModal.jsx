@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
-import { X, Star, Heart, ShoppingBag, Truck, ShieldCheck, Check, Sparkles } from 'lucide-react';
+import { X, Star, Heart, ShoppingCart, Truck, ShieldCheck, Check, Sparkles } from 'lucide-react';
 
 export default function QuickViewModal({ product, onClose, onShowToast }) {
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'M');
@@ -24,7 +24,7 @@ export default function QuickViewModal({ product, onClose, onShowToast }) {
       addToCart(product, selectedSize, selectedColor);
     }
     if (onShowToast) {
-      onShowToast(`Added ${quantity}x "${product.name}" (${selectedSize}) to Bag`);
+      onShowToast(`Added ${quantity}x "${product.name}" (${selectedSize}) to Cart`);
     }
     onClose();
   };
@@ -193,8 +193,8 @@ export default function QuickViewModal({ product, onClose, onShowToast }) {
               onClick={handleAddToCart}
               className="flex-1 py-3.5 bg-orange-500 text-white hover:bg-orange-600 font-bold uppercase tracking-wider text-xs rounded-xl flex items-center justify-center gap-2 shadow-xl border border-orange-400/30 transition-all"
             >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Add to Bag • {formatPrice(product.price * quantity)}</span>
+              <ShoppingCart className="w-4 h-4" />
+              <span>Add to Cart • {formatPrice(product.price * quantity)}</span>
             </button>
 
             <button

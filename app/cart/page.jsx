@@ -5,13 +5,13 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
-import CheckoutModal from '@/components/CheckoutModal';
+
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
 import { useCartStore } from '@/store/useCartStore';
 import { formatPrice } from '@/lib/utils';
 import {
-  ShoppingBag,
+  ShoppingCart,
   Trash2,
   Plus,
   Minus,
@@ -69,7 +69,7 @@ export default function CartPage() {
 
       <div className="flex-1">
         {/* Clickable Breadcrumbs */}
-        <Breadcrumb items={[{ label: 'Shopping Bag' }]} />
+        <Breadcrumb items={[{ label: 'Shopping Cart' }]} />
 
         {/* Page Header */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-b border-slate-200 dark:border-white/10">
@@ -77,10 +77,10 @@ export default function CartPage() {
             <div>
               <div className="inline-flex items-center gap-2 text-xs font-mono text-orange-500 mb-1">
                 <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                <span>EXPRESS CHECKOUT BAG</span>
+                <span>EXPRESS CHECKOUT CART</span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">
-                SHOPPING BAG ({cart.reduce((a, b) => a + b.quantity, 0)})
+                SHOPPING CART ({cart.reduce((a, b) => a + b.quantity, 0)})
               </h1>
             </div>
 
@@ -90,7 +90,7 @@ export default function CartPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500 text-xs font-mono font-bold uppercase rounded-xl transition self-start sm:self-auto hover:text-white"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>Clear Bag</span>
+                <span>Clear Cart</span>
               </button>
             )}
           </div>
@@ -100,10 +100,10 @@ export default function CartPage() {
           {cart.length === 0 ? (
             <div className="text-center py-20 px-4 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl max-w-2xl mx-auto space-y-6">
               <div className="inline-flex p-5 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20">
-                <ShoppingBag className="w-10 h-10" />
+                <ShoppingCart className="w-10 h-10" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-black uppercase tracking-wide">YOUR SHOPPING BAG IS EMPTY</h2>
+                <h2 className="text-2xl font-black uppercase tracking-wide">YOUR SHOPPING CART IS EMPTY</h2>
                 <p className="text-xs font-mono text-slate-500 dark:text-white/60 max-w-md mx-auto">
                   Add items from our signature shirts, Japanese selvedge denim, or baggy pleated trousers to complete your order.
                 </p>
@@ -273,14 +273,23 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  {/* Checkout CTA */}
-                  <button
-                    onClick={() => setIsCheckoutOpen(true)}
-                    className="w-full py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-orange-600 transition shadow-2xl border border-orange-400/30 flex items-center justify-center gap-2"
-                  >
-                    <span>PROCEED TO CHECKOUT</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                  {/* Checkout & Continue Shopping CTAs */}
+                  <div className="space-y-3">
+                    <Link
+                      href="/checkout"
+                      className="w-full py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-orange-600 transition shadow-2xl border border-orange-400/30 flex items-center justify-center gap-2"
+                    >
+                      <span>Proceed to Checkout</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+
+                    <Link
+                      href="/"
+                      className="w-full py-3 bg-slate-100 dark:bg-white/5 text-slate-800 dark:text-white border border-slate-200 dark:border-white/10 font-bold uppercase tracking-wider text-xs rounded-2xl flex items-center justify-center gap-2 transition hover:bg-slate-200 dark:hover:bg-white/10"
+                    >
+                      <span>Continue to Shopping</span>
+                    </Link>
+                  </div>
 
                   <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-slate-500 dark:text-white/50 pt-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-500" />
@@ -295,7 +304,7 @@ export default function CartPage() {
 
       <Footer />
 
-      <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
+
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <Toast message={toastMessage} onClose={() => setToastMessage('')} />
     </main>

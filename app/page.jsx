@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import HeroBanner from '@/components/HeroBanner';
 import CategoryGrid from '@/components/CategoryGrid';
 import BestSellingProducts from '@/components/BestSellingProducts';
 import LookbookSection from '@/components/LookbookSection';
 import CartDrawer from '@/components/CartDrawer';
-import CheckoutModal from '@/components/CheckoutModal';
+
 import SearchModal from '@/components/SearchModal';
 import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
@@ -15,6 +16,7 @@ import Toast from '@/components/Toast';
 import { useThemeStore } from '@/store/useThemeStore';
 
 export default function Home() {
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -64,7 +66,7 @@ export default function Home() {
       <Footer />
 
       {/* Slide-over Cart Drawer */}
-      <CartDrawer onCheckout={() => setIsCheckoutOpen(true)} />
+      <CartDrawer onCheckout={() => router.push('/checkout')} />
 
       {/* Modals & Controls */}
       <SearchModal
@@ -72,10 +74,7 @@ export default function Home() {
         onClose={() => setIsSearchOpen(false)}
       />
 
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-      />
+
 
       {/* Scroll To Top Global Button */}
       <ScrollToTop />

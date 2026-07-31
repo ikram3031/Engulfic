@@ -13,7 +13,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
 import {
-  ShoppingBag,
+  ShoppingCart,
   Heart,
   Star,
   ShieldCheck,
@@ -41,7 +41,7 @@ export default function ProductDetailPage({ params }) {
 
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColor);
-    setToastMessage(`Added "${product.name}" (${selectedSize}, ${selectedColor}) to Bag!`);
+    setToastMessage(`Added "${product.name}" (${selectedSize}, ${selectedColor}) to Cart!`);
     setTimeout(() => setToastMessage(''), 3500);
   };
 
@@ -197,8 +197,8 @@ export default function ProductDetailPage({ params }) {
                   onClick={handleAddToCart}
                   className="flex-1 py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-orange-600 transition shadow-2xl border border-orange-400/30 flex items-center justify-center gap-2"
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>ADD TO SHOPPING BAG</span>
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>ADD TO SHOPPING CART</span>
                 </button>
 
                 <button

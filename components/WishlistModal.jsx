@@ -3,7 +3,7 @@
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useCartStore } from '@/store/useCartStore';
 import { formatPrice } from '@/lib/utils';
-import { X, Heart, ShoppingBag, Trash2 } from 'lucide-react';
+import { X, Heart, ShoppingCart, Trash2 } from 'lucide-react';
 
 export default function WishlistModal({ isOpen, onClose, onShowToast }) {
   const { wishlist, toggleWishlist } = useWishlistStore();
@@ -11,10 +11,10 @@ export default function WishlistModal({ isOpen, onClose, onShowToast }) {
 
   if (!isOpen) return null;
 
-  const handleMoveToBag = (product) => {
+  const handleMoveToCart = (product) => {
     addToCart(product, product.sizes[0] || 'M', product.colors[0]?.name || 'Default');
     if (onShowToast) {
-      onShowToast(`Moved "${product.name}" to Bag`);
+      onShowToast(`Moved "${product.name}" to Cart`);
     }
   };
 
@@ -71,11 +71,11 @@ export default function WishlistModal({ isOpen, onClose, onShowToast }) {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleMoveToBag(item)}
+                    onClick={() => handleMoveToCart(item)}
                     className="px-3 py-1.5 bg-orange-500 text-white hover:bg-orange-600 font-bold text-xs rounded-xl flex items-center gap-1.5 transition border border-orange-400/30"
                   >
-                    <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Bag</span>
+                    <ShoppingCart className="w-3.5 h-3.5" />
+                    <span>Cart</span>
                   </button>
 
                   <button

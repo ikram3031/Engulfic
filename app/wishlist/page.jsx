@@ -9,7 +9,7 @@ import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
 import { useWishlistStore } from '@/store/useWishlistStore';
-import { Heart, ShoppingBag, Trash2, ArrowRight, Sparkles } from 'lucide-react';
+import { Heart, ShoppingCart, Trash2, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function WishlistPage() {
   const { wishlist, clearWishlist } = useWishlistStore();
@@ -66,7 +66,7 @@ export default function WishlistPage() {
               <div className="space-y-2">
                 <h2 className="text-2xl font-black uppercase tracking-wide">YOUR WISHLIST IS EMPTY</h2>
                 <p className="text-xs font-mono text-slate-500 dark:text-white/60 max-w-md mx-auto">
-                  Save your favorite runway garments, denim, and organic tees to view or move them to your bag anytime.
+                  Save your favorite runway garments, denim, and organic tees to view or move them to your cart anytime.
                 </p>
               </div>
               <Link

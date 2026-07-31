@@ -25,25 +25,25 @@ export default function SearchModal({ isOpen, onClose }) {
         className="relative w-full max-w-2xl bg-white dark:bg-[#050505]/90 border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl text-slate-900 dark:text-white p-6 space-y-4 backdrop-blur-2xl transition-colors duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white/70 hover:text-slate-900 dark:hover:text-white rounded-full border border-slate-200 dark:border-white/10 transition backdrop-blur-md"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
         {/* Input Bar */}
-        <div className="relative">
-          <Search className="absolute left-4 top-3.5 w-5 h-5 text-orange-500" />
+        <div className="relative pr-12">
+          <Search className="absolute left-4 top-3.5 w-5 h-5 text-orange-500 z-10" />
           <input
             type="text"
-            placeholder="Search shirts, jeans, denim, baggy, long sleeve, short sleeve..."
+            placeholder="Search shirts, jeans, denim, baggy, long sleeve..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
-            className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/30 focus:outline-none focus:border-orange-500 font-sans"
+            className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/30 focus:outline-none focus:border-orange-500 font-sans relative z-0"
           />
         </div>
+
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white/70 hover:text-slate-900 dark:hover:text-white rounded-full border border-slate-200 dark:border-white/10 transition backdrop-blur-md z-10"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
         {/* Results Container */}
         <div className="max-h-[60vh] overflow-y-auto space-y-3 pt-2">

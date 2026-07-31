@@ -1,13 +1,13 @@
 'use client';
 
-import { Sparkles, ShoppingBag, Eye } from 'lucide-react';
+import { Sparkles, ShoppingCart, Eye } from 'lucide-react';
 import { PRODUCTS } from '@/lib/products';
 
 export default function LookbookSection({ onQuickView }) {
   // Find products featured in the lookbook hotspots
-  const trench = PRODUCTS.find((p) => p.id === 'eng-101');
-  const boots = PRODUCTS.find((p) => p.id === 'eng-106');
-  const bag = PRODUCTS.find((p) => p.id === 'eng-107');
+  const trench = PRODUCTS.find((p) => p.id === 'sw-01') || PRODUCTS[0];
+  const boots = PRODUCTS.find((p) => p.id === 'bp-01') || PRODUCTS[1];
+  const bag = PRODUCTS.find((p) => p.id === 'sh-01') || PRODUCTS[2];
 
   return (
     <section id="lookbook" className="bg-[#050505] py-20 border-t border-white/10 text-white relative">
@@ -18,7 +18,7 @@ export default function LookbookSection({ onQuickView }) {
             <span>INTERACTIVE RUNWAY EDITORIAL</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight">
-            SHOP THE <span className="text-orange-500">ENGULFIC</span> LOOK
+            SHOP THE <span className="text-orange-500">CURATED</span> LOOK
           </h2>
           <p className="text-xs sm:text-sm text-white/60 mt-3 font-light">
             Hover or click over the runway hotspots below to inspect and shop individual garments directly from the autumn collection showcase.
@@ -28,13 +28,10 @@ export default function LookbookSection({ onQuickView }) {
         {/* Lookbook Showcase Container */}
         <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/5 aspect-[16/9] sm:aspect-[21/9] shadow-2xl backdrop-blur-md">
           <img
-            src="/src/assets/images/engulfic_lookbook_1785081528880.jpg"
-            alt="Engulfic Fashion Lookbook Showcase"
+            src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&q=80&w=2000"
+            alt="Fashion Lookbook Showcase"
             className="w-full h-full object-cover object-center"
             referrerPolicy="no-referrer"
-            onError={(e) => {
-              e.currentTarget.src = 'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&q=80&w=2000';
-            }}
           />
 
           {/* Dark gradient overlay */}
@@ -49,7 +46,7 @@ export default function LookbookSection({ onQuickView }) {
                 title="View Trench Coat"
               >
                 <span className="absolute inset-0 rounded-full bg-orange-500 animate-ping opacity-75" />
-                <ShoppingBag className="w-4 h-4 z-10" />
+                <ShoppingCart className="w-4 h-4 z-10" />
               </button>
 
               <div className="absolute left-12 top-0 hidden group-hover:flex flex-col bg-black/80 border border-white/20 p-3.5 rounded-2xl w-52 backdrop-blur-xl shadow-2xl z-30">
@@ -74,7 +71,7 @@ export default function LookbookSection({ onQuickView }) {
                 title="View Leather Bag"
               >
                 <span className="absolute inset-0 rounded-full bg-orange-500 animate-ping opacity-75" />
-                <ShoppingBag className="w-4 h-4 z-10" />
+                <ShoppingCart className="w-4 h-4 z-10" />
               </button>
 
               <div className="absolute right-12 top-0 hidden group-hover:flex flex-col bg-black/80 border border-white/20 p-3.5 rounded-2xl w-52 backdrop-blur-xl shadow-2xl z-30">
@@ -99,7 +96,7 @@ export default function LookbookSection({ onQuickView }) {
                 title="View Derby Boots"
               >
                 <span className="absolute inset-0 rounded-full bg-orange-500 animate-ping opacity-75" />
-                <ShoppingBag className="w-4 h-4 z-10" />
+                <ShoppingCart className="w-4 h-4 z-10" />
               </button>
 
               <div className="absolute left-12 top-0 hidden group-hover:flex flex-col bg-black/80 border border-white/20 p-3.5 rounded-2xl w-52 backdrop-blur-xl shadow-2xl z-30">

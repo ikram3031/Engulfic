@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/useCartStore';
 import { formatPrice } from '@/lib/utils';
-import { X, ShoppingBag, Trash2, Tag, ArrowRight, ShieldCheck, Truck, Sparkles, Eye } from 'lucide-react';
+import { X, ShoppingCart, Trash2, Tag, ArrowRight, ShieldCheck, Truck, Sparkles, Eye } from 'lucide-react';
 
 export default function CartDrawer({ onCheckout }) {
   const router = useRouter();
@@ -61,7 +61,7 @@ export default function CartDrawer({ onCheckout }) {
           <div className="p-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between bg-slate-50/80 dark:bg-white/5">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-orange-500/20 rounded-full border border-orange-500/30 text-orange-500 dark:text-orange-400">
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingCart className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="text-lg font-black uppercase tracking-wider font-sans text-slate-900 dark:text-white">YOUR CART</h2>
@@ -96,7 +96,7 @@ export default function CartDrawer({ onCheckout }) {
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-12 text-slate-400 dark:text-white/40 space-y-4">
-                <ShoppingBag className="w-14 h-14 opacity-40 stroke-[1]" />
+                <ShoppingCart className="w-14 h-14 opacity-40 stroke-[1]" />
                 <div>
                   <p className="text-base font-bold uppercase tracking-wider text-slate-800 dark:text-white">Your Cart is Empty</p>
                   <p className="text-xs text-slate-500 dark:text-white/50 mt-1 max-w-xs">Explore our latest collection and add your favorite garments to the cart.</p>
@@ -260,7 +260,11 @@ export default function CartDrawer({ onCheckout }) {
                 <button
                   onClick={() => {
                     closeCart();
-                    onCheckout();
+                    if (onCheckout) {
+                      onCheckout();
+                    } else {
+                      router.push('/checkout');
+                    }
                   }}
                   className="py-3.5 bg-orange-500 text-white hover:bg-orange-600 font-black uppercase tracking-wider text-xs rounded-xl flex items-center justify-center gap-2 shadow-2xl border border-orange-400/30 transition-all"
                 >
