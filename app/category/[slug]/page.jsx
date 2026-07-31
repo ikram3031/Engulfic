@@ -42,17 +42,29 @@ export default function CategoryPage({ params }) {
     }
   };
 
-  // Filter products by category slug or category name
+  // Filter products by category slug or collection slug
   let filteredProducts = PRODUCTS.filter((p) => {
     if (slug === 'new-arrivals') return p.isNew;
     if (slug === 'sale') return p.originalPrice > p.price;
+    if (slug === 'best-sellers') return p.isBestSeller;
+    if (slug === 'essentials') return p.price <= 2800 || p.isBestSeller;
+    if (slug === 'graphic-collection') return p.name.toLowerCase().includes('graphic') || (p.subcategory && p.subcategory.toLowerCase().includes('graphic'));
+    if (slug === 'oversized-collection') return p.name.toLowerCase().includes('oversized') || (p.subcategory && p.subcategory.toLowerCase().includes('oversized'));
+    if (slug === 'sports-collection') return p.categorySlug === 'jerseys' || p.category.toLowerCase().includes('jersey');
+    if (slug === 'limited-edition') return p.stockCount <= 18 || p.isNew;
+
     const pSlug = p.categorySlug || p.category.toLowerCase().replace(/\s+/g, '-');
     return pSlug === slug;
   });
 
   // Filter by Subcategory if selected
   if (selectedSub && selectedSub !== 'All') {
-    filteredProducts = filteredProducts.filter((p) => p.subcategory === selectedSub);
+    filteredProducts = filteredProducts.filter((p) => {
+      if (!p.subcategory) return false;
+      const pSub = p.subcategory.toLowerCase();
+      const sSub = selectedSub.toLowerCase();
+      return pSub === sSub || pSub.includes(sSub) || sSub.includes(pSub);
+    });
   }
 
   // Filter by Gender
@@ -79,7 +91,7 @@ export default function CategoryPage({ params }) {
   };
 
   const breadcrumbItems = [
-    { label: 'Categories', href: '/#categories-section' },
+    { label: 'Catalog', href: '/catalog' },
     { label: categoryMeta.name, href: `/category/${slug}` }
   ];
 
@@ -142,7 +154,7 @@ export default function CategoryPage({ params }) {
                     : 'bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/70 border-slate-300 dark:border-white/10 hover:border-orange-500'
                 }`}
               >
-                All Subcategories
+                All
               </button>
               {categoryMeta.subcategories.map((sub, idx) => (
                 <button

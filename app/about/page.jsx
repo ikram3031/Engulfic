@@ -73,6 +73,21 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
+
+          {/* Sustainability & Ethics Section */}
+          <div id="sustainability" className="p-8 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4">
+            <div className="inline-flex items-center gap-2 text-xs font-mono text-orange-500 uppercase tracking-widest font-bold">
+              <span>ECO-RESPONSIBLE MANUFACTURING</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">
+              OUR SUSTAINABILITY COMMITMENT
+            </h2>
+            <p className="text-xs sm:text-sm font-mono text-slate-600 dark:text-white/80 leading-relaxed">
+              At Engulfic, luxury means accountability. We operate on a small-batch, zero-overproduction model.
+              All heavy French terry and jersey cottons are 100% GOTS-certified organic cotton, dyed using non-toxic water-recycled processes in closed-loop facilities.
+              Our shipping boxes and garment bags are crafted from 100% biodegradable cornstarch and recycled paper.
+            </p>
+          </div>
         </div>
       </div>
 

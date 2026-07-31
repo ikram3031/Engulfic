@@ -154,18 +154,15 @@ export default function ProductCard({ product, onShowToast }) {
             </div>
           </div>
 
-          {/* Price & Add Button */}
+          {/* Card Action Link (No Price Display as Requested) */}
           <div className="flex items-center justify-between pt-1 sm:pt-2">
-            <div className="flex items-baseline gap-2">
-              <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-mono">
-                {formatPrice(product.price)}
-              </span>
-              {hasDiscount && (
-                <span className="text-[10px] sm:text-xs text-slate-400 dark:text-white/40 line-through font-mono">
-                  {formatPrice(product.originalPrice)}
-                </span>
-              )}
-            </div>
+            <span className="text-[11px] sm:text-xs font-mono font-bold text-orange-500 uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+              <span>View Piece</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+            <span className="text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase">
+              {product.stockCount <= 10 ? 'Limited Run' : 'In Stock'}
+            </span>
           </div>
         </div>
       </div>

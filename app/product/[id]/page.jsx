@@ -2,6 +2,7 @@
 
 import { useState, use } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
@@ -20,10 +21,13 @@ import {
   Truck,
   RotateCcw,
   Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  Zap,
+  ArrowRight
 } from 'lucide-react';
 
 export default function ProductDetailPage({ params }) {
+  const router = useRouter();
   const resolvedParams = use(params);
   const id = resolvedParams.id;
 
@@ -41,8 +45,11 @@ export default function ProductDetailPage({ params }) {
 
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColor);
-    setToastMessage(`Added "${product.name}" (${selectedSize}, ${selectedColor}) to Cart!`);
-    setTimeout(() => setToastMessage(''), 3500);
+  };
+
+  const handleBuyNow = () => {
+    addToCart(product, selectedSize, selectedColor);
+    router.push('/checkout');
   };
 
   const handleToggleWishlist = () => {
@@ -192,18 +199,27 @@ export default function ProductDetailPage({ params }) {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <button
+                  onClick={handleBuyNow}
+                  className="flex-1 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-black dark:hover:bg-slate-200 transition shadow-xl flex items-center justify-center gap-2 group"
+                >
+                  <Zap className="w-4 h-4 fill-orange-500 text-orange-500" />
+                  <span>BUY NOW</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-orange-600 transition shadow-2xl border border-orange-400/30 flex items-center justify-center gap-2"
+                  className="flex-1 py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-orange-600 transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
                 >
                   <ShoppingCart className="w-4 h-4" />
-                  <span>ADD TO SHOPPING CART</span>
+                  <span>ADD TO CART</span>
                 </button>
 
                 <button
                   onClick={handleToggleWishlist}
-                  className={`p-4 rounded-2xl border transition ${
+                  className={`p-4 rounded-2xl border transition flex items-center justify-center ${
                     isWishlisted
                       ? 'bg-orange-500 text-white border-orange-400'
                       : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-700 dark:text-white hover:border-orange-500'

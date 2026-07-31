@@ -23,7 +23,11 @@ import {
   MapPin,
   Phone,
   Mail,
-  Truck
+  Truck,
+  Download,
+  Printer,
+  FileText,
+  Building2
 } from 'lucide-react';
 
 const BANGLADESH_DISTRICTS = [
@@ -47,8 +51,9 @@ export default function CheckoutPage() {
 
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [step, setStep] = useState(1); // 1: Checkout Form, 2: Order Complete
+  const [step, setStep] = useState(1); // 1: Checkout Form, 2: Order Complete / Invoice
   const [orderId, setOrderId] = useState('');
+  const [orderSummary, setOrderSummary] = useState(null);
 
   // Auth toggle tab
   const [authTab, setAuthTab] = useState('signin'); // 'signin' or 'signup'
@@ -62,46 +67,44 @@ export default function CheckoutPage() {
   const [promoInput, setPromoInput] = useState('');
   const [promoMessage, setPromoMessage] = useState(null);
 
-  // Billing address form
+  // Billing address form with prefilled dummy information for easy testing
   const [billingForm, setBillingForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    town: '',
+    firstName: 'Ahsan',
+    lastName: 'Rahman',
+    email: 'ahsan.rahman@engulfic.com',
+    phone: '01712345678',
+    address: 'House 42, Road 11, Block D, Banani',
+    town: 'Dhaka',
     district: 'Dhaka',
-    selectThana: true,
     thana: 'Mohammadpur'
   });
 
   // Shipping address form (different address)
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [shippingForm, setShippingForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    town: '',
+    firstName: 'Ahsan',
+    lastName: 'Rahman',
+    email: 'ahsan.rahman@engulfic.com',
+    phone: '01712345678',
+    address: 'House 42, Road 11, Block D, Banani',
+    town: 'Dhaka',
     district: 'Dhaka',
-    selectThana: true,
     thana: 'Mohammadpur'
   });
 
-  // Pre-fill fields if user is already logged in
+  // Pre-fill fields if user is logged in
   useEffect(() => {
     if (isLoggedIn && user) {
       const nameParts = user.name ? user.name.split(' ') : ['', ''];
       const timer = setTimeout(() => {
         setBillingForm((prev) => ({
           ...prev,
-          firstName: nameParts[0] || '',
-          lastName: nameParts.slice(1).join(' ') || '',
-          email: user.email || '',
-          phone: user.phone || '',
-          address: user.address || '',
-          town: user.city || '',
+          firstName: nameParts[0] || 'Ahsan',
+          lastName: nameParts.slice(1).join(' ') || 'Rahman',
+          email: user.email || 'ahsan.rahman@engulfic.com',
+          phone: user.phone || '01712345678',
+          address: user.address || 'House 42, Road 11, Block D, Banani',
+          town: user.city || 'Dhaka',
           district: 'Dhaka'
         }));
       }, 0);
@@ -158,14 +161,13 @@ export default function CheckoutPage() {
 
     const activeDistrict = shipToDifferent ? shippingForm.district : billingForm.district;
     const activeThana = shipToDifferent ? shippingForm.thana : billingForm.thana;
-    const activeSelectThana = shipToDifferent ? shippingForm.selectThana : billingForm.selectThana;
 
     if (!activeDistrict) {
       return { cost: 0, label: 'Delivery Charge' };
     }
 
     if (activeDistrict.toLowerCase() === 'dhaka') {
-      if (activeSelectThana && activeThana === 'Savar') {
+      if (activeThana === 'Savar') {
         return { cost: 100, label: 'Delivery Charge (Dhaka Suburbs)' };
       } else {
         // Mohammadpur Thana or default Dhaka inside
@@ -211,9 +213,39 @@ export default function CheckoutPage() {
       }
     }
 
-    // Place order
+    // =========================================================================
+    // ORDER API CALL COMMENTED OUT FOR TESTING (FORWARD DIRECTLY TO THANK YOU):
+    // const orderPayload = { cart, billingForm, shippingForm, grandTotal, shippingCost, discount };
+    // const response = await fetch('/api/orders/create', { method: 'POST', body: JSON.stringify(orderPayload) });
+    // =========================================================================
+
+    // Generate Order ID & Snapshot for Invoice
     const generatedId = `ENG-${Math.floor(100000 + Math.random() * 900000)}`;
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const summaryData = {
+      orderId: generatedId,
+      date: formattedDate,
+      items: [...cart],
+      billing: { ...billingForm },
+      shipping: shipToDifferent ? { ...shippingForm } : { ...billingForm },
+      shippingInfo: { ...shippingInfo },
+      subtotal,
+      discount,
+      promoCode,
+      shippingCost,
+      grandTotal
+    };
+
     setOrderId(generatedId);
+    setOrderSummary(summaryData);
     setStep(2);
     clearCart();
   };
@@ -495,38 +527,23 @@ export default function CheckoutPage() {
                             ))}
                           </select>
                         </div>
-                      </div>
 
-                      {/* Optional Thana selector if Dhaka is selected */}
-                      {billingForm.district.toLowerCase() === 'dhaka' && (
-                        <div className="p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl space-y-3">
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              name="selectThana"
-                              checked={billingForm.selectThana}
+                        {billingForm.district.toLowerCase() === 'dhaka' && (
+                          <div className="animate-fadeIn">
+                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Thana *</label>
+                            <select
+                              name="thana"
+                              value={billingForm.thana}
                               onChange={handleBillingChange}
-                              className="w-4 h-4 text-orange-500 rounded border-slate-300 dark:border-white/10 bg-transparent focus:ring-orange-500 focus:ring-2"
-                            />
-                            <span className="text-xs font-mono font-bold text-slate-800 dark:text-white/90">Select Thana / Area under Dhaka</span>
-                          </label>
-
-                          {billingForm.selectThana && (
-                            <div className="animate-fadeIn pl-6">
-                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">Thana Dropdown</label>
-                              <select
-                                name="thana"
-                                value={billingForm.thana}
-                                onChange={handleBillingChange}
-                                className="w-full max-w-xs bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
-                              >
-                                <option value="Mohammadpur" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Mohammadpur (Inside Dhaka - 70 Taka)</option>
-                                <option value="Savar" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Savar (Dhaka Suburbs - 100 Taka)</option>
-                              </select>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                              required
+                              className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
+                            >
+                              <option value="Mohammadpur" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Mohammadpur (Inside Dhaka - 70 Taka)</option>
+                              <option value="Savar" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Savar (Dhaka Suburbs - 100 Taka)</option>
+                            </select>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Ship to Different Address Checkbox */}
@@ -637,37 +654,23 @@ export default function CheckoutPage() {
                               ))}
                             </select>
                           </div>
-                        </div>
 
-                        {shippingForm.district.toLowerCase() === 'dhaka' && (
-                          <div className="p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl space-y-3">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                name="selectThana"
-                                checked={shippingForm.selectThana}
+                          {shippingForm.district.toLowerCase() === 'dhaka' && (
+                            <div className="animate-fadeIn">
+                              <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Thana *</label>
+                              <select
+                                name="thana"
+                                value={shippingForm.thana}
                                 onChange={handleShippingChange}
-                                className="w-4 h-4 text-orange-500 rounded border-slate-300 dark:border-white/10 bg-transparent focus:ring-orange-500 focus:ring-2"
-                              />
-                              <span className="text-xs font-mono font-bold text-slate-800 dark:text-white/90">Select Thana / Area under Dhaka</span>
-                            </label>
-
-                            {shippingForm.selectThana && (
-                              <div className="animate-fadeIn pl-6">
-                                <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">Thana Dropdown</label>
-                                <select
-                                  name="thana"
-                                  value={shippingForm.thana}
-                                  onChange={handleShippingChange}
-                                  className="w-full max-w-xs bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
-                                >
-                                  <option value="Mohammadpur" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Mohammadpur (Inside Dhaka - 70 Taka)</option>
-                                  <option value="Savar" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Savar (Dhaka Suburbs - 100 Taka)</option>
-                                </select>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                                required={shipToDifferent}
+                                className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
+                              >
+                                <option value="Mohammadpur" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Mohammadpur (Inside Dhaka - 70 Taka)</option>
+                                <option value="Savar" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Savar (Dhaka Suburbs - 100 Taka)</option>
+                              </select>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
 
@@ -793,8 +796,8 @@ export default function CheckoutPage() {
                           <span className="block font-bold text-slate-800 dark:text-white">{shippingInfo.label}</span>
                           <span className="text-[10px] text-slate-400 dark:text-white/40 block leading-tight">
                             {shipToDifferent 
-                              ? `Based on shipping to ${shippingForm.district}${shippingForm.district.toLowerCase() === 'dhaka' && shippingForm.selectThana ? ` (${shippingForm.thana})` : ''}`
-                              : `Based on billing to ${billingForm.district}${billingForm.district.toLowerCase() === 'dhaka' && billingForm.selectThana ? ` (${billingForm.thana})` : ''}`
+                              ? `Based on shipping to ${shippingForm.district}${shippingForm.district.toLowerCase() === 'dhaka' ? ` (${shippingForm.thana})` : ''}`
+                              : `Based on billing to ${billingForm.district}${billingForm.district.toLowerCase() === 'dhaka' ? ` (${billingForm.thana})` : ''}`
                             }
                           </span>
                         </div>
@@ -818,50 +821,214 @@ export default function CheckoutPage() {
               </div>
             )
           ) : (
-            /* Order Confirmed Step 2 */
-            <div className="max-w-xl mx-auto py-12 px-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl text-center space-y-6 animate-fadeIn shadow-2xl">
-              <div className="inline-flex p-4 rounded-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
-                <CheckCircle2 className="w-12 h-12" />
-              </div>
+            /* Order Confirmed & Printable Invoice View (Step 2) */
+            <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn">
+              {/* Header Banner & Print/Download Controls */}
+              <div className="p-6 sm:p-8 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl text-center space-y-6 shadow-2xl no-print">
+                <div className="inline-flex p-4 rounded-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
+                  <CheckCircle2 className="w-12 h-12" />
+                </div>
 
-              <div>
-                <span className="px-3 py-1 bg-orange-500/20 text-orange-600 dark:text-orange-300 text-xs font-mono rounded-full border border-orange-500/30">
-                  ORDER PLACED
-                </span>
-                <h2 className="text-3xl font-black uppercase mt-4 tracking-wide">Thank You!</h2>
-                <p className="text-xs text-slate-500 dark:text-white/60 mt-2 font-mono">
-                  Your order <strong className="text-orange-500 font-bold">{orderId}</strong> is processed and prepared for delivery.
-                </p>
-              </div>
-
-              <div className="p-5 bg-white dark:bg-black/40 rounded-2xl border border-slate-200 dark:border-white/10 text-left text-xs font-mono space-y-2.5 text-slate-700 dark:text-white/70">
-                <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2">
-                  <span>Shipping Address:</span>
-                  <span className="text-slate-900 dark:text-white font-bold max-w-[200px] text-right truncate">
-                    {shipToDifferent 
-                      ? `${shippingForm.firstName} ${shippingForm.lastName}, ${shippingForm.address}, ${shippingForm.town}, ${shippingForm.district}`
-                      : `${billingForm.firstName} ${billingForm.lastName}, ${billingForm.address}, ${billingForm.town}, ${billingForm.district}`
-                    }
+                <div className="space-y-2">
+                  <span className="px-3.5 py-1 bg-orange-500/20 text-orange-600 dark:text-orange-300 text-xs font-mono font-bold rounded-full border border-orange-500/30 uppercase tracking-widest">
+                    ORDER CONFIRMED & INVOICE GENERATED
                   </span>
+                  <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">Thank You For Your Order!</h2>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-white/70 max-w-lg mx-auto font-mono">
+                    Order <strong className="text-orange-500 font-bold">{orderId}</strong> has been logged. An official tax invoice has been generated below.
+                  </p>
                 </div>
-                <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2">
-                  <span>Payment Method:</span>
-                  <span className="text-slate-900 dark:text-white font-bold">Cash on Delivery (COD)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Estimated Delivery:</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">24-48 Hours (Home Delivery)</span>
+
+                {/* Quick Action Buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                  <button
+                    onClick={() => window.print()}
+                    className="w-full sm:w-auto px-8 py-3.5 bg-orange-500 text-white font-black uppercase tracking-wider text-xs rounded-2xl hover:bg-orange-600 transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>DOWNLOAD / PRINT INVOICE (PDF)</span>
+                  </button>
+
+                  <Link
+                    href="/"
+                    className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold uppercase tracking-wider text-xs rounded-2xl hover:bg-black dark:hover:bg-slate-200 transition shadow-md flex items-center justify-center gap-2"
+                  >
+                    <span>CONTINUE SHOPPING</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
 
-              <div className="pt-2">
-                <Link
-                  href="/"
-                  className="w-full py-4 bg-orange-500 text-white hover:bg-orange-600 font-extrabold uppercase tracking-widest text-xs rounded-2xl transition border border-orange-400/30 shadow-xl flex items-center justify-center gap-2"
-                >
-                  <span>Continue to Shopping</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+              {/* Printable Tax Invoice Container */}
+              <div
+                id="printable-invoice"
+                className="p-8 sm:p-12 bg-white text-slate-900 rounded-3xl border border-slate-300 shadow-2xl font-mono text-xs space-y-8"
+              >
+                {/* Invoice Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b border-slate-300 pb-8">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-xl font-black tracking-widest uppercase text-slate-900">
+                      <Sparkles className="w-5 h-5 text-orange-500 fill-orange-500" />
+                      <span>ENGULFIC</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                      HIGH-DENSITY ARCHITECTURAL STREETWEAR
+                    </p>
+                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                      House 42, Banani Avenue, Dhaka 1213, Bangladesh<br />
+                      Support: +880 1712-345678 • support@engulfic.com<br />
+                      BIN / TAX REG: BD-948120491
+                    </p>
+                  </div>
+
+                  <div className="sm:text-right space-y-1">
+                    <span className="inline-block px-3 py-1 bg-orange-500/10 text-orange-600 font-bold text-[10px] uppercase rounded border border-orange-500/20">
+                      OFFICIAL TAX INVOICE
+                    </span>
+                    <h3 className="text-2xl font-black text-slate-900 mt-1">{orderId}</h3>
+                    <p className="text-[11px] text-slate-600">
+                      Date: <strong className="text-slate-900">{orderSummary?.date || new Date().toLocaleDateString()}</strong>
+                    </p>
+                    <p className="text-[11px] text-slate-600">
+                      Payment Status: <strong className="text-emerald-600 font-bold">Cash on Delivery (COD)</strong>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Customer Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest block mb-1">
+                      BILLED TO:
+                    </span>
+                    <p className="font-bold text-slate-900 text-sm">
+                      {orderSummary?.billing?.firstName} {orderSummary?.billing?.lastName}
+                    </p>
+                    <p className="text-slate-700">{orderSummary?.billing?.address}</p>
+                    <p className="text-slate-700">{orderSummary?.billing?.town}, {orderSummary?.billing?.district} ({orderSummary?.billing?.thana || 'Central'})</p>
+                    <p className="text-slate-700">Phone: {orderSummary?.billing?.phone}</p>
+                    <p className="text-slate-700">Email: {orderSummary?.billing?.email}</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest block mb-1">
+                      DELIVERY DESTINATION:
+                    </span>
+                    <p className="font-bold text-slate-900 text-sm">
+                      {orderSummary?.shipping?.firstName} {orderSummary?.shipping?.lastName}
+                    </p>
+                    <p className="text-slate-700">{orderSummary?.shipping?.address}</p>
+                    <p className="text-slate-700">{orderSummary?.shipping?.town}, {orderSummary?.shipping?.district}</p>
+                    <p className="text-slate-700">Phone: {orderSummary?.shipping?.phone}</p>
+                    <p className="text-slate-700 font-bold text-emerald-600">Method: Home Delivery (24-48 Hrs)</p>
+                  </div>
+                </div>
+
+                {/* Items Table */}
+                <div className="space-y-3">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest block">
+                    ORDERED PIECES SUMMARY
+                  </span>
+
+                  <div className="overflow-x-auto border border-slate-200 rounded-2xl">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-100 border-b border-slate-200 text-slate-600 uppercase">
+                        <tr>
+                          <th className="py-3 px-4">Item Details</th>
+                          <th className="py-3 px-4 text-center">Specs</th>
+                          <th className="py-3 px-4 text-right">Unit Price</th>
+                          <th className="py-3 px-4 text-center">Qty</th>
+                          <th className="py-3 px-4 text-right">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {orderSummary?.items && orderSummary.items.length > 0 ? (
+                          orderSummary.items.map((item, idx) => (
+                            <tr key={idx}>
+                              <td className="py-3.5 px-4">
+                                <div className="flex items-center gap-3">
+                                  {item.image && (
+                                    <img
+                                      src={item.image}
+                                      alt={item.name}
+                                      className="w-10 h-10 object-cover rounded-lg border border-slate-200"
+                                    />
+                                  )}
+                                  <div>
+                                    <p className="font-bold text-slate-900 uppercase">{item.name}</p>
+                                    <p className="text-[10px] text-slate-500">{item.category || 'Garment'}</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4 text-center">
+                                <span className="font-bold text-slate-900">{item.selectedSize || item.size || 'M'}</span> / <span className="text-slate-600">{item.selectedColor || item.color || 'Standard'}</span>
+                              </td>
+                              <td className="py-3.5 px-4 text-right">{formatPrice(item.price)}</td>
+                              <td className="py-3.5 px-4 text-center font-bold">{item.quantity}</td>
+                              <td className="py-3.5 px-4 text-right font-bold text-slate-900">
+                                {formatPrice(item.price * item.quantity)}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="py-4 px-4 text-center text-slate-500">
+                              Order item records recorded.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Financial Summary Calculation */}
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-t border-slate-300 pt-6">
+                  <div className="space-y-2 text-[11px] text-slate-600 max-w-xs">
+                    <span className="font-bold text-slate-900 uppercase block">TERMS & GUARANTEE</span>
+                    <p>
+                      • Garments are backed by Engulfic 7-day hassle-free replacement policy.<br />
+                      • Please retain this official invoice for returns or exchanges.<br />
+                      • Sealed in anti-static biodegradable packaging.
+                    </p>
+                  </div>
+
+                  <div className="w-full sm:w-72 space-y-2 text-xs">
+                    <div className="flex justify-between text-slate-600">
+                      <span>Subtotal</span>
+                      <span className="font-bold text-slate-900">{formatPrice(orderSummary?.subtotal || 0)}</span>
+                    </div>
+
+                    {orderSummary?.discount > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-bold">
+                        <span>Discount ({orderSummary?.promoCode})</span>
+                        <span>-{formatPrice(orderSummary.discount)}</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between text-slate-600 pb-2 border-b border-slate-200">
+                      <span>{orderSummary?.shippingInfo?.label || 'Delivery Fee'}</span>
+                      <span className="font-bold text-slate-900">{formatPrice(orderSummary?.shippingCost || 0)}</span>
+                    </div>
+
+                    <div className="flex justify-between text-sm font-black text-slate-900 pt-1">
+                      <span>AMOUNT PAYABLE</span>
+                      <span className="text-orange-600">{formatPrice(orderSummary?.grandTotal || 0)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Signature Line */}
+                <div className="flex justify-between items-end border-t border-dashed border-slate-300 pt-6 text-[10px] text-slate-400">
+                  <div>
+                    <p>Computer Generated Official Invoice • No Physical Signature Required</p>
+                    <p className="font-bold text-slate-600 mt-0.5">www.engulfic.com</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-slate-900 uppercase">ENGULFIC QUALITY CONTROL</p>
+                    <p>VERIFIED & PASSED</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

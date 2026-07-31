@@ -20,12 +20,7 @@ export default function QuickViewModal({ product, onClose, onShowToast }) {
   if (!product) return null;
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product, selectedSize, selectedColor);
-    }
-    if (onShowToast) {
-      onShowToast(`Added ${quantity}x "${product.name}" (${selectedSize}) to Cart`);
-    }
+    addToCart(product, selectedSize, selectedColor, quantity);
     onClose();
   };
 

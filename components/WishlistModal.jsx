@@ -13,9 +13,6 @@ export default function WishlistModal({ isOpen, onClose, onShowToast }) {
 
   const handleMoveToCart = (product) => {
     addToCart(product, product.sizes[0] || 'M', product.colors[0]?.name || 'Default');
-    if (onShowToast) {
-      onShowToast(`Moved "${product.name}" to Cart`);
-    }
   };
 
   return (

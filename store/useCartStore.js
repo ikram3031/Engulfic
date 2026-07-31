@@ -5,12 +5,24 @@ export const useCartStore = create((set, get) => ({
   isOpen: false,
   promoCode: '',
   discountPercentage: 0,
+  toastMessage: '',
+  setToastMessage: (msg) => set({ toastMessage: msg }),
+  showToast: (msg) => {
+    set({ toastMessage: msg });
+    if (get()._toastTimer) {
+      clearTimeout(get()._toastTimer);
+    }
+    const timer = setTimeout(() => {
+      set({ toastMessage: '' });
+    }, 3500);
+    set({ _toastTimer: timer });
+  },
   
   toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
 
-  addToCart: (product, size = 'M', color = 'Default') => {
+  addToCart: (product, size = 'M', color = 'Default', quantity = 1) => {
     set((state) => {
       const existingIndex = state.cart.findIndex(
         (item) => item.id === product.id && item.selectedSize === size && item.selectedColor === color
@@ -20,7 +32,7 @@ export const useCartStore = create((set, get) => ({
       if (existingIndex > -1) {
         updatedCart = state.cart.map((item, index) =>
           index === existingIndex
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
@@ -30,7 +42,7 @@ export const useCartStore = create((set, get) => ({
             ...product,
             selectedSize: size,
             selectedColor: color,
-            quantity: 1,
+            quantity: quantity,
             cartItemId: `${product.id}-${size}-${color}`,
           },
         ];
@@ -38,6 +50,7 @@ export const useCartStore = create((set, get) => ({
 
       return { cart: updatedCart, isOpen: true };
     });
+    get().showToast(`Added ${quantity > 1 ? `${quantity}x ` : ''}"${product.name}" (${size}, ${color}) to Cart!`);
   },
 
   removeFromCart: (cartItemId) => {

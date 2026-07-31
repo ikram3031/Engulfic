@@ -24,6 +24,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import ProfileModal from '@/components/ProfileModal';
+import Toast from '@/components/Toast';
 
 export default function Navbar({ onOpenSearch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -35,6 +36,8 @@ export default function Navbar({ onOpenSearch }) {
 
   const totalCartCount = useCartStore((state) => state.getTotalItemsCount());
   const toggleCart = useCartStore((state) => state.toggleCart);
+  const toastMessage = useCartStore((state) => state.toastMessage);
+  const setToastMessage = useCartStore((state) => state.setToastMessage);
   const wishlistCount = useWishlistStore((state) => state.wishlist.length);
   const { theme, toggleTheme, initTheme } = useThemeStore();
   const { isLoggedIn, user, logout } = useAuthStore();
@@ -69,22 +72,21 @@ export default function Navbar({ onOpenSearch }) {
           </div>
         </div>
 
-        {/* Main Navigation Bar - Balanced Symmetrical Layout */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between relative">
-          {/* Left Side: Navigation Links / Mobile Hamburger & Search */}
-          <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-start">
+        {/* MOBILE NAVIGATION BAR (lg:hidden) */}
+        <div className="lg:hidden max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+          {/* Left: Mobile Menu & Search */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-700 dark:text-white/80 hover:text-slate-900 dark:hover:text-white rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 transition"
+              className="p-2 text-slate-700 dark:text-white/80 hover:text-slate-900 dark:hover:text-white rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 transition"
               aria-label="Toggle Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            {/* Mobile Search Button directly beside Hamburger */}
             <button
               onClick={onOpenSearch}
-              className="lg:hidden p-2 text-slate-700 dark:text-white/80 hover:text-slate-900 dark:hover:text-white rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 transition"
+              className="p-2 text-slate-700 dark:text-white/80 hover:text-slate-900 dark:hover:text-white rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 transition"
               aria-label="Open Search"
               title="Search Archive"
             >
@@ -92,366 +94,390 @@ export default function Navbar({ onOpenSearch }) {
             </button>
           </div>
 
-          {/* Centered Brand Name Logo */}
-          <div className="absolute left-1/2 -translate-x-1/2 text-center">
+          {/* Center: Mobile Logo */}
+          <div className="text-center">
             <Link href="/" className="inline-block group">
-              <span className="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans">
+              <span className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans">
                 ENGULFIC
               </span>
             </Link>
           </div>
 
-          {/* Right Side Controls: Search, Auth Status (My Account / Logout / Login), Cart, Theme */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
-            {/* Search Bar / Button (Desktop) */}
-            <button
-              onClick={onOpenSearch}
-              className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-xs text-slate-700 dark:text-zinc-200 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition backdrop-blur-md"
-              title="Search Archive"
-              aria-label="Search Archive"
-            >
-              <Search className="w-4 h-4 text-orange-500" />
-              <span className="font-mono text-slate-600 dark:text-zinc-400">Search...</span>
-            </button>
-
-            {/* Dynamic Auth Buttons: My Account & Logout when logged in; Login / Register when not */}
-            {isLoggedIn ? (
-              <div className="hidden sm:flex items-center gap-2">
-                <Link
-                  href="/profile"
-                  className="px-3.5 py-1.5 rounded-full bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-orange-600 dark:text-orange-400 font-bold text-xs uppercase tracking-wider transition flex items-center gap-1.5"
-                >
-                  <UserCheck className="w-3.5 h-3.5" />
-                  <span>My Account</span>
-                </Link>
-
-                <button
-                  onClick={logout}
-                  className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-zinc-900/80 hover:bg-red-500/10 text-slate-600 dark:text-zinc-300 hover:text-red-500 border border-slate-200 dark:border-zinc-800 transition text-xs font-mono flex items-center gap-1"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsProfileOpen(true)}
-                className="hidden sm:flex px-3.5 py-1.5 rounded-full bg-orange-500 text-white font-bold text-xs uppercase tracking-wider hover:bg-orange-600 transition shadow-md items-center gap-1.5"
-              >
-                <User className="w-3.5 h-3.5" />
-                <span>Login / Register</span>
-              </button>
-            )}
-
-            {/* Wishlist Icon */}
-            <Link
-              href="/wishlist"
-              className="relative p-2 sm:p-2.5 text-slate-700 dark:text-zinc-200 hover:text-orange-500 dark:hover:text-orange-400 transition rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-800 backdrop-blur-md"
-              title="Wishlist"
-            >
-              <Heart className="w-4 h-4 sm:w-4 sm:h-4" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center border border-white dark:border-zinc-950 shadow-md">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
-
-            {/* Cart Icon */}
+          {/* Right: Cart & User Toggle */}
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleCart}
-              className="relative p-2 sm:p-2.5 text-slate-700 dark:text-zinc-200 hover:text-orange-500 dark:hover:text-orange-400 transition rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-800 backdrop-blur-md group"
-              title="Open Cart Drawer"
-              aria-label="Open Shopping Cart Drawer"
+              className="relative p-2 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800"
+              aria-label="Open Cart Drawer"
             >
-              <ShoppingCart className="w-4 h-4 sm:w-4 sm:h-4 text-slate-800 dark:text-zinc-100 group-hover:text-orange-500 transition-colors" />
+              <ShoppingCart className="w-4 h-4 text-slate-800 dark:text-zinc-100" />
               {totalCartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white font-mono font-bold text-[10px] min-w-5 h-5 px-1 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-zinc-950 animate-scaleIn">
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white font-mono font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
                   {totalCartCount}
                 </span>
-              )}
-            </button>
-
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className={`hidden sm:flex p-2 sm:p-2.5 transition rounded-full border shadow-sm ${
-                theme === 'light'
-                  ? 'bg-slate-900 text-white border-slate-900 hover:bg-slate-800'
-                  : 'bg-zinc-900 text-amber-400 border-zinc-800 hover:bg-zinc-800 shadow-[0_0_12px_rgba(251,191,36,0.25)]'
-              }`}
-              title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
-              aria-label="Toggle Theme"
-            >
-              {theme === 'light' ? (
-                <Moon className="w-4 h-4 text-amber-300 fill-amber-300" />
-              ) : (
-                <Sun className="w-4 h-4 text-amber-400 fill-amber-400" />
               )}
             </button>
           </div>
         </div>
 
-        {/* FULL-WIDTH DESKTOP NAVIGATION BAR (Positioned under the main header) */}
-        <div className="hidden lg:block w-full bg-slate-100/90 dark:bg-zinc-900/90 border-t border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-zinc-100 backdrop-blur-md shadow-sm">
-          <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-widest relative">
-            
-            {/* 1. HOME */}
-            <Link
-              href="/"
-              className={`py-3 hover:text-orange-500 transition-colors relative ${
-                pathname === '/' ? 'text-orange-500 font-extrabold' : ''
-              }`}
-            >
-              Home
-              {pathname === '/' && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
-              )}
-            </Link>
+        {/* DESKTOP TWO-TIER NAVBAR LAYOUT (hidden on mobile, visible lg+) */}
+        <div className="hidden lg:block">
+          {/* TOP TIER: Left Search Button | Center Brand Logo | Right User, Wishlist, Cart & Theme */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-3 items-center">
+            {/* Left Column: Search Icon Button & Profile / Logout Controls */}
+            <div className="flex items-center justify-start gap-3">
+              <button
+                onClick={onOpenSearch}
+                className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 dark:hover:text-orange-400 hover:border-orange-500 transition shadow-sm flex items-center justify-center cursor-pointer group"
+                title="Search Archive"
+                aria-label="Search Archive"
+              >
+                <Search className="w-5 h-5 text-slate-700 dark:text-zinc-200 group-hover:text-orange-500 transition-colors" />
+              </button>
 
-            {/* 2. NEW ARRIVALS */}
-            <Link
-              href="/category/new-arrivals"
-              className={`py-3 hover:text-orange-500 transition-colors relative ${
-                pathname === '/category/new-arrivals' ? 'text-orange-500 font-extrabold' : ''
-              }`}
-            >
-              New Arrivals
-              {pathname === '/category/new-arrivals' && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
-              )}
-            </Link>
-
-            {/* 3. SHOP (MEGA MENU) */}
-            <div className="group py-3 cursor-pointer">
-              <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
-                Shop
-                <span className="text-[9px] text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180">▼</span>
-              </span>
-
-              {/* Shop Mega Menu Dropdown Container */}
-              <div className="absolute left-0 right-0 top-full hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-zinc-800 shadow-2xl p-8 z-50 text-slate-900 dark:text-white animate-fadeIn">
-                <div className="max-w-7xl mx-auto grid grid-cols-5 gap-6 text-left">
-                  {/* Sweatshirts Column */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                      Sweatshirts
-                    </h4>
-                    <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                      <li>
-                        <Link href={`/category/sweatshirts?sub=${encodeURIComponent('Oversized Sweatshirt')}`} className="hover:text-orange-500 transition block">
-                          Oversized Sweatshirt
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href={`/category/sweatshirts?sub=${encodeURIComponent('Oversized Graphic Sweatshirt')}`} className="hover:text-orange-500 transition block">
-                          Oversized Graphic Sweatshirt
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Baggy Pants Column */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                      Baggy Pants
-                    </h4>
-                    <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                      <li>
-                        <Link href={`/category/pants?sub=${encodeURIComponent('Baggy Sweatpants')}`} className="hover:text-orange-500 transition block">
-                          Baggy Sweatpants
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href={`/category/pants?sub=${encodeURIComponent('Baggy Graphic Sweatpants')}`} className="hover:text-orange-500 transition block">
-                          Baggy Graphic Sweatpants
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Shirts Column */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                      Shirts
-                    </h4>
-                    <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                      <li>
-                        <Link href={`/category/shirts?sub=${encodeURIComponent('Oversized Shirt')}`} className="hover:text-orange-500 transition block">
-                          Oversized Shirt
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href={`/category/shirts?sub=${encodeURIComponent('Casual Shirt')}`} className="hover:text-orange-500 transition block">
-                          Casual Shirt
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Drop Shoulder T-Shirts Column */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                      Drop Shoulder T-Shirts
-                    </h4>
-                    <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                      <li>
-                        <Link href={`/category/tees?sub=${encodeURIComponent('Drop Shoulder Tee')}`} className="hover:text-orange-500 transition block">
-                          Drop Shoulder Tee
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href={`/category/tees?sub=${encodeURIComponent('Graphic Drop Shoulder Tee')}`} className="hover:text-orange-500 transition block">
-                          Graphic Drop Shoulder Tee
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Jerseys Column */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                      Jerseys
-                    </h4>
-                    <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                      <li>
-                        <Link href={`/category/jerseys?sub=${encodeURIComponent('Player Edition Jersey')}`} className="hover:text-orange-500 transition block">
-                          Player Edition Jersey
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href={`/category/jerseys?sub=${encodeURIComponent('Fan Edition Jersey')}`} className="hover:text-orange-500 transition block">
-                          Fan Edition Jersey
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href={`/category/jerseys?sub=${encodeURIComponent('Retro Jersey')}`} className="hover:text-orange-500 transition block">
-                          Retro Edition Jersey
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. COLLECTIONS (DROPDOWN) */}
-            <div className="group py-3 relative cursor-pointer">
-              <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
-                Collections
-                <span className="text-[9px] text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180">▼</span>
-              </span>
-
-              <div className="absolute left-1/2 -translate-x-1/2 top-full w-60 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
-                <Link href="/category/new-arrivals" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  New Arrivals
-                </Link>
-                <Link href="/category/sweatshirts" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Best Sellers
-                </Link>
-                <Link href="/category/tees" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Essentials
-                </Link>
-                <Link href="/category/pants" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Graphic Collection
-                </Link>
-                <Link href="/category/shirts" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Oversized Collection
-                </Link>
-                <Link href="/category/jerseys" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Sports Collection
-                </Link>
-                <Link href="/category/jerseys" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium text-orange-500 font-bold">
-                  Limited Edition
-                </Link>
-              </div>
-            </div>
-
-            {/* 5. SALE */}
-            <Link
-              href="/category/sale"
-              className="py-3 hover:text-orange-500 transition-colors text-orange-500 font-black flex items-center gap-1"
-            >
-              <span>Sale</span>
-              <span className="px-1.5 py-0.5 bg-orange-500 text-white text-[9px] rounded-full font-mono uppercase">
-                Hot
-              </span>
-            </Link>
-
-            {/* 6. ABOUT (DROPDOWN) */}
-            <div className="group py-3 relative cursor-pointer">
-              <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
-                About
-                <span className="text-[9px] text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180">▼</span>
-              </span>
-
-              <div className="absolute left-1/2 -translate-x-1/2 top-full w-48 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
-                <Link href="/about" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Our Story
-                </Link>
-                <Link href="/about#sustainability" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Sustainability
-                </Link>
-                <Link href="/faq" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Size Guide
-                </Link>
-                <Link href="/contact" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Contact
-                </Link>
-              </div>
-            </div>
-
-            {/* 7. CONTACT */}
-            <Link
-              href="/contact"
-              className={`py-3 hover:text-orange-500 transition-colors ${
-                pathname === '/contact' ? 'text-orange-500 font-extrabold' : ''
-              }`}
-            >
-              Contact
-            </Link>
-
-            {/* 8. ACCOUNT (DROPDOWN) */}
-            <div className="group py-3 relative cursor-pointer">
-              <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
-                Account
-                <span className="text-[9px] text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180">▼</span>
-              </span>
-
-              <div className="absolute right-0 top-full w-48 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
-                {!isLoggedIn ? (
-                  <>
-                    <button
-                      onClick={() => setIsProfileOpen(true)}
-                      className="w-full text-left py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium"
-                    >
-                      Login
-                    </button>
-                    <button
-                      onClick={() => setIsProfileOpen(true)}
-                      className="w-full text-left py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium"
-                    >
-                      Register
-                    </button>
-                  </>
-                ) : (
+              {/* Profile / Account & Logout Buttons (Left side) */}
+              {isLoggedIn ? (
+                <div className="flex items-center gap-2">
                   <Link
                     href="/profile"
-                    className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium"
+                    className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                    title="My Account"
                   >
-                    My Profile
+                    <UserCheck className="w-5 h-5 text-orange-500" />
                   </Link>
-                )}
-                <Link href="/profile?tab=orders" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Orders
-                </Link>
-                <Link href="/wishlist" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                  Wishlist ({wishlistCount})
-                </Link>
-              </div>
+
+                  <button
+                    onClick={logout}
+                    className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 hover:bg-red-500/10 text-slate-600 dark:text-zinc-300 hover:text-red-500 border border-slate-200 dark:border-zinc-800 transition text-xs font-mono flex items-center justify-center"
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsProfileOpen(true)}
+                  className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                  title="Sign In / Register"
+                >
+                  <User className="w-5 h-5" />
+                </button>
+              )}
             </div>
 
+            {/* Center Column: Prominent Brand Logo */}
+            <div className="flex items-center justify-center">
+              <Link href="/" className="inline-block group">
+                <span className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans group-hover:text-orange-500 transition-colors">
+                  ENGULFIC
+                </span>
+              </Link>
+            </div>
+
+            {/* Right Column: Wishlist, Cart, Theme Toggle */}
+            <div className="flex items-center justify-end gap-3">
+              {/* Wishlist Button */}
+              <Link
+                href="/wishlist"
+                className="relative p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                title="Wishlist"
+              >
+                <Heart className="w-5 h-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white font-mono font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center border border-white dark:border-zinc-950 shadow-md">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Shopping Cart Drawer Button */}
+              <button
+                onClick={toggleCart}
+                className="relative p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                title="Open Cart Drawer"
+                aria-label="Open Shopping Cart Drawer"
+              >
+                <ShoppingCart className="w-5 h-5 text-slate-800 dark:text-zinc-100" />
+                {totalCartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white font-mono font-bold text-[10px] min-w-5 h-5 px-1 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-zinc-950">
+                    {totalCartCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className={`p-3 rounded-full border transition flex items-center justify-center ${
+                  theme === 'light'
+                    ? 'bg-slate-900 text-white border-slate-900 hover:bg-slate-800'
+                    : 'bg-zinc-900 text-amber-400 border-zinc-800 hover:bg-zinc-800'
+                }`}
+                title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+                aria-label="Toggle Theme"
+              >
+                {theme === 'light' ? (
+                  <Moon className="w-5 h-5 text-amber-300 fill-amber-300" />
+                ) : (
+                  <Sun className="w-5 h-5 text-amber-400 fill-amber-400" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* BOTTOM TIER: Centered Menu Items Row */}
+          <div className="border-t border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-black/20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest relative">
+                {/* 1. T-SHIRT */}
+                <Link
+                  href="/category/tees"
+                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                    pathname === '/category/tees' ? 'text-orange-500 font-extrabold' : ''
+                  }`}
+                >
+                  T-Shirt
+                  {pathname === '/category/tees' && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
+                  )}
+                </Link>
+
+                {/* 2. SHIRTS */}
+                <Link
+                  href="/category/shirts"
+                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                    pathname === '/category/shirts' ? 'text-orange-500 font-extrabold' : ''
+                  }`}
+                >
+                  Shirts
+                  {pathname === '/category/shirts' && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
+                  )}
+                </Link>
+
+                {/* 3. SWEATSHIRTS */}
+                <Link
+                  href="/category/sweatshirts"
+                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                    pathname === '/category/sweatshirts' ? 'text-orange-500 font-extrabold' : ''
+                  }`}
+                >
+                  Sweatshirts
+                </Link>
+
+                {/* 4. PANTS */}
+                <Link
+                  href="/category/pants"
+                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                    pathname === '/category/pants' ? 'text-orange-500 font-extrabold' : ''
+                  }`}
+                >
+                  Pants
+                </Link>
+
+                {/* 5. JERSEYS */}
+                <Link
+                  href="/category/jerseys"
+                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                    pathname === '/category/jerseys' ? 'text-orange-500 font-extrabold' : ''
+                  }`}
+                >
+                  Jerseys
+                </Link>
+
+                {/* 6. SHOP (MEGA MENU) */}
+                <div className="group py-3.5 cursor-pointer relative">
+                  <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
+                    Shop
+                    <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
+                  </span>
+
+                  {/* Shop Mega Menu Dropdown Container */}
+                  <div className="fixed left-0 right-0 top-32 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-zinc-800 shadow-2xl p-8 z-50 text-slate-900 dark:text-white animate-fadeIn">
+                    <div className="max-w-7xl mx-auto grid grid-cols-5 gap-6 text-left">
+                      {/* Sweatshirts Column */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
+                          Sweatshirts
+                        </h4>
+                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
+                          <li>
+                            <Link href={`/category/sweatshirts?sub=${encodeURIComponent('Oversized Sweatshirt')}`} className="hover:text-orange-500 transition block">
+                              Oversized Sweatshirt
+                            </Link>
+                          </li>
+                          <li>
+                            <Link href={`/category/sweatshirts?sub=${encodeURIComponent('Oversized Graphic Sweatshirt')}`} className="hover:text-orange-500 transition block">
+                              Oversized Graphic Sweatshirt
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Baggy Pants Column */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
+                          Baggy Pants
+                        </h4>
+                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
+                          <li>
+                            <Link href={`/category/pants?sub=${encodeURIComponent('Baggy Sweatpants')}`} className="hover:text-orange-500 transition block">
+                              Baggy Sweatpants
+                            </Link>
+                          </li>
+                          <li>
+                            <Link href={`/category/pants?sub=${encodeURIComponent('Baggy Graphic Sweatpants')}`} className="hover:text-orange-500 transition block">
+                              Baggy Graphic Sweatpants
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Shirts Column */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
+                          Shirts
+                        </h4>
+                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
+                          <li>
+                            <Link href={`/category/shirts?sub=${encodeURIComponent('Oversized Shirt')}`} className="hover:text-orange-500 transition block">
+                              Oversized Shirt
+                            </Link>
+                          </li>
+                          <li>
+                            <Link href={`/category/shirts?sub=${encodeURIComponent('Casual Shirt')}`} className="hover:text-orange-500 transition block">
+                              Casual Shirt
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Drop Shoulder T-Shirts Column */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
+                          Drop Shoulder T-Shirts
+                        </h4>
+                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
+                          <li>
+                            <Link href={`/category/tees?sub=${encodeURIComponent('Drop Shoulder Tee')}`} className="hover:text-orange-500 transition block">
+                              Drop Shoulder Tee
+                            </Link>
+                          </li>
+                          <li>
+                            <Link href={`/category/tees?sub=${encodeURIComponent('Graphic Drop Shoulder Tee')}`} className="hover:text-orange-500 transition block">
+                              Graphic Drop Shoulder Tee
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Jerseys Column */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
+                          Jerseys
+                        </h4>
+                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
+                          <li>
+                            <Link href={`/category/jerseys?sub=${encodeURIComponent('Player Edition Jersey')}`} className="hover:text-orange-500 transition block">
+                              Player Edition Jersey
+                            </Link>
+                          </li>
+                          <li>
+                            <Link href={`/category/jerseys?sub=${encodeURIComponent('Fan Edition Jersey')}`} className="hover:text-orange-500 transition block">
+                              Fan Edition Jersey
+                            </Link>
+                          </li>
+                          <li>
+                            <Link href={`/category/jerseys?sub=${encodeURIComponent('Retro Jersey')}`} className="hover:text-orange-500 transition block">
+                              Retro Edition Jersey
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 7. COLLECTIONS (DROPDOWN) */}
+                <div className="group py-3.5 relative cursor-pointer">
+                  <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
+                    Collections
+                    <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
+                  </span>
+
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-60 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
+                    <Link href="/catalog" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-bold text-orange-500 uppercase border-b border-slate-200 dark:border-zinc-800 pb-2 mb-1">
+                      Full Catalog ↗
+                    </Link>
+                    <Link href="/category/new-arrivals" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      New Arrivals
+                    </Link>
+                    <Link href="/category/best-sellers" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Best Sellers
+                    </Link>
+                    <Link href="/category/essentials" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Essentials
+                    </Link>
+                    <Link href="/category/graphic-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Graphic Collection
+                    </Link>
+                    <Link href="/category/oversized-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Oversized Collection
+                    </Link>
+                    <Link href="/category/sports-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Sports Collection
+                    </Link>
+                    <Link href="/category/limited-edition" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium text-orange-500 font-bold">
+                      Limited Edition
+                    </Link>
+                  </div>
+                </div>
+
+                {/* 8. SALE */}
+                <Link
+                  href="/category/sale"
+                  className="py-3.5 hover:text-orange-500 transition-colors text-orange-500 font-black flex items-center gap-1"
+                >
+                  <span>Sale</span>
+                  <span className="px-1.5 py-0.5 bg-orange-500 text-white text-[9px] rounded-full font-mono uppercase">
+                    Hot
+                  </span>
+                </Link>
+
+                {/* 9. ABOUT */}
+                <div className="group py-3.5 relative cursor-pointer">
+                  <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
+                    About
+                    <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
+                  </span>
+
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-48 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
+                    <Link href="/about" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Our Story
+                    </Link>
+                    <Link href="/about#sustainability" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Sustainability
+                    </Link>
+                    <Link href="/size-guide" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Size Guide
+                    </Link>
+                    <Link href="/contact" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                      Contact
+                    </Link>
+                  </div>
+                </div>
+
+                {/* 10. CONTACT */}
+                <Link
+                  href="/contact"
+                  className={`py-3.5 hover:text-orange-500 transition-colors flex items-center ${
+                    pathname === '/contact' ? 'text-orange-500 font-extrabold' : ''
+                  }`}
+                >
+                  Contact
+                </Link>
+              </nav>
+            </div>
           </div>
         </div>
 
@@ -526,13 +552,14 @@ export default function Navbar({ onOpenSearch }) {
                 </button>
                 {collectionsOpen && (
                   <div className="pl-3 space-y-1 text-[11px] capitalize normal-case text-slate-600 dark:text-zinc-400 animate-fadeIn pt-1">
+                    <Link href="/catalog" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500 uppercase">Full Catalog ↗</Link>
                     <Link href="/category/new-arrivals" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">New Arrivals</Link>
-                    <Link href="/category/sweatshirts" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Best Sellers</Link>
-                    <Link href="/category/tees" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Essentials</Link>
-                    <Link href="/category/pants" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Graphic Collection</Link>
-                    <Link href="/category/shirts" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Oversized Collection</Link>
-                    <Link href="/category/jerseys" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Sports Collection</Link>
-                    <Link href="/category/jerseys" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500">Limited Edition</Link>
+                    <Link href="/category/best-sellers" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Best Sellers</Link>
+                    <Link href="/category/essentials" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Essentials</Link>
+                    <Link href="/category/graphic-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Graphic Collection</Link>
+                    <Link href="/category/oversized-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Oversized Collection</Link>
+                    <Link href="/category/sports-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Sports Collection</Link>
+                    <Link href="/category/limited-edition" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500">Limited Edition</Link>
                   </div>
                 )}
               </div>
@@ -678,6 +705,11 @@ export default function Navbar({ onOpenSearch }) {
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
       />
+
+      {/* Global Toast Notification */}
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage('')} />
+      )}
     </>
   );
 }
