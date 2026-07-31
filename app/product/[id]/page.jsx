@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
@@ -38,6 +38,36 @@ export default function ProductDetailPage({ params }) {
   const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || 'Default');
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
+
+  useEffect(() => {
+    if (!product || !product.id) return;
+
+    try {
+      // Retrieve previously viewed product IDs from session storage
+      const stored = sessionStorage.getItem('engulfic_recently_viewed');
+      let ids = stored ? JSON.parse(stored) : [];
+
+      if (!Array.isArray(ids)) ids = [];
+
+      // Exclude current product ID from history list to display prior visits
+      const previousIds = ids.filter((pId) => pId !== product.id);
+
+      // Resolve product objects from catalog
+      const previousProducts = previousIds
+        .map((pId) => PRODUCTS.find((item) => item.id === pId))
+        .filter(Boolean)
+        .slice(0, 8); // Max 8 items
+
+      setRecentlyViewed(previousProducts);
+
+      // Add current product to the top of session history and save (max 8 items)
+      const updatedIds = [product.id, ...previousIds].slice(0, 8);
+      sessionStorage.setItem('engulfic_recently_viewed', JSON.stringify(updatedIds));
+    } catch (e) {
+      console.error('Recently viewed storage error:', e);
+    }
+  }, [product.id]);
 
   const addToCart = useCartStore((state) => state.addToCart);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
@@ -276,6 +306,26 @@ export default function ProductDetailPage({ params }) {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {relatedProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} onShowToast={(msg) => setToastMessage(msg)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recently Viewed Products Section */}
+          {recentlyViewed.length > 0 && (
+            <div className="mt-16 pt-10 border-t border-slate-200 dark:border-white/10 space-y-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-black uppercase tracking-wide flex items-center gap-3">
+                  <span>RECENTLY VIEWED</span>
+                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                    {recentlyViewed.length} {recentlyViewed.length === 1 ? 'PIECE' : 'PIECES'}
+                  </span>
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {recentlyViewed.map((p) => (
                   <ProductCard key={p.id} product={p} onShowToast={(msg) => setToastMessage(msg)} />
                 ))}
               </div>

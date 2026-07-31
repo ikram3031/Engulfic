@@ -124,8 +124,44 @@ export default function Navbar({ onOpenSearch }) {
         <div className="hidden lg:block">
           {/* TOP TIER: Left Search Button | Center Brand Logo | Right User, Wishlist, Cart & Theme */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-3 items-center">
-            {/* Left Column: Search Icon Button & Profile / Logout Controls */}
+            {/* Left Column: Logout (arrow left), Profile & Search Buttons */}
             <div className="flex items-center justify-start gap-3">
+              {/* Logout & Profile / Login Buttons */}
+              {isLoggedIn ? (
+                <div className="flex items-center gap-3">
+                  {/* 1. Logout Button at the far left with arrow pointing left */}
+                  <button
+                    onClick={logout}
+                    className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 hover:bg-red-500/10 text-slate-600 dark:text-zinc-300 hover:text-red-500 border border-slate-200 dark:border-zinc-800 transition text-xs font-mono flex items-center justify-center cursor-pointer"
+                    title="Sign Out"
+                    aria-label="Sign Out"
+                  >
+                    <LogOut className="w-5 h-5 rotate-180" />
+                  </button>
+
+                  {/* 2. Profile / My Account Button beside Logout */}
+                  <Link
+                    href="/profile"
+                    className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                    title="My Account"
+                    aria-label="My Account"
+                  >
+                    <UserCheck className="w-5 h-5 text-orange-500" />
+                  </Link>
+                </div>
+              ) : (
+                /* Login / User Register Button if not logged in */
+                <button
+                  onClick={() => setIsProfileOpen(true)}
+                  className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                  title="Sign In / Register"
+                  aria-label="Sign In / Register"
+                >
+                  <User className="w-5 h-5" />
+                </button>
+              )}
+
+              {/* 3. Search Icon Button after Profile */}
               <button
                 onClick={onOpenSearch}
                 className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 dark:hover:text-orange-400 hover:border-orange-500 transition shadow-sm flex items-center justify-center cursor-pointer group"
@@ -134,35 +170,6 @@ export default function Navbar({ onOpenSearch }) {
               >
                 <Search className="w-5 h-5 text-slate-700 dark:text-zinc-200 group-hover:text-orange-500 transition-colors" />
               </button>
-
-              {/* Profile / Account & Logout Buttons (Left side) */}
-              {isLoggedIn ? (
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/profile"
-                    className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
-                    title="My Account"
-                  >
-                    <UserCheck className="w-5 h-5 text-orange-500" />
-                  </Link>
-
-                  <button
-                    onClick={logout}
-                    className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 hover:bg-red-500/10 text-slate-600 dark:text-zinc-300 hover:text-red-500 border border-slate-200 dark:border-zinc-800 transition text-xs font-mono flex items-center justify-center"
-                    title="Sign Out"
-                  >
-                    <LogOut className="w-5 h-5" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setIsProfileOpen(true)}
-                  className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
-                  title="Sign In / Register"
-                >
-                  <User className="w-5 h-5" />
-                </button>
-              )}
             </div>
 
             {/* Center Column: Prominent Brand Logo */}
