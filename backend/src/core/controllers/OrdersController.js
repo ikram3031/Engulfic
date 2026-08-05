@@ -1,0 +1,222 @@
+import mongoose from 'mongoose';
+import { validateOrderPayload } from '../helper/orderHelper.js';
+import { OrderModel } from '../models/order.model.js';
+import { MemberModel } from '../models/member.model.js';
+import { CouponModel } from '../models/coupon.model.js';
+import {
+  buildAllowedOrderUpdates,
+  buildOrderDocument,
+  syncMemberOrderSnapshot,
+  syncPaymentDocument,
+  updateMemberOrderReference,
+  updateMemberTotals,
+} from '../helper/orderControllerHelper.js';
+
+const { Types } = mongoose;
+
+// Create a new order from checkout payload and sync related payment/member data.
+export const createOrder = async (req, res, next) => {
+  try {
+    const payload = req.body ?? {};
+    const validationErrors = validateOrderPayload(payload);
+
+    // Backend validation: Ensure multiple coupons are not added at once (optional field)
+    const rawCoupon = payload.couponCode;
+    if (rawCoupon && typeof rawCoupon === 'string' && rawCoupon.trim() !== '' && rawCoupon.trim().toLowerCase() !== 'null' && rawCoupon.trim().toLowerCase() !== 'undefined') {
+      const code = rawCoupon.trim().toUpperCase();
+      if (code.includes(',') || code.includes(' ') || code.includes(';')) {
+        validationErrors.push('Only one coupon can be applied to an order');
+      } else {
+        const coupon = await CouponModel.findOne({ code });
+        if (!coupon) {
+          validationErrors.push('Coupon code is invalid or has expired');
+        } else if (!coupon.active) {
+          validationErrors.push('Coupon is currently inactive');
+        } else {
+          const now = new Date();
+          if (coupon.validFrom && now < new Date(coupon.validFrom)) {
+            validationErrors.push('Coupon promotion has not started yet');
+          }
+          if (coupon.validTo && now > new Date(coupon.validTo)) {
+            validationErrors.push('Coupon code has expired');
+          }
+          const subtotal = Number(payload.subtotal || 0);
+          if (subtotal < Number(coupon.minOrderAmount || 0)) {
+            validationErrors.push(`Coupon requires a minimum purchase of ৳${coupon.minOrderAmount}`);
+          }
+        }
+      }
+    }
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid order payload',
+        errors: validationErrors,
+      });
+    }
+
+    const orderData = await buildOrderDocument(payload);
+    const createdOrder = await OrderModel.create(orderData);
+
+    await syncPaymentDocument(createdOrder);
+    await syncMemberOrderSnapshot(orderData.member, createdOrder, payload);
+
+    return res.status(201).json({
+      status: 'success',
+      message: 'Order received successfully',
+      data: createdOrder,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// List orders with pagination and optional filtering by status or customer email.
+export const listOrders = async (req, res, next) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page || '1', 10));
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit || '20', 10)));
+    const filter = {};
+
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+
+    if (req.query.email) {
+      filter['customer.email'] = req.query.email.toLowerCase().trim();
+    }
+
+    const total = await OrderModel.countDocuments(filter);
+    const orders = await OrderModel.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    return res.json({
+      status: 'success',
+      data: orders,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Fetch a single order by Mongo ObjectId for detail views or admin editing.
+export const getOrderById = async (req, res, next) => {
+  try {
+    const { orderId } = req.params;
+    if (!Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid order ID' });
+    }
+
+    const order = await OrderModel.findById(orderId).lean();
+    if (!order) {
+      return res.status(404).json({ status: 'error', message: 'Order not found' });
+    }
+
+    return res.json({ status: 'success', data: order });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update an existing order while keeping member references and payment sync consistent.
+export const updateOrder = async (req, res, next) => {
+  try {
+    const { orderId } = req.params;
+    if (!Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid order ID' });
+    }
+
+    const payload = req.body ?? {};
+    const existingOrder = await OrderModel.findById(orderId).lean();
+    if (!existingOrder) {
+      return res.status(404).json({ status: 'error', message: 'Order not found' });
+    }
+
+    const affectedMemberIds = new Set();
+    if (existingOrder.member) {
+      affectedMemberIds.add(existingOrder.member.toString());
+    }
+
+    const allowedUpdates = await buildAllowedOrderUpdates(payload, existingOrder);
+    if (payload.memberId !== undefined && payload.memberId && Types.ObjectId.isValid(payload.memberId)) {
+      affectedMemberIds.add(payload.memberId);
+    }
+
+    const order = await OrderModel.findByIdAndUpdate(orderId, allowedUpdates, {
+      new: true,
+      runValidators: true,
+    }).lean();
+
+    if (!order) {
+      return res.status(404).json({ status: 'error', message: 'Order not found' });
+    }
+
+    const oldMemberId = existingOrder.member ? existingOrder.member.toString() : null;
+    const newMemberId = order.member ? order.member.toString() : null;
+    const orderDid = order.did;
+    const orderValue = Number(order.totals?.total || 0);
+
+    if (oldMemberId && oldMemberId !== newMemberId) {
+      await MemberModel.updateOne(
+        { _id: oldMemberId },
+        { $pull: { orders: { did: orderDid } } },
+      );
+    }
+
+    if (newMemberId) {
+      await updateMemberOrderReference(newMemberId, orderDid, orderValue);
+    }
+
+    await syncPaymentDocument(order);
+
+    if (oldMemberId) affectedMemberIds.add(oldMemberId);
+    if (newMemberId) affectedMemberIds.add(newMemberId);
+
+    for (const memberId of affectedMemberIds) {
+      await updateMemberTotals(memberId);
+    }
+
+    return res.status(200).json({ status: 'success', data: order });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete an order and clean up its linked member and payment records.
+export const deleteOrder = async (req, res, next) => {
+  try {
+    const { orderId } = req.params;
+    if (!Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid order ID' });
+    }
+
+    const deletedOrder = await OrderModel.findByIdAndDelete(orderId).lean();
+    if (!deletedOrder) {
+      return res.status(404).json({ status: 'error', message: 'Order not found' });
+    }
+
+    if (deletedOrder.member) {
+      await MemberModel.updateOne(
+        { _id: deletedOrder.member },
+        { $pull: { orders: { did: deletedOrder.did } } },
+      );
+      await updateMemberTotals(deletedOrder.member);
+    }
+
+    await PaymentModel.findOneAndDelete({ orderId: deletedOrder._id });
+
+    return res.json({ status: 'success', message: 'Order deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
