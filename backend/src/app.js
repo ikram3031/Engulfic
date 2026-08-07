@@ -4,7 +4,7 @@ import cors from "cors";
 import { errorHandler } from "./core/middlewares/errorHandler.js";
 import { logger } from "./config/logger.js";
 import coreRouter from "./core/routesIndex.js";
-import attributeRouter from "./dashboard/routes/attribute.route.js";
+// import attributeRouter from "./dashboard/routes/attribute.route.js"; // dashboard not active yet
 
 export async function createApp() {
   const app = express();
@@ -12,15 +12,12 @@ export async function createApp() {
   app.set("wpTablePrefix", process.env.WP_TABLE_PREFIX || "wp_");
   const corsOptions = {
     origin: [
-      "http://decantrebd.com",
-      "https://decantrebd.com",
-      "http://www.decantrebd.com",
-      "https://www.decantrebd.com",
-      "http://dashboard.decantrebd.com",
-      "https://dashboard.decantrebd.com",
+      "https://engulfic.com",
+      "https://www.engulfic.com",
+      "https://dashboard.engulfic.com",
+      "https://server.engulfic.com",
       "http://localhost:8001",
       "http://localhost:8005",
-      "https://localhost:8005",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
@@ -55,7 +52,7 @@ export async function createApp() {
   });
 
   app.use("/api/v1", coreRouter);
-  app.use("/api/v1", attributeRouter);
+  // app.use("/api/v1", attributeRouter); // dashboard not active yet
 
   app.use((req, res) => {
     res.status(404).json({ status: "error", message: "Resource not found" });
