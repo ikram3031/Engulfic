@@ -19,10 +19,10 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 # Copy only the built output and production dependencies
+# Copy built output, config, and package files
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/next.config.* ./
 # If you keep an env file for production, copy it (optional)
 # COPY --from=builder /app/.env.production ./.env.production
 

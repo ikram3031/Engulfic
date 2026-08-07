@@ -31,8 +31,4 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Not active yet
-dashboard/
-new/
-
 .agents
