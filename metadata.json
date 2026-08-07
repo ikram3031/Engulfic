@@ -1,6 +1,0 @@
-{
-  "name": "Engulfic",
-  "description": "Modern Fashion E-Commerce Store for luxury apparel, streetwear, footwear, and accessories.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
