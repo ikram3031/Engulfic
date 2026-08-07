@@ -1,0 +1,106 @@
+'use client';
+
+import Link from 'next/link';
+import { CATEGORY_METADATA } from '@/lib/products';
+import { ArrowRight, Sparkles, FolderTree } from 'lucide-react';
+
+export default function CategoryGrid() {
+  return (
+    <section id="categories-section" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+        <div>
+          <div className="inline-flex items-center gap-2 text-xs font-mono text-orange-500 mb-2 uppercase tracking-widest">
+            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+            <span>CURATED ARCHIVE</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-slate-900 dark:text-white font-sans">
+            CATEGORIES & SUBCATEGORIES
+          </h2>
+        </div>
+        <p className="text-xs text-slate-600 dark:text-white/60 max-w-md font-mono">
+          Explore our signature collections tailored from heavy French terry, Italian cotton poplin, and 300GSM organic jersey.
+        </p>
+      </div>
+
+      {/* Grid: 3 Columns on Tablet/Desktop, 1 Column on Mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 lg:gap-6">
+        {CATEGORY_METADATA.map((cat, idx) => (
+          <div
+            key={cat.id}
+            className="group relative h-[420px] sm:h-[460px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl transition-all duration-500 hover:shadow-2xl hover:border-orange-500/50 flex flex-col justify-between p-5 sm:p-6"
+          >
+            {/* Background Image with Scale Animation */}
+            <img
+              src={cat.image}
+              alt={cat.name}
+              className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
+              referrerPolicy="no-referrer"
+            />
+
+            {/* Gradient Overlay for Text Legibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/30 group-hover:from-black/95 transition-colors duration-500" />
+
+            {/* Top Pill / Badge */}
+            <div className="relative z-10 flex items-center justify-between gap-1">
+              <span className="px-3 py-1 bg-black/70 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-mono font-bold uppercase rounded-full tracking-wider shadow-lg">
+                0{idx + 1}. CATEGORY
+              </span>
+              <span className="px-2.5 py-1 bg-orange-500/90 text-white text-[10px] sm:text-[11px] font-mono font-bold uppercase rounded-full tracking-wider shadow-lg">
+                {cat.itemCount}
+              </span>
+            </div>
+
+            {/* Bottom Content Area */}
+            <div className="relative z-10 space-y-3">
+              <Link href={`/category/${cat.slug}`} className="block">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider font-sans group-hover:text-orange-400 transition-colors line-clamp-1">
+                    {idx + 1}. {cat.name}
+                  </h3>
+                  <div className="p-2.5 bg-orange-500 text-white rounded-full opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300 shadow-xl border border-orange-400/30 flex-shrink-0">
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </Link>
+
+              {/* Subcategories List */}
+              {cat.subcategories && (
+                <div className="pt-2 border-t border-white/15 space-y-2">
+                  <div className="flex items-center gap-1.5 text-[11px] font-mono text-orange-400 font-bold uppercase tracking-wider">
+                    <FolderTree className="w-3.5 h-3.5" />
+                    <span>SUBCATEGORIES</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {cat.subcategories.map((sub, sIdx) => (
+                      <Link
+                        key={sIdx}
+                        href={`/category/${cat.slug}?sub=${encodeURIComponent(sub)}`}
+                        className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-orange-500 hover:scale-105 text-white text-xs font-semibold backdrop-blur-md border border-white/20 hover:border-orange-400 transition-all shadow-md active:scale-95 cursor-pointer z-20"
+                      >
+                        {sub}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-1 flex items-center justify-between">
+                <p className="text-xs text-white/70 font-mono line-clamp-1">
+                  {cat.tagline}
+                </p>
+                <Link
+                  href={`/category/${cat.slug}`}
+                  className="flex items-center gap-1 text-xs font-bold uppercase text-orange-400 tracking-widest font-mono hover:underline flex-shrink-0"
+                >
+                  <span>Explore</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

@@ -1,48 +1,53 @@
-.PHONY: up down build rebuild logs status ps \
-        build-backend build-frontend build-dashboard
+.PHONY: deploy build-bg build-fg build-dash logs status down ps \
+        rebuild up
 
-# ── Full stack ────────────────────────────────────────────────
-up:
-	docker compose up -d
-
-down:
-	docker compose down
-
-build:
+# ── Full deploy ───────────────────────────────────────────────
+deploy:
+	git pull origin live
 	docker compose build --no-cache
+	docker compose up -d
 
 rebuild:
 	docker compose down
 	docker compose build --no-cache
 	docker compose up -d
 
+up:
+	docker compose up -d
+
+down:
+	docker compose down
+
 # ── Individual builds ─────────────────────────────────────────
-build-backend:
+build-bg:
+	git pull origin live
 	docker compose build --no-cache backend
 	docker compose up -d backend
 
-build-frontend:
+build-fg:
+	git pull origin live
 	docker compose build --no-cache frontend
 	docker compose up -d frontend
 
-build-dashboard:
+build-dash:
+	git pull origin live
 	docker compose build --no-cache dashboard
 	docker compose up -d dashboard
 
 # ── Monitoring ────────────────────────────────────────────────
-logs:
-	docker compose logs -f
-
-logs-backend:
-	docker compose logs -f backend
-
-logs-frontend:
-	docker compose logs -f frontend
-
-logs-dashboard:
-	docker compose logs -f dashboard
-
 status:
 	docker compose ps
 
 ps: status
+
+logs:
+	docker compose logs -f
+
+logs-bg:
+	docker compose logs -f backend
+
+logs-fg:
+	docker compose logs -f frontend
+
+logs-dash:
+	docker compose logs -f dashboard
