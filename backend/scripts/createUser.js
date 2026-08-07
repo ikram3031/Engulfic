@@ -1,28 +1,21 @@
 import { connectDatabase, closeDatabase } from "../src/database/index.js";
-import { UserModel } from "../src/models/user.model.js";
-import { hashPassword } from "../src/utils/password.js";
+import { UserModel } from "../src/core/models/user.model.js";
+import { hashPassword } from "../src/core/utils/password.js";
 
 const owner_Data = [
-	{
-		email: "ahmedsabit3232@gmail.com",
-		name: "Ahmed Sabit",
-		password: "dec@Ntr3",
-		phone: "+8801710000001",
-		role: "Admin",
-	},
-	{
-		email: "saadazad97@gmail.com ",
-		name: "Saad Azad",
-		password: "dec@Ntr3",
-		phone: "+8801710000002",
-		role: "Owner",
-	},
   {
-    email: "decantre.store@gmail.com",
-    name: "Decantre Office",
-    password: "dec@Ntr3",
+    email: "ikramul.web@gmail.com",
+    name: "Mr Developer",
+    password: "11223345",
     phone: "+8801710000003",
-    role: "Admin",  
+    role: "Owner",  
+  },
+  {
+    email: "engulficclothing@gmail.com",
+    name: "Engulfic SuperAdmin",
+    password: "11223345",
+    phone: "+8801710000004",
+    role: "Owner",
   }
 ];
 

@@ -15,7 +15,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-engulfic_dev_pass_2024}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-engulfic-db}
     ports:
-      - "127.0.0.1:${MONGODB_PORT:-27017}:27017"
+      - "${MONGODB_PORT:-27017}:27017"
     volumes:
       - engulfic-mongodb-data:/data/db
     networks:
