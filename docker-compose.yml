@@ -65,20 +65,7 @@ services:
     networks:
       - engulfic-net
 
-  dashboard:
-    build:
-      context: ./dashboard
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://server.engulfic.com}
-    container_name: ${DASHBOARD_CONTAINER_NAME:-engulfic-dashboard}
-    restart: always
-    ports:
-      - "${DASHBOARD_PORT:-8005}:8005"
-    depends_on:
-      - backend
-    networks:
-      - engulfic-net
+  # dashboard: (not active yet)
 
 networks:
   engulfic-net:
