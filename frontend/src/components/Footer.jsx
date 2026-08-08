@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Sparkles, Check, Instagram, Twitter, Globe } from 'lucide-react';
 
 export default function Footer() {
@@ -77,24 +77,24 @@ export default function Footer() {
           <div className="space-y-2">
             <h4 className="font-bold text-white uppercase tracking-wider font-mono">CATEGORIES</h4>
             <ul className="space-y-2 text-slate-400 dark:text-white/60 font-light">
-              <li><Link href="/category/shirts" className="hover:text-orange-400 transition">Shirts Collection</Link></li>
-              <li><Link href="/category/jeans" className="hover:text-orange-400 transition">Jeans & Selvedge</Link></li>
-              <li><Link href="/category/denim" className="hover:text-orange-400 transition">Denim Jackets & Vests</Link></li>
-              <li><Link href="/category/baggy" className="hover:text-orange-400 transition">Baggy Trousers</Link></li>
-              <li><Link href="/category/long-sleeve-t-shirt" className="hover:text-orange-400 transition">Long Sleeve Tees</Link></li>
-              <li><Link href="/category/short-sleeve-t-shirt" className="hover:text-orange-400 transition">Short Sleeve Tees</Link></li>
+              <li><Link to="/category/shirts" className="hover:text-orange-400 transition">Shirts Collection</Link></li>
+              <li><Link to="/category/jeans" className="hover:text-orange-400 transition">Jeans & Selvedge</Link></li>
+              <li><Link to="/category/denim" className="hover:text-orange-400 transition">Denim Jackets & Vests</Link></li>
+              <li><Link to="/category/baggy" className="hover:text-orange-400 transition">Baggy Trousers</Link></li>
+              <li><Link to="/category/long-sleeve-t-shirt" className="hover:text-orange-400 transition">Long Sleeve Tees</Link></li>
+              <li><Link to="/category/short-sleeve-t-shirt" className="hover:text-orange-400 transition">Short Sleeve Tees</Link></li>
             </ul>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-bold text-white uppercase tracking-wider font-mono">COMPANY & POLICIES</h4>
             <ul className="space-y-2 text-slate-400 dark:text-white/60 font-light">
-              <li><Link href="/about" className="hover:text-orange-400 transition">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-orange-400 transition">Contact Us</Link></li>
-              <li><Link href="/faq" className="hover:text-orange-400 transition">FAQ & Help</Link></li>
-              <li><Link href="/privacy-policy" className="hover:text-orange-400 transition">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-orange-400 transition">Terms & Conditions</Link></li>
-              <li><Link href="/refund-policy" className="hover:text-orange-400 transition">Return & Refund Policy</Link></li>
+              <li><Link to="/about" className="hover:text-orange-400 transition">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-orange-400 transition">Contact Us</Link></li>
+              <li><Link to="/faq" className="hover:text-orange-400 transition">FAQ & Help</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-orange-400 transition">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-orange-400 transition">Terms & Conditions</Link></li>
+              <li><Link to="/refund-policy" className="hover:text-orange-400 transition">Return & Refund Policy</Link></li>
             </ul>
           </div>
 
@@ -112,13 +112,13 @@ export default function Footer() {
         <div className="pt-8 border-t border-slate-800 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400 dark:text-white/40 font-mono">
           <p>© {new Date().getFullYear()} ENGULFIC INC. ALL RIGHTS RESERVED.</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link href="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
+            <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
             <span>•</span>
-            <Link href="/terms" className="hover:text-white">Terms & Conditions</Link>
+            <Link to="/terms" className="hover:text-white">Terms & Conditions</Link>
             <span>•</span>
-            <Link href="/refund-policy" className="hover:text-white">Refund Policy</Link>
+            <Link to="/refund-policy" className="hover:text-white">Refund Policy</Link>
             <span>•</span>
-            <Link href="/faq" className="hover:text-white">FAQ</Link>
+            <Link to="/faq" className="hover:text-white">FAQ</Link>
           </div>
         </div>
       </div>

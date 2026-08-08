@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
@@ -108,8 +108,7 @@ export default function CartPage() {
                   Add items from our signature shirts, Japanese selvedge denim, or baggy pleated trousers to complete your order.
                 </p>
               </div>
-              <Link
-                href="/"
+              <Link to="/"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white font-bold uppercase tracking-wider text-xs rounded-2xl hover:bg-orange-600 transition shadow-xl"
               >
                 <span>CONTINUE SHOPPING</span>
@@ -275,16 +274,14 @@ export default function CartPage() {
 
                   {/* Checkout & Continue Shopping CTAs */}
                   <div className="space-y-3">
-                    <Link
-                      href="/checkout"
+                    <Link to="/checkout"
                       className="w-full py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-orange-600 transition shadow-2xl border border-orange-400/30 flex items-center justify-center gap-2"
                     >
                       <span>Proceed to Checkout</span>
                       <ArrowRight className="w-4 h-4" />
                     </Link>
 
-                    <Link
-                      href="/"
+                    <Link to="/"
                       className="w-full py-3 bg-slate-100 dark:bg-white/5 text-slate-800 dark:text-white border border-slate-200 dark:border-white/10 font-bold uppercase tracking-wider text-xs rounded-2xl flex items-center justify-center gap-2 transition hover:bg-slate-200 dark:hover:bg-white/10"
                     >
                       <span>Continue to Shopping</span>

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link } from 'react-router-dom';
+import {  useLocation  } from 'react-router-dom';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useThemeStore } from '@/store/useThemeStore';
@@ -32,7 +32,7 @@ export default function Navbar({ onOpenSearch }) {
   const [shopOpen, setShopOpen] = useState(false);
   const [collectionsOpen, setCollectionsOpen] = useState(false);
 
-  const pathname = usePathname();
+  const pathname = useLocation();
 
   const totalCartCount = useCartStore((state) => state.getTotalItemsCount());
   const toggleCart = useCartStore((state) => state.toggleCart);
@@ -96,7 +96,7 @@ export default function Navbar({ onOpenSearch }) {
 
           {/* Center: Mobile Logo */}
           <div className="text-center">
-            <Link href="/" className="inline-block group">
+            <Link to="/" className="inline-block group">
               <span className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans">
                 ENGULFIC
               </span>
@@ -140,8 +140,7 @@ export default function Navbar({ onOpenSearch }) {
                   </button>
 
                   {/* 2. Profile / My Account Button beside Logout */}
-                  <Link
-                    href="/profile"
+                  <Link to="/profile"
                     className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
                     title="My Account"
                     aria-label="My Account"
@@ -174,7 +173,7 @@ export default function Navbar({ onOpenSearch }) {
 
             {/* Center Column: Prominent Brand Logo */}
             <div className="flex items-center justify-center">
-              <Link href="/" className="inline-block group">
+              <Link to="/" className="inline-block group">
                 <span className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans group-hover:text-orange-500 transition-colors">
                   ENGULFIC
                 </span>
@@ -184,8 +183,7 @@ export default function Navbar({ onOpenSearch }) {
             {/* Right Column: Wishlist, Cart, Theme Toggle */}
             <div className="flex items-center justify-end gap-3">
               {/* Wishlist Button */}
-              <Link
-                href="/wishlist"
+              <Link to="/wishlist"
                 className="relative p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
                 title="Wishlist"
               >
@@ -237,8 +235,7 @@ export default function Navbar({ onOpenSearch }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest relative">
                 {/* 1. T-SHIRT */}
-                <Link
-                  href="/category/tees"
+                <Link to="/category/tees"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
                     pathname === '/category/tees' ? 'text-orange-500 font-extrabold' : ''
                   }`}
@@ -250,8 +247,7 @@ export default function Navbar({ onOpenSearch }) {
                 </Link>
 
                 {/* 2. SHIRTS */}
-                <Link
-                  href="/category/shirts"
+                <Link to="/category/shirts"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
                     pathname === '/category/shirts' ? 'text-orange-500 font-extrabold' : ''
                   }`}
@@ -263,8 +259,7 @@ export default function Navbar({ onOpenSearch }) {
                 </Link>
 
                 {/* 3. SWEATSHIRTS */}
-                <Link
-                  href="/category/sweatshirts"
+                <Link to="/category/sweatshirts"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
                     pathname === '/category/sweatshirts' ? 'text-orange-500 font-extrabold' : ''
                   }`}
@@ -273,8 +268,7 @@ export default function Navbar({ onOpenSearch }) {
                 </Link>
 
                 {/* 4. PANTS */}
-                <Link
-                  href="/category/pants"
+                <Link to="/category/pants"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
                     pathname === '/category/pants' ? 'text-orange-500 font-extrabold' : ''
                   }`}
@@ -283,8 +277,7 @@ export default function Navbar({ onOpenSearch }) {
                 </Link>
 
                 {/* 5. JERSEYS */}
-                <Link
-                  href="/category/jerseys"
+                <Link to="/category/jerseys"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
                     pathname === '/category/jerseys' ? 'text-orange-500 font-extrabold' : ''
                   }`}
@@ -413,36 +406,35 @@ export default function Navbar({ onOpenSearch }) {
                   </span>
 
                   <div className="absolute left-1/2 -translate-x-1/2 top-full w-60 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
-                    <Link href="/catalog" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-bold text-orange-500 uppercase border-b border-slate-200 dark:border-zinc-800 pb-2 mb-1">
+                    <Link to="/catalog" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-bold text-orange-500 uppercase border-b border-slate-200 dark:border-zinc-800 pb-2 mb-1">
                       Full Catalog ↗
                     </Link>
-                    <Link href="/category/new-arrivals" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/category/new-arrivals" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       New Arrivals
                     </Link>
-                    <Link href="/category/best-sellers" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/category/best-sellers" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Best Sellers
                     </Link>
-                    <Link href="/category/essentials" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/category/essentials" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Essentials
                     </Link>
-                    <Link href="/category/graphic-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/category/graphic-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Graphic Collection
                     </Link>
-                    <Link href="/category/oversized-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/category/oversized-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Oversized Collection
                     </Link>
-                    <Link href="/category/sports-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/category/sports-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Sports Collection
                     </Link>
-                    <Link href="/category/limited-edition" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium text-orange-500 font-bold">
+                    <Link to="/category/limited-edition" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium text-orange-500 font-bold">
                       Limited Edition
                     </Link>
                   </div>
                 </div>
 
                 {/* 8. SALE */}
-                <Link
-                  href="/category/sale"
+                <Link to="/category/sale"
                   className="py-3.5 hover:text-orange-500 transition-colors text-orange-500 font-black flex items-center gap-1"
                 >
                   <span>Sale</span>
@@ -459,24 +451,23 @@ export default function Navbar({ onOpenSearch }) {
                   </span>
 
                   <div className="absolute left-1/2 -translate-x-1/2 top-full w-48 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
-                    <Link href="/about" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/about" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Our Story
                     </Link>
-                    <Link href="/about#sustainability" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/about#sustainability" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Sustainability
                     </Link>
-                    <Link href="/size-guide" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/size-guide" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Size Guide
                     </Link>
-                    <Link href="/contact" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
+                    <Link to="/contact" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
                       Contact
                     </Link>
                   </div>
                 </div>
 
                 {/* 10. CONTACT */}
-                <Link
-                  href="/contact"
+                <Link to="/contact"
                   className={`py-3.5 hover:text-orange-500 transition-colors flex items-center ${
                     pathname === '/contact' ? 'text-orange-500 font-extrabold' : ''
                   }`}
@@ -493,8 +484,7 @@ export default function Navbar({ onOpenSearch }) {
           <div className="lg:hidden bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 px-6 py-6 animate-fadeIn text-slate-900 dark:text-white space-y-6">
             {/* Category Navigation Links (AT TOP) */}
             <div className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-widest">
-              <Link
-                href="/"
+              <Link to="/"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-2 border-b border-slate-100 dark:border-white/5 text-slate-900 dark:text-white font-bold hover:text-orange-500 flex items-center justify-between"
               >
@@ -502,8 +492,7 @@ export default function Navbar({ onOpenSearch }) {
                 <ArrowRight className="w-4 h-4 text-orange-500" />
               </Link>
 
-              <Link
-                href="/category/new-arrivals"
+              <Link to="/category/new-arrivals"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-2 border-b border-slate-100 dark:border-white/5 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
               >
@@ -559,20 +548,19 @@ export default function Navbar({ onOpenSearch }) {
                 </button>
                 {collectionsOpen && (
                   <div className="pl-3 space-y-1 text-[11px] capitalize normal-case text-slate-600 dark:text-zinc-400 animate-fadeIn pt-1">
-                    <Link href="/catalog" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500 uppercase">Full Catalog ↗</Link>
-                    <Link href="/category/new-arrivals" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">New Arrivals</Link>
-                    <Link href="/category/best-sellers" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Best Sellers</Link>
-                    <Link href="/category/essentials" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Essentials</Link>
-                    <Link href="/category/graphic-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Graphic Collection</Link>
-                    <Link href="/category/oversized-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Oversized Collection</Link>
-                    <Link href="/category/sports-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Sports Collection</Link>
-                    <Link href="/category/limited-edition" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500">Limited Edition</Link>
+                    <Link to="/catalog" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500 uppercase">Full Catalog ↗</Link>
+                    <Link to="/category/new-arrivals" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">New Arrivals</Link>
+                    <Link to="/category/best-sellers" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Best Sellers</Link>
+                    <Link to="/category/essentials" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Essentials</Link>
+                    <Link to="/category/graphic-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Graphic Collection</Link>
+                    <Link to="/category/oversized-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Oversized Collection</Link>
+                    <Link to="/category/sports-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Sports Collection</Link>
+                    <Link to="/category/limited-edition" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500">Limited Edition</Link>
                   </div>
                 )}
               </div>
 
-              <Link
-                href="/category/sale"
+              <Link to="/category/sale"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-2 border-b border-slate-100 dark:border-white/5 text-orange-500 font-extrabold flex items-center justify-between"
               >
@@ -580,8 +568,7 @@ export default function Navbar({ onOpenSearch }) {
                 <span className="px-2 py-0.5 bg-orange-500 text-white text-[9px] rounded-full">HOT</span>
               </Link>
 
-              <Link
-                href="/about"
+              <Link to="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-2 border-b border-slate-100 dark:border-white/5 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
               >
@@ -589,8 +576,7 @@ export default function Navbar({ onOpenSearch }) {
                 <ArrowRight className="w-4 h-4 text-slate-400 dark:text-white/30" />
               </Link>
 
-              <Link
-                href="/contact"
+              <Link to="/contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-2 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
               >
@@ -637,8 +623,7 @@ export default function Navbar({ onOpenSearch }) {
                   </>
                 ) : (
                   <>
-                    <Link
-                      href="/profile"
+                    <Link to="/profile"
                       onClick={() => setMobileMenuOpen(false)}
                       className="p-3.5 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl text-center text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition border border-orange-400/30"
                     >

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import {  useNavigate  } from 'react-router-dom';
 import { useCartStore } from '@/store/useCartStore';
 import { formatPrice } from '@/lib/utils';
 import { X, ShoppingCart, Trash2, Tag, ArrowRight, ShieldCheck, Truck, Sparkles, Eye } from 'lucide-react';
 
 export default function CartDrawer({ onCheckout }) {
-  const router = useRouter();
+  const router = useNavigate();
   const {
     cart,
     isOpen,
@@ -44,7 +44,7 @@ export default function CartDrawer({ onCheckout }) {
 
   const handleViewCart = () => {
     closeCart();
-    router.push('/cart');
+    navigate('/cart');
   };
 
   return (
@@ -263,7 +263,7 @@ export default function CartDrawer({ onCheckout }) {
                     if (onCheckout) {
                       onCheckout();
                     } else {
-                      router.push('/checkout');
+                      navigate('/checkout');
                     }
                   }}
                   className="py-3.5 bg-orange-500 text-white hover:bg-orange-600 font-black uppercase tracking-wider text-xs rounded-xl flex items-center justify-center gap-2 shadow-2xl border border-orange-400/30 transition-all"

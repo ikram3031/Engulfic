@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { CATEGORY_METADATA } from '@/lib/products';
 import { ArrowRight, Sparkles, FolderTree } from 'lucide-react';
 

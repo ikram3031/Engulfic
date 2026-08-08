@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { Link } from 'react-router-dom';
+
+import {  useNavigate  } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 
 export default function ProfilePage() {
-  const router = useRouter();
+  const router = useNavigate();
   const { isLoggedIn, user, orders, updateProfile, logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'orders'
   const [isEditing, setIsEditing] = useState(false);
@@ -79,7 +79,7 @@ export default function ProfilePage() {
               Please sign in to access your member dashboard, track active orders, and view exclusive VIP discount privileges.
             </p>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => navigate('/')}
               className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition shadow-lg"
             >
               Back To Shop
@@ -108,7 +108,7 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between pb-6 border-b border-slate-200 dark:border-zinc-800 mb-8">
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400 font-mono mb-1">
-              <Link href="/" className="hover:text-orange-500 transition">Home</Link>
+              <Link to="/" className="hover:text-orange-500 transition">Home</Link>
               <span>/</span>
               <span className="text-slate-900 dark:text-white font-bold">Account Dashboard</span>
             </div>
@@ -182,7 +182,7 @@ export default function ProfilePage() {
               <button
                 onClick={() => {
                   logout();
-                  router.push('/');
+                  navigate('/');
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400 hover:bg-red-500/10 transition"
               >

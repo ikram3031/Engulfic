@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link } from 'react-router-dom';
+import {  useNavigate  } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
@@ -45,7 +45,7 @@ const BANGLADESH_DISTRICTS = [
 ];
 
 export default function CheckoutPage() {
-  const router = useRouter();
+  const router = useNavigate();
   const { cart, getSubtotal, getDiscountAmount, promoCode, applyPromoCode, removePromoCode, clearCart } = useCartStore();
   const { isLoggedIn, user, login, logout, updateProfile } = useAuthStore();
 
@@ -280,8 +280,7 @@ export default function CheckoutPage() {
                     Please add items to your cart before proceeding to the checkout page.
                   </p>
                 </div>
-                <Link
-                  href="/"
+                <Link to="/"
                   className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white font-bold uppercase tracking-wider text-xs rounded-2xl hover:bg-orange-600 transition shadow-xl"
                 >
                   <span>CONTINUE SHOPPING</span>
@@ -849,8 +848,7 @@ export default function CheckoutPage() {
                     <span>DOWNLOAD / PRINT INVOICE (PDF)</span>
                   </button>
 
-                  <Link
-                    href="/"
+                  <Link to="/"
                     className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold uppercase tracking-wider text-xs rounded-2xl hover:bg-black dark:hover:bg-slate-200 transition shadow-md flex items-center justify-center gap-2"
                   >
                     <span>CONTINUE SHOPPING</span>

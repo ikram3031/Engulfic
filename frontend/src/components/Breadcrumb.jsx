@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 
 export default function Breadcrumb({ items = [] }) {
@@ -8,8 +8,7 @@ export default function Breadcrumb({ items = [] }) {
     <nav aria-label="Breadcrumb" className="py-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <ol className="flex items-center flex-wrap gap-2 text-xs font-mono text-slate-500 dark:text-white/50">
         <li>
-          <Link
-            href="/"
+          <Link to="/"
             className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white transition-colors py-1"
           >
             <Home className="w-3.5 h-3.5 text-orange-500" />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
@@ -69,8 +69,7 @@ export default function WishlistPage() {
                   Save your favorite runway garments, denim, and organic tees to view or move them to your cart anytime.
                 </p>
               </div>
-              <Link
-                href="/"
+              <Link to="/"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white font-bold uppercase tracking-wider text-xs rounded-2xl hover:bg-orange-600 transition shadow-xl"
               >
                 <span>EXPLORE ARCHIVE</span>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, User, ShieldCheck, Tag, Sparkles, CheckCircle2, ArrowRight, LogIn, Heart, ShoppingCart, LogOut } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function ProfileModal({ isOpen, onClose, onShowToast }) {
@@ -131,16 +131,14 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <Link
-                href="/wishlist"
+              <Link to="/wishlist"
                 onClick={onClose}
                 className="p-3 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold uppercase flex items-center justify-center gap-2 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white"
               >
                 <Heart className="w-4 h-4 text-orange-500" />
                 <span>Wishlist</span>
               </Link>
-              <Link
-                href="/cart"
+              <Link to="/cart"
                 onClick={onClose}
                 className="p-3 bg-orange-500/10 hover:bg-orange-500/20 rounded-xl text-xs font-bold uppercase flex items-center justify-center gap-2 border border-orange-500/30 text-orange-600 dark:text-orange-400"
               >

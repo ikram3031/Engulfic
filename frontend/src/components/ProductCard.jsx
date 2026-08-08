@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link } from 'react-router-dom';
+import {  useNavigate  } from 'react-router-dom';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
 import { Heart, Star, ArrowRight } from 'lucide-react';
@@ -11,7 +11,7 @@ export default function ProductCard({ product, onShowToast }) {
   const [hovered, setHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
   const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || 'Default');
-  const router = useRouter();
+  const router = useNavigate();
 
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const isWishlisted = isInWishlist(product.id);

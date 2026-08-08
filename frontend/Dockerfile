@@ -1,36 +1,28 @@
 # -------------------------------------------------
-# Multi‑stage Dockerfile for the Next.js front‑end
+# Multi‑stage Dockerfile for the Vite React front‑end
 # -------------------------------------------------
 # Stage 1 – build the app
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install only production dependencies first (will be overwritten by dev deps for build)
-COPY package.json ./
-RUN npm install               # install all dependencies (dev + prod) for build
+# Install dependencies
+COPY package*.json ./
+RUN npm install
 
-# Copy the rest of the source and install dev dependencies for the build step
+# Copy source and build
 COPY . .
-RUN npm install               # installs dev dependencies (e.g., next)
-RUN npm run build             # creates the .next output
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+RUN npm run build
 
 # Stage 2 – run the app (lightweight runtime)
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Copy only the built output and production dependencies
-# Copy built output, config, and package files
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/next.config.* ./
-# If you keep an env file for production, copy it (optional)
-# COPY --from=builder /app/.env.production ./.env.production
+RUN npm install -g serve
 
-# Install production dependencies only
-RUN npm install --omit=dev   # install only production dependencies for runtime
+COPY --from=builder /app/dist ./dist
 
-# Expose the port Next.js listens on (default 3000)
-EXPOSE 3000
+EXPOSE 8001
 
-# Start the server
-CMD ["npm", "run", "start"]
+CMD ["serve", "-s", "dist", "-l", "8001"]
