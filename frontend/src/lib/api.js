@@ -1,58 +1,42 @@
 import { PRODUCTS } from './products';
 
-// Simulated API calls for TanStack Query
+// Real API calls using the backend server
 export async function fetchProducts({ category, searchQuery, sortBy, inStockOnly, gender }) {
-  // Simulate network latency (250ms)
-  await new Promise((resolve) => setTimeout(resolve, 250));
+  const baseUrl = import.meta.env.VITE_API_URL;
+  const url = new URL(`${baseUrl}/api/v1/products`);
+  const params = new URLSearchParams();
+  if (category && category !== 'All') params.append('category', category);
+  if (gender && gender !== 'All') params.append('gender', gender);
+  if (searchQuery && searchQuery.trim() !== '') params.append('search', searchQuery.trim());
+  if (inStockOnly) params.append('inStockOnly', 'true');
+  if (sortBy) params.append('sortBy', sortBy);
+  url.search = params.toString();
 
-  let result = [...PRODUCTS];
-
-  if (category && category !== 'All') {
-    result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error || 'Failed to fetch products');
   }
-
-  if (gender && gender !== 'All') {
-    result = result.filter((p) => p.gender === gender || p.gender === 'Unisex');
-  }
-
-  if (searchQuery && searchQuery.trim() !== '') {
-    const q = searchQuery.toLowerCase().trim();
-    result = result.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.tagline.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
-    );
-  }
-
-  if (inStockOnly) {
-    result = result.filter((p) => p.inStock);
-  }
-
-  if (sortBy) {
-    if (sortBy === 'price-asc') {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'price-desc') {
-      result.sort((a, b) => b.price - a.price);
-    } else if (sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === 'new') {
-      result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-    }
-  }
-
-  return result;
+  const data = await response.json();
+  return data;
 }
 
 export async function fetchProductById(id) {
-  await new Promise((resolve) => setTimeout(resolve, 200));
-  const product = PRODUCTS.find((p) => p.id === id);
-  if (!product) throw new Error('Product not found');
-  return product;
+  const baseUrl = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${baseUrl}/api/v1/products/${id}`);
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error || 'Product not found');
+  }
+  return await response.json();
 }
 
 export async function fetchFeaturedProducts() {
-  await new Promise((resolve) => setTimeout(resolve, 200));
-  return PRODUCTS.filter((p) => p.isBestSeller || p.isNew);
+  const baseUrl = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${baseUrl}/api/v1/products/featured`);
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error || 'Failed to fetch featured products');
+  }
+  return await response.json();
 }
