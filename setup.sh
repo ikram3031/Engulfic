@@ -6,9 +6,9 @@
 
 set -e
 
-VPS_DIR="/engulf/dev"
+VPS_DIR="/plexivia/engulficDev"
 REPO_URL="https://github.com/ikram3031/Engulfic.git"
-BRANCH="live"
+BRANCH="dev"
 
 echo "==> Creating directory..."
 mkdir -p $VPS_DIR

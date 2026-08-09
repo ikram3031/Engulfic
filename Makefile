@@ -3,7 +3,7 @@
 
 # ── Full deploy ───────────────────────────────────────────────
 deploy:
-	git pull origin live
+	git pull origin dev
 	docker compose build --no-cache
 	docker compose up -d
 
@@ -20,17 +20,17 @@ down:
 
 # ── Individual builds ─────────────────────────────────────────
 build-bg:
-	git pull origin live
+	git pull origin dev
 	docker compose build --no-cache backend
 	docker compose up -d backend
 
 build-fg:
-	git pull origin live
+	git pull origin dev
 	docker compose build --no-cache frontend
 	docker compose up -d frontend
 
 build-dash:
-	git pull origin live
+	git pull origin dev
 	docker compose build --no-cache dashboard
 	docker compose up -d dashboard
 
