@@ -1,0 +1,129 @@
+[
+  {
+    "name": "Sweatshirts",
+    "slug": "sweatshirts",
+    "description": "Heavyweight 500GSM fleece & oversized graphic crews",
+    "imageUrl": "",
+    "productCount": 0,
+    "parent": null,
+    "subcategories": [
+      {
+        "name": "Oversized Sweatshirt",
+        "slug": "oversized-sweatshirt",
+        "description": "Architectural heavy oversized crewnecks and sweatshirts",
+        "imageUrl": "",
+        "productCount": 0
+      },
+      {
+        "name": "Oversized Graphic Sweatshirt",
+        "slug": "oversized-graphic-sweatshirt",
+        "description": "High-density puff printed and screen-printed graphic sweatshirts",
+        "imageUrl": "",
+        "productCount": 0
+      }
+    ]
+  },
+  {
+    "name": "Baggy Pants",
+    "slug": "baggy-pants",
+    "description": "Oversized double-pleated sweatpants & graphic wide-legs",
+    "imageUrl": "",
+    "productCount": 0,
+    "parent": null,
+    "subcategories": [
+      {
+        "name": "Baggy Sweatpants",
+        "slug": "baggy-sweatpants",
+        "description": "Voluminous double-pleated relaxed sweatpants",
+        "imageUrl": "",
+        "productCount": 0
+      },
+      {
+        "name": "Baggy Graphic Sweatpants",
+        "slug": "baggy-graphic-sweatpants",
+        "description": "Wide-leg sweatpants featuring lateral seam screen prints and graphics",
+        "imageUrl": "",
+        "productCount": 0
+      }
+    ]
+  },
+  {
+    "name": "Shirts",
+    "slug": "shirts",
+    "description": "Oversized Italian poplin & casual relaxed button-downs",
+    "imageUrl": "",
+    "productCount": 0,
+    "parent": null,
+    "subcategories": [
+      {
+        "name": "Oversized Shirt",
+        "slug": "oversized-shirt",
+        "description": "Boxy drop-shoulder crisp Italian cotton shirts",
+        "imageUrl": "",
+        "productCount": 0
+      },
+      {
+        "name": "Casual Shirt",
+        "slug": "casual-shirt",
+        "description": "Minimal and smart casual relaxed fit button-downs",
+        "imageUrl": "",
+        "productCount": 0
+      }
+    ]
+  },
+  {
+    "name": "Drop Shoulder T-Shirts",
+    "slug": "drop-shoulder-t-shirts",
+    "description": "Boxy 320GSM organic cotton tees & graphic drop-shoulder cuts",
+    "imageUrl": "",
+    "productCount": 0,
+    "parent": null,
+    "subcategories": [
+      {
+        "name": "Drop Shoulder Tee",
+        "slug": "drop-shoulder-tee",
+        "description": "Premium boxy heavy combed cotton drop-shoulder tees",
+        "imageUrl": "",
+        "productCount": 0
+      },
+      {
+        "name": "Graphic Drop Shoulder Tee",
+        "slug": "graphic-drop-shoulder-tee",
+        "description": "Tactile screen-printed and rubberized chest graphic tees",
+        "imageUrl": "",
+        "productCount": 0
+      }
+    ]
+  },
+  {
+    "name": "Jerseys",
+    "slug": "jerseys",
+    "description": "Player edition, fan edition & retro archive kits",
+    "imageUrl": "",
+    "productCount": 0,
+    "parent": null,
+    "subcategories": [
+      {
+        "name": "Player Edition",
+        "slug": "player-edition",
+        "description": "Heavyweight jacquard knitted performance jerseys with raised crests",
+        "imageUrl": "",
+        "productCount": 0
+      },
+      {
+        "name": "Fan Edition",
+        "slug": "fan-edition",
+        "description": "Comfortable cotton-knit lifestyle jerseys with embroidered emblems",
+        "imageUrl": "",
+        "productCount": 0
+      },
+      {
+        "name": "Retro Edition",
+        "slug": "retro-edition",
+        "description": "Vintage polo collar long-sleeve knit archive jerseys",
+        "imageUrl": "",
+        "productCount": 0
+      }
+    ]
+  }
+]
