@@ -9,12 +9,12 @@ import { Heart, Star, ArrowRight } from 'lucide-react';
 
 export default function ProductCard({ product, onShowToast }) {
   const [hovered, setHovered] = useState(false);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || 'Default');
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || product.variants?.[0]?.size || '');
+  const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || '');
   const router = useNavigate();
 
   const { toggleWishlist, isInWishlist } = useWishlistStore();
-  const isWishlisted = isInWishlist(product.id);
+  const isWishlisted = isInWishlist(product.slug || product.id);
 
   const handleToggleWishlist = (e) => {
     e.stopPropagation();
@@ -41,7 +41,7 @@ export default function ProductCard({ product, onShowToast }) {
       onMouseLeave={() => setHovered(false)}
     >
       {/* Top Image Container - Links to product details page */}
-      <Link href={`/product/${product.id}`} className="relative aspect-[3/4] w-full overflow-hidden bg-slate-200 dark:bg-black/40 block">
+      <Link to={`/product/${product.slug || product.id}`} className="relative aspect-[3/4] w-full overflow-hidden bg-slate-200 dark:bg-black/40 block">
         <img
           src={hovered && product.secondaryImage ? product.secondaryImage : product.image}
           alt={product.name}
@@ -87,13 +87,15 @@ export default function ProductCard({ product, onShowToast }) {
         <div>
           <div className="flex items-center justify-between text-[11px] sm:text-xs text-slate-500 dark:text-white/50 font-mono mb-1">
             <span>{product.category} • {product.gender}</span>
-            <div className="hidden sm:flex items-center gap-1 text-orange-500">
-              <Star className="w-3.5 h-3.5 fill-orange-500" />
-              <span className="font-bold text-slate-800 dark:text-white/90">{product.rating}</span>
-            </div>
+            {product.rating > 0 && (
+              <div className="hidden sm:flex items-center gap-1 text-orange-500">
+                <Star className="w-3.5 h-3.5 fill-orange-500" />
+                <span className="font-bold text-slate-800 dark:text-white/90">{product.rating}</span>
+              </div>
+            )}
           </div>
 
-          <Link href={`/product/${product.id}`} className="block">
+          <Link to={`/product/${product.slug || product.id}`} className="block">
             <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight hover:text-orange-500 transition line-clamp-1">
               {product.name}
             </h3>
@@ -107,51 +109,78 @@ export default function ProductCard({ product, onShowToast }) {
         {/* Color Swatches & Size Picker (Hidden on Mobile) */}
         <div className="pt-2 border-t border-slate-200 dark:border-white/10">
           <div className="hidden sm:block space-y-3 pb-2">
-            {/* Colors */}
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400 dark:text-white/40 font-mono text-[11px]">COLOR</span>
-              <div className="flex items-center gap-1.5">
-                {product.colors.map((c, idx) => (
+            {product.variants?.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {product.variants.map((v, idx) => (
                   <button
                     key={idx}
                     onClick={(e) => {
                       e.preventDefault();
-                      setSelectedColor(c.name);
+                      setSelectedSize(v.size);
                     }}
-                    className={`w-3.5 h-3.5 rounded-full border transition-all ${
-                      selectedColor === c.name
-                        ? 'ring-2 ring-orange-500 scale-110 border-slate-900 dark:border-white'
-                        : 'border-slate-300 dark:border-white/20 opacity-70 hover:opacity-100'
-                    }`}
-                    style={{ backgroundColor: c.hex }}
-                    title={c.name}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Sizes */}
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400 dark:text-white/40 font-mono text-[11px]">SIZE</span>
-              <div className="flex items-center gap-1">
-                {product.sizes.map((s) => (
-                  <button
-                    key={s}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSelectedSize(s);
-                    }}
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
-                      selectedSize === s
+                    className={`px-2 py-1 rounded text-[10px] font-mono font-bold transition-all ${
+                      selectedSize === v.size
                         ? 'bg-orange-500 text-white'
                         : 'bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
-                    {s}
+                    {v.size} — {formatPrice(v.price)}
                   </button>
                 ))}
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Colors */}
+                {product.colors?.length > 0 && (
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 dark:text-white/40 font-mono text-[11px]">COLOR</span>
+                    <div className="flex items-center gap-1.5">
+                      {product.colors.map((c, idx) => (
+                        <button
+                          key={idx}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setSelectedColor(c.name);
+                          }}
+                          className={`w-3.5 h-3.5 rounded-full border transition-all ${
+                            selectedColor === c.name
+                              ? 'ring-2 ring-orange-500 scale-110 border-slate-900 dark:border-white'
+                              : 'border-slate-300 dark:border-white/20 opacity-70 hover:opacity-100'
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Sizes */}
+                {product.sizes?.length > 0 && (
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 dark:text-white/40 font-mono text-[11px]">SIZE</span>
+                    <div className="flex items-center gap-1">
+                      {product.sizes.map((s) => (
+                        <button
+                          key={s}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setSelectedSize(s);
+                          }}
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                            selectedSize === s
+                              ? 'bg-orange-500 text-white'
+                              : 'bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Card Action Link (No Price Display as Requested) */}

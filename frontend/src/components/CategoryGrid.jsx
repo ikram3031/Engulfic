@@ -1,10 +1,35 @@
 'use client';
 
 import { Link } from 'react-router-dom';
-import { CATEGORY_METADATA } from '@/lib/products';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCategories } from '@/lib/api';
 import { ArrowRight, Sparkles, FolderTree } from 'lucide-react';
 
 export default function CategoryGrid() {
+  const { data: categories = [], isLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories
+  });
+
+  if (isLoading) {
+    return (
+      <section id="categories-section" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+          <div>
+            <div className="w-32 h-4 bg-slate-200 dark:bg-white/10 rounded-full mb-2 animate-pulse" />
+            <div className="w-64 h-10 bg-slate-200 dark:bg-white/10 rounded-lg animate-pulse" />
+          </div>
+          <div className="w-48 h-4 bg-slate-200 dark:bg-white/10 rounded-full animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 lg:gap-6">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-[420px] sm:h-[460px] rounded-3xl bg-slate-200 dark:bg-white/5 animate-pulse" />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="categories-section" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Header Section */}
@@ -25,14 +50,14 @@ export default function CategoryGrid() {
 
       {/* Grid: 3 Columns on Tablet/Desktop, 1 Column on Mobile */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 lg:gap-6">
-        {CATEGORY_METADATA.map((cat, idx) => (
+        {categories.map((cat, idx) => (
           <div
-            key={cat.id}
+            key={cat.id || cat.slug}
             className="group relative h-[420px] sm:h-[460px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl transition-all duration-500 hover:shadow-2xl hover:border-orange-500/50 flex flex-col justify-between p-5 sm:p-6"
           >
             {/* Background Image with Scale Animation */}
             <img
-              src={cat.image}
+              src={cat.imageUrl}
               alt={cat.name}
               className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
               referrerPolicy="no-referrer"
@@ -47,7 +72,7 @@ export default function CategoryGrid() {
                 0{idx + 1}. CATEGORY
               </span>
               <span className="px-2.5 py-1 bg-orange-500/90 text-white text-[10px] sm:text-[11px] font-mono font-bold uppercase rounded-full tracking-wider shadow-lg">
-                {cat.itemCount}
+                {cat.productCount}
               </span>
             </div>
 
@@ -87,7 +112,7 @@ export default function CategoryGrid() {
 
               <div className="pt-1 flex items-center justify-between">
                 <p className="text-xs text-white/70 font-mono line-clamp-1">
-                  {cat.tagline}
+                  {cat.description}
                 </p>
                 <Link
                   href={`/category/${cat.slug}`}

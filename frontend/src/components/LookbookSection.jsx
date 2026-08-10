@@ -1,13 +1,18 @@
 'use client';
 
 import { Sparkles, ShoppingCart, Eye } from 'lucide-react';
-import { PRODUCTS } from '@/lib/products';
+import { useQuery } from '@tanstack/react-query';
+import { fetchProducts } from '@/lib/api';
 
 export default function LookbookSection({ onQuickView }) {
-  // Find products featured in the lookbook hotspots
-  const trench = PRODUCTS.find((p) => p.id === 'sw-01') || PRODUCTS[0];
-  const boots = PRODUCTS.find((p) => p.id === 'bp-01') || PRODUCTS[1];
-  const bag = PRODUCTS.find((p) => p.id === 'sh-01') || PRODUCTS[2];
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['lookbookProducts'],
+    queryFn: () => fetchProducts({ limit: 3 }),
+  });
+
+  const trench = products[0];
+  const boots = products[1];
+  const bag = products[2];
 
   return (
     <section id="lookbook" className="bg-[#050505] py-20 border-t border-white/10 text-white relative">

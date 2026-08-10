@@ -1,15 +1,14 @@
 'use client';
 
 import { useFilterStore } from '@/store/useFilterStore';
-import { CATEGORIES } from '@/lib/products';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCategories } from '@/lib/api';
 import { SlidersHorizontal, RotateCcw, Check } from 'lucide-react';
 
 export default function CategoryPills({ totalResults }) {
   const {
     category,
     setCategory,
-    selectedGender,
-    setSelectedGender,
     sortBy,
     setSortBy,
     inStockOnly,
@@ -17,33 +16,18 @@ export default function CategoryPills({ totalResults }) {
     resetFilters,
   } = useFilterStore();
 
-  const genderOptions = ['All', 'Men', 'Women', 'Unisex'];
+  const { data: categoryData = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories
+  });
+
+  const categoryList = ['All', ...categoryData.map(c => c.name)];
 
   return (
     <div id="catalog-section" className="bg-slate-100 dark:bg-white/5 backdrop-blur-md border-y border-slate-200 dark:border-white/10 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-4">
-        {/* Top Row: Gender Segment Control + Sort & Reset */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          {/* Gender Filter Pills */}
-          <div className="flex items-center gap-1.5 bg-slate-200 dark:bg-black/40 p-1.5 rounded-full border border-slate-300 dark:border-white/10 backdrop-blur-xl">
-            {genderOptions.map((g) => {
-              const active = selectedGender === g;
-              return (
-                <button
-                  key={g}
-                  onClick={() => setSelectedGender(g)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all ${
-                    active
-                      ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                      : 'text-slate-700 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {g}
-                </button>
-              );
-            })}
-          </div>
-
+        {/* Top Row: Sort & Reset */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-4">
           {/* Sort & Quick Controls */}
           <div className="flex flex-wrap items-center gap-3 text-xs w-full sm:w-auto justify-between sm:justify-end">
             <button
@@ -92,7 +76,7 @@ export default function CategoryPills({ totalResults }) {
 
         {/* Categories Bar */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 border-t border-slate-200 dark:border-white/10">
-          {CATEGORIES.map((cat) => {
+          {categoryList.map((cat) => {
             const isSelected = category === cat;
             return (
               <button
@@ -115,7 +99,7 @@ export default function CategoryPills({ totalResults }) {
           <span>
             Showing <strong className="text-slate-900 dark:text-white font-mono">{totalResults ?? 0}</strong> curated garments
           </span>
-          {(category !== 'All' || selectedGender !== 'All' || inStockOnly || sortBy !== 'featured') && (
+          {(category !== 'All' || inStockOnly || sortBy !== 'featured') && (
             <span className="text-orange-500 text-[11px] font-mono">Filters active</span>
           )}
         </div>

@@ -7,7 +7,8 @@ import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { CATEGORY_METADATA } from '@/lib/products';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCategories } from '@/lib/api';
 import {
   ShoppingCart,
   Heart,
@@ -30,9 +31,9 @@ export default function Navbar({ onOpenSearch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
-  const [collectionsOpen, setCollectionsOpen] = useState(false);
 
   const pathname = useLocation();
+  const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories });
 
   const totalCartCount = useCartStore((state) => state.getTotalItemsCount());
   const toggleCart = useCartStore((state) => state.toggleCart);
@@ -294,142 +295,15 @@ export default function Navbar({ onOpenSearch }) {
 
                   {/* Shop Mega Menu Dropdown Container */}
                   <div className="fixed left-0 right-0 top-32 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-zinc-800 shadow-2xl p-8 z-50 text-slate-900 dark:text-white animate-fadeIn">
-                    <div className="max-w-7xl mx-auto grid grid-cols-5 gap-6 text-left">
-                      {/* Sweatshirts Column */}
-                      <div className="space-y-3">
-                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                          Sweatshirts
-                        </h4>
-                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                          <li>
-                            <Link href={`/category/sweatshirts?sub=${encodeURIComponent('Oversized Sweatshirt')}`} className="hover:text-orange-500 transition block">
-                              Oversized Sweatshirt
-                            </Link>
-                          </li>
-                          <li>
-                            <Link href={`/category/sweatshirts?sub=${encodeURIComponent('Oversized Graphic Sweatshirt')}`} className="hover:text-orange-500 transition block">
-                              Oversized Graphic Sweatshirt
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
-
-                      {/* Baggy Pants Column */}
-                      <div className="space-y-3">
-                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                          Baggy Pants
-                        </h4>
-                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                          <li>
-                            <Link href={`/category/pants?sub=${encodeURIComponent('Baggy Sweatpants')}`} className="hover:text-orange-500 transition block">
-                              Baggy Sweatpants
-                            </Link>
-                          </li>
-                          <li>
-                            <Link href={`/category/pants?sub=${encodeURIComponent('Baggy Graphic Sweatpants')}`} className="hover:text-orange-500 transition block">
-                              Baggy Graphic Sweatpants
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
-
-                      {/* Shirts Column */}
-                      <div className="space-y-3">
-                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                          Shirts
-                        </h4>
-                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                          <li>
-                            <Link href={`/category/shirts?sub=${encodeURIComponent('Oversized Shirt')}`} className="hover:text-orange-500 transition block">
-                              Oversized Shirt
-                            </Link>
-                          </li>
-                          <li>
-                            <Link href={`/category/shirts?sub=${encodeURIComponent('Casual Shirt')}`} className="hover:text-orange-500 transition block">
-                              Casual Shirt
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
-
-                      {/* Drop Shoulder T-Shirts Column */}
-                      <div className="space-y-3">
-                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                          Drop Shoulder T-Shirts
-                        </h4>
-                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                          <li>
-                            <Link href={`/category/tees?sub=${encodeURIComponent('Drop Shoulder Tee')}`} className="hover:text-orange-500 transition block">
-                              Drop Shoulder Tee
-                            </Link>
-                          </li>
-                          <li>
-                            <Link href={`/category/tees?sub=${encodeURIComponent('Graphic Drop Shoulder Tee')}`} className="hover:text-orange-500 transition block">
-                              Graphic Drop Shoulder Tee
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
-
-                      {/* Jerseys Column */}
-                      <div className="space-y-3">
-                        <h4 className="text-xs font-black text-orange-500 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800">
-                          Jerseys
-                        </h4>
-                        <ul className="space-y-2 text-xs font-medium text-slate-600 dark:text-zinc-300">
-                          <li>
-                            <Link href={`/category/jerseys?sub=${encodeURIComponent('Player Edition Jersey')}`} className="hover:text-orange-500 transition block">
-                              Player Edition Jersey
-                            </Link>
-                          </li>
-                          <li>
-                            <Link href={`/category/jerseys?sub=${encodeURIComponent('Fan Edition Jersey')}`} className="hover:text-orange-500 transition block">
-                              Fan Edition Jersey
-                            </Link>
-                          </li>
-                          <li>
-                            <Link href={`/category/jerseys?sub=${encodeURIComponent('Retro Jersey')}`} className="hover:text-orange-500 transition block">
-                              Retro Edition Jersey
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
+                    <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 text-left">
+                      {categories.map((cat) => (
+                        <div key={cat._id} className="space-y-3">
+                          <Link to={`/category/${cat.slug}`} className="text-xs font-black hover:text-orange-500 text-slate-800 dark:text-zinc-200 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800 block transition-colors">
+                            {cat.name}
+                          </Link>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                </div>
-
-                {/* 7. COLLECTIONS (DROPDOWN) */}
-                <div className="group py-3.5 relative cursor-pointer">
-                  <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
-                    Collections
-                    <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
-                  </span>
-
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-60 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
-                    <Link to="/catalog" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-bold text-orange-500 uppercase border-b border-slate-200 dark:border-zinc-800 pb-2 mb-1">
-                      Full Catalog ↗
-                    </Link>
-                    <Link to="/category/new-arrivals" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      New Arrivals
-                    </Link>
-                    <Link to="/category/best-sellers" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Best Sellers
-                    </Link>
-                    <Link to="/category/essentials" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Essentials
-                    </Link>
-                    <Link to="/category/graphic-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Graphic Collection
-                    </Link>
-                    <Link to="/category/oversized-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Oversized Collection
-                    </Link>
-                    <Link to="/category/sports-collection" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Sports Collection
-                    </Link>
-                    <Link to="/category/limited-edition" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium text-orange-500 font-bold">
-                      Limited Edition
-                    </Link>
                   </div>
                 </div>
 
@@ -511,51 +385,17 @@ export default function Navbar({ onOpenSearch }) {
                   <ChevronDown className={`w-4 h-4 text-orange-500 transition-transform duration-200 ${shopOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {shopOpen && (
-                  <div className="pl-3 space-y-2 text-[11px] capitalize normal-case text-slate-600 dark:text-zinc-400 animate-fadeIn pt-1">
-                    <div className="font-bold text-slate-800 dark:text-zinc-200">Sweatshirts</div>
-                    <Link href={`/category/sweatshirts?sub=${encodeURIComponent('Oversized Sweatshirt')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Oversized Sweatshirt</Link>
-                    <Link href={`/category/sweatshirts?sub=${encodeURIComponent('Oversized Graphic Sweatshirt')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Oversized Graphic Sweatshirt</Link>
-
-                    <div className="font-bold text-slate-800 dark:text-zinc-200 pt-1">Baggy Pants</div>
-                    <Link href={`/category/pants?sub=${encodeURIComponent('Baggy Sweatpants')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Baggy Sweatpants</Link>
-                    <Link href={`/category/pants?sub=${encodeURIComponent('Baggy Graphic Sweatpants')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Baggy Graphic Sweatpants</Link>
-
-                    <div className="font-bold text-slate-800 dark:text-zinc-200 pt-1">Shirts</div>
-                    <Link href={`/category/shirts?sub=${encodeURIComponent('Oversized Shirt')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Oversized Shirt</Link>
-                    <Link href={`/category/shirts?sub=${encodeURIComponent('Casual Shirt')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Casual Shirt</Link>
-
-                    <div className="font-bold text-slate-800 dark:text-zinc-200 pt-1">Drop Shoulder T-Shirts</div>
-                    <Link href={`/category/tees?sub=${encodeURIComponent('Drop Shoulder Tee')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Drop Shoulder Tee</Link>
-                    <Link href={`/category/tees?sub=${encodeURIComponent('Graphic Drop Shoulder Tee')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Graphic Drop Shoulder Tee</Link>
-
-                    <div className="font-bold text-slate-800 dark:text-zinc-200 pt-1">Jerseys</div>
-                    <Link href={`/category/jerseys?sub=${encodeURIComponent('Player Edition Jersey')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Player Edition</Link>
-                    <Link href={`/category/jerseys?sub=${encodeURIComponent('Fan Edition Jersey')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Fan Edition</Link>
-                    <Link href={`/category/jerseys?sub=${encodeURIComponent('Retro Jersey')}`} onClick={() => setMobileMenuOpen(false)} className="block pl-2 hover:text-orange-500">Retro Edition</Link>
-                  </div>
-                )}
-              </div>
-
-              {/* Collections Section Accordion */}
-              <div className="py-2 border-b border-slate-100 dark:border-white/5 space-y-1">
-                <button
-                  type="button"
-                  onClick={() => setCollectionsOpen(!collectionsOpen)}
-                  className="w-full text-orange-500 font-extrabold text-xs flex items-center justify-between focus:outline-none"
-                >
-                  <span>Collections</span>
-                  <ChevronDown className={`w-4 h-4 text-orange-500 transition-transform duration-200 ${collectionsOpen ? 'rotate-180' : ''}`} />
-                </button>
-                {collectionsOpen && (
-                  <div className="pl-3 space-y-1 text-[11px] capitalize normal-case text-slate-600 dark:text-zinc-400 animate-fadeIn pt-1">
-                    <Link to="/catalog" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500 uppercase">Full Catalog ↗</Link>
-                    <Link to="/category/new-arrivals" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">New Arrivals</Link>
-                    <Link to="/category/best-sellers" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Best Sellers</Link>
-                    <Link to="/category/essentials" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Essentials</Link>
-                    <Link to="/category/graphic-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Graphic Collection</Link>
-                    <Link to="/category/oversized-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Oversized Collection</Link>
-                    <Link to="/category/sports-collection" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500">Sports Collection</Link>
-                    <Link to="/category/limited-edition" onClick={() => setMobileMenuOpen(false)} className="block hover:text-orange-500 font-bold text-orange-500">Limited Edition</Link>
+                  <div className="pl-3 space-y-3 text-[11px] capitalize normal-case text-slate-600 dark:text-zinc-400 animate-fadeIn pt-1 pb-2">
+                    {categories.map((cat) => (
+                      <Link 
+                        key={cat._id}
+                        to={`/category/${cat.slug}`} 
+                        onClick={() => setMobileMenuOpen(false)} 
+                        className="block font-bold text-slate-800 dark:text-zinc-200 hover:text-orange-500 transition-colors"
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>

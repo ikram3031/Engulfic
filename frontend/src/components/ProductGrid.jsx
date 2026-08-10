@@ -7,11 +7,11 @@ import ProductCard from './ProductCard';
 import { PackageX, Loader2 } from 'lucide-react';
 
 export default function ProductGrid({ onShowToast, onTotalResultsChange }) {
-  const { category, searchQuery, sortBy, inStockOnly, selectedGender } = useFilterStore();
+  const { category, searchQuery, sortBy, inStockOnly } = useFilterStore();
 
   const { data: products = [], isLoading, isError, error } = useQuery({
-    queryKey: ['products', { category, searchQuery, sortBy, inStockOnly, selectedGender }],
-    queryFn: () => fetchProducts({ category, searchQuery, sortBy, inStockOnly, gender: selectedGender }),
+    queryKey: ['products', { category, searchQuery, sortBy, inStockOnly }],
+    queryFn: () => fetchProducts({ category, searchQuery, sortBy, inStockOnly }),
   });
 
   // Notify parent of total results

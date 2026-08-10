@@ -8,99 +8,27 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { PRODUCTS, CATEGORY_METADATA } from '@/lib/products';
+import { useQuery } from '@tanstack/react-query';
+import { fetchProducts, fetchCategories } from '@/lib/api';
 import { Sparkles, SlidersHorizontal, Search, ArrowUpDown, Grid, LayoutList } from 'lucide-react';
 
 export default function CatalogPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedSubcategory, setSelectedSubcategory] = useState('All');
-  const [selectedGender, setSelectedGender] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('featured');
-  const [toastMessage, setToastMessage] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories
+  });
 
-  // Get available subcategories based on selected category
-  const availableSubcategories = useMemo(() => {
-    if (selectedCategory === 'All') {
-      const subs = new Set();
-      PRODUCTS.forEach((p) => {
-        if (p.subcategory) subs.add(p.subcategory);
-      });
-      return Array.from(subs);
-    }
-    const cat = CATEGORY_METADATA.find(
-      (c) => c.name.toLowerCase() === selectedCategory.toLowerCase() || c.slug === selectedCategory.toLowerCase()
-    );
-    return cat ? cat.subcategories || [] : [];
-  }, [selectedCategory]);
+  const { data: filteredProducts = [], isLoading: isLoadingProducts } = useQuery({
+    queryKey: ['products', selectedCategory, searchQuery, sortBy],
+    queryFn: () => fetchProducts({ 
+      category: selectedCategory !== 'All' ? selectedCategory.toLowerCase() : undefined, 
+      searchQuery: searchQuery || undefined, 
+      sortBy 
+    })
+  });
 
-  // Filter products
-  const filteredProducts = useMemo(() => {
-    let result = [...PRODUCTS];
-
-    // Category Filter
-    if (selectedCategory !== 'All') {
-      const lowerCat = selectedCategory.toLowerCase();
-      result = result.filter((p) => {
-        const pCat = p.category.toLowerCase();
-        const pSlug = (p.categorySlug || '').toLowerCase();
-        if (lowerCat === 'new arrivals') return p.isNew;
-        if (lowerCat === 'sale') return p.originalPrice > p.price;
-        return pCat === lowerCat || pSlug === lowerCat;
-      });
-    }
-
-    // Subcategory Filter
-    if (selectedSubcategory !== 'All') {
-      const lowerSub = selectedSubcategory.toLowerCase();
-      result = result.filter((p) => {
-        if (!p.subcategory) return false;
-        return p.subcategory.toLowerCase().includes(lowerSub);
-      });
-    }
-
-    // Gender Filter
-    if (selectedGender !== 'All') {
-      result = result.filter(
-        (p) => p.gender === selectedGender || p.gender === 'Unisex'
-      );
-    }
-
-    // Search Query Filter
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          (p.subcategory && p.subcategory.toLowerCase().includes(q)) ||
-          p.description.toLowerCase().includes(q)
-      );
-    }
-
-    // Sorting
-    if (sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === 'newest') {
-      result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-    } else if (sortBy === 'name-asc') {
-      result.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return result;
-  }, [selectedCategory, selectedSubcategory, selectedGender, searchQuery, sortBy]);
-
-  const categoriesList = [
-    'All',
-    'Sweatshirts',
-    'Baggy Pants',
-    'Shirts',
-    'Drop Shoulder T-Shirts',
-    'Jerseys',
-    'New Arrivals',
-    'Sale'
-  ];
+  const categoriesList = ['All', ...categories.map(c => c.name)];
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white flex flex-col justify-between transition-colors duration-300">
@@ -122,7 +50,7 @@ export default function CatalogPage() {
                 FULL PRODUCT CATALOG
               </h1>
               <p className="text-xs sm:text-sm font-mono text-slate-500 dark:text-white/60 mt-1">
-                Explore all {PRODUCTS.length} signature Engulfic streetwear garments.
+                Explore all signature Engulfic streetwear garments.
               </p>
             </div>
 
@@ -140,7 +68,6 @@ export default function CatalogPage() {
                 key={cat}
                 onClick={() => {
                   setSelectedCategory(cat);
-                  setSelectedSubcategory('All');
                 }}
                 className={`px-4 py-2 rounded-2xl text-xs font-mono font-bold uppercase transition border shrink-0 ${
                   selectedCategory === cat
@@ -168,39 +95,8 @@ export default function CatalogPage() {
                 />
               </div>
 
-              {/* Subcategory Dropdown */}
-              <div>
-                <select
-                  value={selectedSubcategory}
-                  onChange={(e) => setSelectedSubcategory(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 uppercase"
-                >
-                  <option value="All">All Subcategories</option>
-                  {availableSubcategories.map((sub) => (
-                    <option key={sub} value={sub}>
-                      {sub}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Gender Filter */}
-              <div className="flex items-center bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl p-1 text-xs font-mono">
-                {['All', 'Unisex', 'Mens', 'Womens'].map((g) => (
-                  <button
-                    key={g}
-                    onClick={() => setSelectedGender(g)}
-                    className={`flex-1 py-1.5 rounded-xl transition text-[11px] font-bold ${
-                      selectedGender === g
-                        ? 'bg-orange-500 text-white shadow-sm'
-                        : 'text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    {g}
-                  </button>
-                ))}
-              </div>
-
+              <div className="hidden lg:block lg:col-span-2"></div>
+              
               {/* Sort By Dropdown */}
               <div>
                 <select
@@ -218,7 +114,13 @@ export default function CatalogPage() {
           </div>
 
           {/* Product Cards Grid */}
-          {filteredProducts.length > 0 ? (
+          {isLoadingProducts ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 pt-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                <div key={n} className="animate-pulse bg-slate-200 dark:bg-white/5 rounded-3xl aspect-[3/4]"></div>
+              ))}
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 pt-4">
               {filteredProducts.map((p) => (
                 <ProductCard
@@ -234,13 +136,11 @@ export default function CatalogPage() {
                 NO MATCHING PIECES FOUND
               </p>
               <p className="text-xs font-mono text-slate-500 dark:text-white/60 max-w-sm mx-auto">
-                Try resetting search query or selecting a different subcategory filter.
+                Try resetting search query.
               </p>
               <button
                 onClick={() => {
                   setSelectedCategory('All');
-                  setSelectedSubcategory('All');
-                  setSelectedGender('All');
                   setSearchQuery('');
                 }}
                 className="px-6 py-2.5 bg-orange-500 text-white rounded-2xl text-xs font-mono font-bold uppercase hover:bg-orange-600 transition"

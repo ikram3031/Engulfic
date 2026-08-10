@@ -1,27 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { PRODUCTS } from '@/lib/products';
+import { useQuery } from '@tanstack/react-query';
+import { fetchProducts } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
 import { Sparkles, TrendingUp } from 'lucide-react';
 
 export default function BestSellingProducts({ onShowToast }) {
-  const [activeTab, setActiveTab] = useState('All');
-
-  // Filter products by Best Sellers or top products, and selected gender tab
-  const bestSellers = PRODUCTS.filter((p) => p.isBestSeller || p.rating >= 4.8);
-
-  const displayedProducts = bestSellers
-    .filter((p) => {
-      if (activeTab === 'Men') {
-        return p.gender === 'Men' || p.gender === 'Unisex';
-      }
-      if (activeTab === 'Women') {
-        return p.gender === 'Women' || p.gender === 'Unisex';
-      }
-      return true; // All
-    })
-    .slice(0, 12); // Display 12 products max
+  const { data: displayedProducts = [], isLoading } = useQuery({
+    queryKey: ['bestSellingProducts'],
+    queryFn: () => fetchProducts({ sortBy: 'newest', limit: 12 })
+  });
 
   return (
     <section id="bestsellers-section" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -37,36 +25,22 @@ export default function BestSellingProducts({ onShowToast }) {
           </h2>
         </div>
 
-        {/* Gender Tabs: All, Men, Women (NO in-stock or sort filters here) */}
-        <div className="flex items-center gap-1.5 bg-slate-200/80 dark:bg-white/5 p-1.5 rounded-full border border-slate-300 dark:border-white/10 backdrop-blur-xl">
-          {['All', 'Men', 'Women'].map((tab) => {
-            const isActive = activeTab === tab;
-            return (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
-                  isActive
-                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                    : 'text-slate-700 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
+
       </div>
 
       {/* Grid: Mobile = 2 products per row (grid-cols-2), Desktop = 4 products per row (lg:grid-cols-4) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
-        {displayedProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onShowToast={onShowToast}
-          />
-        ))}
+        {isLoading
+          ? Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="animate-pulse bg-slate-200 dark:bg-white/10 rounded-3xl aspect-[3/4]" />
+            ))
+          : displayedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onShowToast={onShowToast}
+              />
+            ))}
       </div>
     </section>
   );

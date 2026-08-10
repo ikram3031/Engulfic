@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
-import { Link } from 'react-router-dom';
-import {  useNavigate  } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { PRODUCTS } from '@/lib/products';
+import { useQuery } from '@tanstack/react-query';
+import { fetchProductById, fetchProducts } from '@/lib/api';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
@@ -26,52 +26,39 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-export default function ProductDetailPage({ params }) {
-  const router = useNavigate();
-  const resolvedParams = use(params);
-  const id = resolvedParams.id;
+export default function ProductDetailPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
+  const { data: product, isLoading } = useQuery({
+    queryKey: ['product', id],
+    queryFn: () => fetchProductById(id),
+    enabled: !!id
+  });
 
-  const [activeImage, setActiveImage] = useState(product.image);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || 'Default');
+  const { data: relatedProducts = [] } = useQuery({
+    queryKey: ['products', 'latest'],
+    queryFn: () => fetchProducts({ limit: 4 })
+  });
+
+  const [activeImage, setActiveImage] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  
+  useEffect(() => {
+    if (product) {
+      setActiveImage(product.image);
+      setSelectedSize(product.sizes?.[0] || (product.variants?.[0]?.name) || 'M');
+      setSelectedColor(product.colors?.[0]?.name || 'Default');
+    }
+  }, [product]);
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
-  useEffect(() => {
-    if (!product || !product.id) return;
-
-    try {
-      // Retrieve previously viewed product IDs from session storage
-      const stored = sessionStorage.getItem('engulfic_recently_viewed');
-      let ids = stored ? JSON.parse(stored) : [];
-
-      if (!Array.isArray(ids)) ids = [];
-
-      // Exclude current product ID from history list to display prior visits
-      const previousIds = ids.filter((pId) => pId !== product.id);
-
-      // Resolve product objects from catalog
-      const previousProducts = previousIds
-        .map((pId) => PRODUCTS.find((item) => item.id === pId))
-        .filter(Boolean)
-        .slice(0, 8); // Max 8 items
-
-      setRecentlyViewed(previousProducts);
-
-      // Add current product to the top of session history and save (max 8 items)
-      const updatedIds = [product.id, ...previousIds].slice(0, 8);
-      sessionStorage.setItem('engulfic_recently_viewed', JSON.stringify(updatedIds));
-    } catch (e) {
-      console.error('Recently viewed storage error:', e);
-    }
-  }, [product.id]);
-
   const addToCart = useCartStore((state) => state.addToCart);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
-  const isWishlisted = isInWishlist(product.id);
+  const isWishlisted = product ? isInWishlist(product.id) : false;
 
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColor);
@@ -92,18 +79,21 @@ export default function ProductDetailPage({ params }) {
     setTimeout(() => setToastMessage(''), 3500);
   };
 
-  const categorySlug = product.categorySlug || product.category.toLowerCase().replace(/\s+/g, '-');
-  const relatedProducts = PRODUCTS.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
-
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white flex flex-col justify-between transition-colors duration-300">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
 
       <div className="flex-1">
-        {/* Clickable Breadcrumbs */}
+        {isLoading || !product ? (
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+          </div>
+        ) : (
+          <>
+            {/* Clickable Breadcrumbs */}
         <Breadcrumb
           items={[
-            { label: product.category, href: `/category/${categorySlug}` },
+            { label: product.category, href: `/category/${product.categorySlug || product.category.toLowerCase().replace(/\s+/g, '-')}` },
             { label: product.name }
           ]}
         />
@@ -156,7 +146,7 @@ export default function ProductDetailPage({ params }) {
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-xs font-mono text-orange-500">
                   <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                  <span>{product.category} • {product.gender}</span>
+                  <span>{product.category}</span>
                 </div>
                 <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-wide">
                   {product.name}
@@ -174,59 +164,65 @@ export default function ProductDetailPage({ params }) {
                       {formatPrice(product.originalPrice)}
                     </span>
                   )}
-                  <div className="flex items-center gap-1 bg-orange-500/10 text-orange-500 px-2.5 py-1 rounded-full text-xs font-bold">
-                    <Star className="w-3.5 h-3.5 fill-orange-500" />
-                    <span>{product.rating} ({product.reviewsCount} Reviews)</span>
-                  </div>
+                  {product.rating > 0 && (
+                    <div className="flex items-center gap-1 bg-orange-500/10 text-orange-500 px-2.5 py-1 rounded-full text-xs font-bold">
+                      <Star className="w-3.5 h-3.5 fill-orange-500" />
+                      <span>{product.rating} ({product.reviewsCount} Reviews)</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Color Swatches */}
-              <div className="space-y-3">
-                <div className="flex justify-between items-center text-xs font-mono">
-                  <span className="text-slate-500 dark:text-white/60">SELECT COLOR:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">{selectedColor}</span>
+              {product.colors && product.colors.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-xs font-mono">
+                    <span className="text-slate-500 dark:text-white/60">SELECT COLOR:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{selectedColor}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {product.colors.map((c, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedColor(c.name)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-mono transition ${
+                          selectedColor === c.name
+                            ? 'border-orange-500 bg-orange-500/10 font-bold text-slate-900 dark:text-white'
+                            : 'border-slate-300 dark:border-white/10 text-slate-600 dark:text-white/60'
+                        }`}
+                      >
+                        <span className="w-3.5 h-3.5 rounded-full border border-slate-400" style={{ backgroundColor: c.hex }} />
+                        <span>{c.name}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  {product.colors.map((c, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedColor(c.name)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-mono transition ${
-                        selectedColor === c.name
-                          ? 'border-orange-500 bg-orange-500/10 font-bold text-slate-900 dark:text-white'
-                          : 'border-slate-300 dark:border-white/10 text-slate-600 dark:text-white/60'
-                      }`}
-                    >
-                      <span className="w-3.5 h-3.5 rounded-full border border-slate-400" style={{ backgroundColor: c.hex }} />
-                      <span>{c.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              )}
 
-              {/* Size Selector */}
-              <div className="space-y-3">
-                <div className="flex justify-between items-center text-xs font-mono">
-                  <span className="text-slate-500 dark:text-white/60">SELECT SIZE:</span>
-                  <span className="text-orange-500 underline cursor-pointer">Size Guide</span>
+              {/* Size/Variant Selector */}
+              {(product.sizes?.length > 0 || product.variants?.length > 0) && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-xs font-mono">
+                    <span className="text-slate-500 dark:text-white/60">SELECT SIZE:</span>
+                    <span className="text-orange-500 underline cursor-pointer">Size Guide</span>
+                  </div>
+                  <div className="grid grid-cols-5 gap-2">
+                    {(product.sizes?.length > 0 ? product.sizes : product.variants?.map(v => v.name) || []).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSelectedSize(s)}
+                        className={`py-3 rounded-xl text-xs font-mono font-bold transition border ${
+                          selectedSize === s
+                            ? 'bg-orange-500 text-white border-orange-400 shadow-lg'
+                            : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white hover:border-orange-500'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="grid grid-cols-5 gap-2">
-                  {product.sizes.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSelectedSize(s)}
-                      className={`py-3 rounded-xl text-xs font-mono font-bold transition border ${
-                        selectedSize === s
-                          ? 'bg-orange-500 text-white border-orange-400 shadow-lg'
-                          : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white hover:border-orange-500'
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              )}
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
@@ -268,16 +264,28 @@ export default function ProductDetailPage({ params }) {
                     {product.description}
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200 dark:border-white/10">
-                  <div>
-                    <span className="text-slate-500 dark:text-white/50 block">FABRIC:</span>
-                    <span className="text-slate-900 dark:text-white font-bold">{product.fabric}</span>
+                {(product.fabric || product.fit || product.care) && (
+                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200 dark:border-white/10">
+                    {product.fabric && (
+                      <div>
+                        <span className="text-slate-500 dark:text-white/50 block">FABRIC:</span>
+                        <span className="text-slate-900 dark:text-white font-bold">{product.fabric}</span>
+                      </div>
+                    )}
+                    {product.fit && (
+                      <div>
+                        <span className="text-slate-500 dark:text-white/50 block">FIT:</span>
+                        <span className="text-slate-900 dark:text-white font-bold">{product.fit}</span>
+                      </div>
+                    )}
+                    {product.care && (
+                      <div className="col-span-2">
+                        <span className="text-slate-500 dark:text-white/50 block">CARE:</span>
+                        <span className="text-slate-900 dark:text-white font-bold">{product.care}</span>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <span className="text-slate-500 dark:text-white/50 block">FIT:</span>
-                    <span className="text-slate-900 dark:text-white font-bold">{product.fit}</span>
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Guarantees */}
@@ -297,42 +305,24 @@ export default function ProductDetailPage({ params }) {
               </div>
             </div>
           </div>
-
-          {/* Related Products Section */}
-          {relatedProducts.length > 0 && (
-            <div className="mt-20 pt-10 border-t border-slate-200 dark:border-white/10 space-y-8">
-              <h2 className="text-2xl font-black uppercase tracking-wide">
-                MORE FROM {product.category.toUpperCase()}
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {relatedProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} onShowToast={(msg) => setToastMessage(msg)} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recently Viewed Products Section */}
-          {recentlyViewed.length > 0 && (
-            <div className="mt-16 pt-10 border-t border-slate-200 dark:border-white/10 space-y-8">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-black uppercase tracking-wide flex items-center gap-3">
-                  <span>RECENTLY VIEWED</span>
-                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20">
-                    {recentlyViewed.length} {recentlyViewed.length === 1 ? 'PIECE' : 'PIECES'}
-                  </span>
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recentlyViewed.map((p) => (
-                  <ProductCard key={p.id} product={p} onShowToast={(msg) => setToastMessage(msg)} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
-      </div>
+
+        {/* Related Products Section */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-20 pt-10 border-t border-slate-200 dark:border-white/10 space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-black uppercase tracking-wide">
+              MORE FROM {product.category.toUpperCase()}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((p) => (
+                <ProductCard key={p.id} product={p} onShowToast={(msg) => setToastMessage(msg)} />
+              ))}
+            </div>
+          </div>
+        )}
+        </>
+      )}
+    </div>
 
       <Footer />
 
