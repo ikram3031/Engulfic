@@ -22,16 +22,13 @@ ssh -i "C:\Users\mdikr\.ssh\engulfic" root@144.79.218.8
 
 
 # ── INDIVIDUAL SERVICE BUILD ──────────────────────────────────
-# make build-backend
-# make build-frontend
-# make build-dashboard
+# make build-fg           ← frontend build
 
 
 # ── MONITORING ───────────────────────────────────────────────
 # make status             ← container status
 # make logs               ← all logs (live)
-# make logs-backend
-# make logs-frontend
+# make logs-fg            ← frontend logs
 
 
 # ── NGINX (on VPS host) ──────────────────────────────────────
@@ -44,16 +41,10 @@ ssh -i "C:\Users\mdikr\.ssh\engulfic" root@144.79.218.8
 # ── SSL — CERTBOT (run once after DNS is pointed) ────────────
 # apt install certbot python3-certbot-nginx -y
 # certbot --nginx \
-#   -d engulfic.com -d www.engulfic.com \
-#   -d server.engulfic.com
-
-
-# ── UPLOADS VOLUME ────────────────────────────────────────────
-# mkdir -p /engulf/uploads
+#   -d engulfic.com -d www.engulfic.com
 
 
 # ── USEFUL DOCKER COMMANDS ────────────────────────────────────
 # docker ps
-# docker compose logs -f backend
-# docker compose exec backend sh
-# docker compose exec mongodb mongosh -u admin -p
+# docker compose logs -f
+# docker compose exec frontend sh

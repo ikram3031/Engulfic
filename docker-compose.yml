@@ -6,50 +6,6 @@
 
 services:
 
-  mongodb:
-    image: mongo:7.0
-    container_name: ${MONGODB_CONTAINER_NAME:-engulfic-mongodb}
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-engulfic_dev_pass_2024}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-engulfic-db}
-    ports:
-      - "${MONGODB_PORT:-27017}:27017"
-    volumes:
-      - engulfic-mongodb-data:/data/db
-    networks:
-      - engulfic-net
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 20s
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: ${BACKEND_CONTAINER_NAME:-engulfic-backend}
-    restart: always
-    env_file: .env
-    environment:
-      PORT: ${BACKEND_PORT:-5092}
-      MONGODB_URI: ${MONGODB_URI}
-      MONGODB_DB_NAME: ${MONGODB_DB_NAME:-engulfic-db}
-      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
-      NODE_ENV: ${NODE_ENV:-development}
-    ports:
-      - "${BACKEND_PORT:-5092}:5092"
-    volumes:
-      - ${UPLOADS_PATH:-/engulf/uploads}:/app/uploads
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    networks:
-      - engulfic-net
-
   frontend:
     build:
       context: ./frontend
@@ -60,30 +16,9 @@ services:
     restart: always
     ports:
       - "${FRONTEND_PORT:-8001}:8001"
-    depends_on:
-      - backend
-    networks:
-      - engulfic-net
-
-  dashboard:
-    build:
-      context: ./dashboard
-      dockerfile: Dockerfile
-      args:
-        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-https://server.engulfic.com}
-    container_name: engulfic-dashboard
-    restart: always
-    ports:
-      - "8005:80"
-    depends_on:
-      - backend
     networks:
       - engulfic-net
 
 networks:
   engulfic-net:
     driver: bridge
-
-volumes:
-  engulfic-mongodb-data:
-    driver: local
