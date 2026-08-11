@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AppProvider } from './core/context/AppContext';
 
 // Pages
 import Home from './pages/Home';
@@ -20,9 +21,10 @@ import Wishlist from './pages/Wishlist';
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="flex flex-col min-h-screen">
-        <main className="flex-grow">
+    <AppProvider>
+      <BrowserRouter>
+        <div className="flex flex-col min-h-screen">
+          <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
@@ -43,6 +45,7 @@ function App() {
         </main>
       </div>
     </BrowserRouter>
+    </AppProvider>
   );
 }
 

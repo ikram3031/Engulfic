@@ -11,6 +11,7 @@ import SearchModal from '@/components/SearchModal';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatPrice } from '@/lib/utils';
+import { createOrder } from '@/core/lib/api';
 import {
   ShoppingCart,
   ShieldCheck,
@@ -196,7 +197,7 @@ export default function CheckoutPage() {
   };
 
   // Final Order Submit handler
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
 
     // Verify billing address fields
@@ -213,41 +214,59 @@ export default function CheckoutPage() {
       }
     }
 
-    // =========================================================================
-    // ORDER API CALL COMMENTED OUT FOR TESTING (FORWARD DIRECTLY TO THANK YOU):
-    // const orderPayload = { cart, billingForm, shippingForm, grandTotal, shippingCost, discount };
-    // const response = await fetch('/api/orders/create', { method: 'POST', body: JSON.stringify(orderPayload) });
-    // =========================================================================
+    try {
+      // Build order payload for backend Order API submission
+      const orderPayload = {
+        items: cart.map(item => ({
+          product: item.id || item._id,
+          name: item.name,
+          size: item.selectedSize || 'Standard',
+          price: item.price,
+          quantity: item.quantity
+        })),
+        shippingAddress: shipToDifferent ? shippingForm : billingForm,
+        billingAddress: billingForm,
+        subtotal,
+        shippingFee: shippingCost,
+        discount,
+        promoCode,
+        totalAmount: grandTotal,
+        paymentMethod: 'COD' // Cash on Delivery
+      };
 
-    // Generate Order ID & Snapshot for Invoice
-    const generatedId = `ENG-${Math.floor(100000 + Math.random() * 900000)}`;
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+      const response = await createOrder(orderPayload);
+      const generatedId = response.data?.orderId || response.orderId || `ENG-${Math.floor(100000 + Math.random() * 900000)}`;
 
-    const summaryData = {
-      orderId: generatedId,
-      date: formattedDate,
-      items: [...cart],
-      billing: { ...billingForm },
-      shipping: shipToDifferent ? { ...shippingForm } : { ...billingForm },
-      shippingInfo: { ...shippingInfo },
-      subtotal,
-      discount,
-      promoCode,
-      shippingCost,
-      grandTotal
-    };
+      const now = new Date();
+      const formattedDate = now.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 
-    setOrderId(generatedId);
-    setOrderSummary(summaryData);
-    setStep(2);
-    clearCart();
+      const summaryData = {
+        orderId: generatedId,
+        date: formattedDate,
+        items: [...cart],
+        billing: { ...billingForm },
+        shipping: shipToDifferent ? { ...shippingForm } : { ...billingForm },
+        shippingInfo: { ...shippingInfo },
+        subtotal,
+        discount,
+        promoCode,
+        shippingCost,
+        grandTotal
+      };
+
+      setOrderId(generatedId);
+      setOrderSummary(summaryData);
+      setStep(2);
+      clearCart();
+    } catch (err) {
+      setToastMessage(err.message || 'Failed to place order. Please try again.');
+    }
   };
 
   return (

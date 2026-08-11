@@ -1,30 +1,196 @@
 'use client';
 
-import { useState } from 'react';
-import { X, User, ShieldCheck, Tag, Sparkles, CheckCircle2, ArrowRight, LogIn, Heart, ShoppingCart, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, User, ShieldCheck, Tag, Sparkles, CheckCircle2, LogIn, Heart, ShoppingCart, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
+import { checkMemberEmail, loginMember, registerMember, verifyMemberOtp, resendMemberOtp, forgotMemberPassword, resetMemberPassword } from '@/core/lib/api';
 
 export default function ProfileModal({ isOpen, onClose, onShowToast }) {
   const { isLoggedIn, user, login, logout } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  
+  // Auth Modes: 'check-email' | 'login' | 'register' | 'otp' | 'forgot' | 'reset'
+  const [mode, setMode] = useState('check-email');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpContext, setOtpContext] = useState(''); // 'login' | 'register' | 'forgot'
+  const [resendTimer, setResendTimer] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  // Countdown timer for OTP resend capability
+  useEffect(() => {
+    let interval;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   if (!isOpen) return null;
 
-  const handleLogin = (e) => {
+  // Step 1: Check if the email exists on the backend
+  const handleCheckEmail = async (e) => {
     e.preventDefault();
     if (!email) return;
-    const loggedUser = login(email);
-    if (onShowToast) {
-      onShowToast(`Welcome back, ${loggedUser.name}! 5% extra discount unlocked.`);
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      const response = await checkMemberEmail({ email });
+      // If verification or OTP is required, route to OTP screen
+      if (response.requiresOtp || response.isEmailVerified === false) {
+        setOtpContext('login');
+        setMode('otp');
+        setResendTimer(180);
+      } else {
+        // Email exists and is verified, route to password input for login
+        setMode('login');
+      }
+    } catch (err) {
+      // If email doesn't exist, route to registration screen
+      setMode('register');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    if (onShowToast) {
-      onShowToast('Signed out of Engulfic Member Account');
+  // Step 2 (Option A): Log in with credentials
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      const response = await loginMember({ email, password });
+      if (response.requiresOtp || response.isEmailVerified === false) {
+        setOtpContext('login');
+        setMode('otp');
+        setResendTimer(180);
+      } else {
+        const tokenBundle = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken
+        };
+        const memberData = response.member || response.data || response;
+        login(memberData, tokenBundle);
+        if (onShowToast) {
+          onShowToast(`Welcome back, ${memberData.name}! 5% extra discount unlocked.`);
+        }
+        onClose();
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Step 2 (Option B): Register a new member
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      await registerMember({ name, email, phone, password });
+      setOtpContext('register');
+      setMode('otp');
+      setResendTimer(180);
+      if (onShowToast) {
+        onShowToast('Verification OTP sent to your email.');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Registration failed.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Step 3: Verify the 6-digit OTP code
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      const response = await verifyMemberOtp({ email, otp: otpCode, context: otpContext });
+      if (otpContext === 'forgot') {
+        setMode('reset');
+      } else {
+        const tokenBundle = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken
+        };
+        const memberData = response.member || response.data || response;
+        login(memberData, tokenBundle);
+        if (onShowToast) {
+          onShowToast('Account successfully verified and logged in!');
+        }
+        onClose();
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Invalid OTP code.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Resend OTP handler
+  const handleResendOtp = async () => {
+    if (resendTimer > 0) return;
+    setErrorMsg('');
+    try {
+      await resendMemberOtp({ email, context: otpContext });
+      setResendTimer(180);
+      if (onShowToast) {
+        onShowToast('New OTP has been dispatched.');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to resend OTP.');
+    }
+  };
+
+  // Forgot password initialization
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setErrorMsg('Please enter your email first.');
+      return;
+    }
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      await forgotMemberPassword({ email });
+      setOtpContext('forgot');
+      setMode('otp');
+      setResendTimer(180);
+      if (onShowToast) {
+        onShowToast('Password reset OTP sent.');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to send password reset request.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset password submission
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      await resetMemberPassword({ email, password, otp: otpCode });
+      if (onShowToast) {
+        onShowToast('Password reset successful. Please log in.');
+      }
+      setMode('login');
+      setPassword('');
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to reset password.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,66 +207,225 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
           <X className="w-5 h-5" />
         </button>
 
+        {errorMsg && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-mono rounded-xl">
+            {errorMsg}
+          </div>
+        )}
+
         {!isLoggedIn ? (
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div className="text-center space-y-2">
-              <div className="inline-flex p-3 bg-orange-500/10 text-orange-500 rounded-full border border-orange-500/20 mb-1">
-                <User className="w-8 h-8" />
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-600 dark:text-orange-400 font-mono text-[11px] rounded-full border border-orange-500/20">
-                <Sparkles className="w-3 h-3 animate-pulse" />
-                <span>MEMBERSHIP SIGN-IN</span>
-              </div>
-              <h2 className="text-2xl font-black uppercase tracking-tight font-sans text-slate-900 dark:text-white">
-                Member Portal
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-white/60">
-                Sign in to claim your <strong>5% extra discount</strong> and track orders.
-              </p>
-            </div>
+          <>
+            {mode === 'check-email' && (
+              <form onSubmit={handleCheckEmail} className="space-y-5">
+                <div className="text-center space-y-2">
+                  <div className="inline-flex p-3 bg-orange-500/10 text-orange-500 rounded-full border border-orange-500/20 mb-1">
+                    <User className="w-8 h-8" />
+                  </div>
+                  <h2 className="text-2xl font-black uppercase tracking-tight font-sans">Member Portal</h2>
+                  <p className="text-xs text-slate-500 dark:text-white/60">
+                    Enter your email to sign in or create an account.
+                  </p>
+                </div>
 
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">Email Address</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  required
-                  className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-mono"
-                />
-              </div>
+                <div>
+                  <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@example.com"
+                    required
+                    className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-mono"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-mono"
-                />
-              </div>
-            </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold uppercase tracking-widest text-xs rounded-xl transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+                  <span>Continue</span>
+                </button>
+              </form>
+            )}
 
-            <div className="p-3.5 bg-orange-500/10 border border-orange-500/20 rounded-2xl flex items-start gap-2.5 text-xs font-mono text-slate-700 dark:text-white/80">
-              <Tag className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <span className="font-bold text-orange-500 block">Member Benefit</span>
-                <span>Use code <strong className="text-orange-500">ENGULF5</strong> at checkout for an extra 5% discount on all garments!</span>
-              </div>
-            </div>
+            {mode === 'login' && (
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-black uppercase tracking-tight font-sans">Member Sign In</h2>
+                  <p className="text-xs text-slate-500 dark:text-white/60">Enter password for {email}</p>
+                </div>
 
-            <button
-              type="submit"
-              className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold uppercase tracking-widest text-xs rounded-xl transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Sign In & Unlock Discount</span>
-            </button>
-          </form>
+                <div>
+                  <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-mono"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center text-xs">
+                  <button type="button" onClick={() => setMode('check-email')} className="text-slate-500 hover:text-orange-500 font-mono">
+                    Change Email
+                  </button>
+                  <button type="button" onClick={handleForgotPassword} className="text-slate-500 hover:text-orange-500 font-mono">
+                    Forgot Password?
+                  </button>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold uppercase tracking-widest text-xs rounded-xl transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+                  <span>Sign In</span>
+                </button>
+              </form>
+            )}
+
+            {mode === 'register' && (
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-black uppercase tracking-tight font-sans">Create Account</h2>
+                  <p className="text-xs text-slate-500 dark:text-white/60">Complete the details to register {email}</p>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">Name</label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your Name"
+                      required
+                      className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">Phone Number</label>
+                    <input
+                      type="text"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+88017XXXXXXXX"
+                      required
+                      className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">Password</label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center text-xs">
+                  <button type="button" onClick={() => setMode('check-email')} className="text-slate-500 hover:text-orange-500 font-mono">
+                    Change Email
+                  </button>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold uppercase tracking-widest text-xs rounded-xl transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+                  <span>Register</span>
+                </button>
+              </form>
+            )}
+
+            {mode === 'otp' && (
+              <form onSubmit={handleVerifyOtp} className="space-y-5">
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-black uppercase tracking-tight font-sans">Verify OTP</h2>
+                  <p className="text-xs text-slate-500 dark:text-white/60">We sent a 6-digit OTP code to {email}</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">OTP Code</label>
+                  <input
+                    type="text"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    placeholder="123456"
+                    required
+                    maxLength={6}
+                    className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-mono text-center tracking-widest text-lg font-black"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center text-xs font-mono">
+                  <button type="button" onClick={() => setMode('check-email')} className="text-slate-500 hover:text-orange-500">
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={resendTimer > 0}
+                    onClick={handleResendOtp}
+                    className={`text-slate-500 hover:text-orange-500 ${resendTimer > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {resendTimer > 0 ? `Resend OTP (${resendTimer}s)` : 'Resend OTP'}
+                  </button>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold uppercase tracking-widest text-xs rounded-xl transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+                  <span>Verify OTP</span>
+                </button>
+              </form>
+            )}
+
+            {mode === 'reset' && (
+              <form onSubmit={handleResetPassword} className="space-y-5">
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-black uppercase tracking-tight font-sans">Reset Password</h2>
+                  <p className="text-xs text-slate-500 dark:text-white/60 font-mono">Reset password for {email}</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">New Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 font-mono"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold uppercase tracking-widest text-xs rounded-xl transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+                  <span>Change Password</span>
+                </button>
+              </form>
+            )}
+          </>
         ) : (
           <div className="space-y-6 text-center">
             <div className="inline-flex p-4 bg-emerald-500/20 text-emerald-500 rounded-full border border-emerald-500/30">
@@ -109,7 +434,7 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
 
             <div>
               <span className="px-3 py-1 bg-orange-500/20 text-orange-500 text-[11px] font-mono rounded-full border border-orange-500/30">
-                {user?.tier}
+                VIP Member
               </span>
               <h2 className="text-2xl font-black uppercase tracking-wide mt-2">Welcome, {user?.name}!</h2>
               <p className="text-xs text-slate-500 dark:text-white/60 mt-0.5">{user?.email}</p>
@@ -119,7 +444,7 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
               <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-white/10">
                 <span className="text-slate-500 dark:text-white/60">Extra 5% Coupon:</span>
                 <span className="px-2 py-0.5 bg-orange-500 text-white font-black rounded text-[11px]">
-                  {user?.discountCode}
+                  ENGULF5
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -148,7 +473,10 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
             </div>
 
             <button
-              onClick={handleLogout}
+              onClick={() => {
+                logout();
+                if (onShowToast) onShowToast('Signed out successfully.');
+              }}
               className="w-full py-2.5 text-xs text-slate-500 dark:text-white/50 hover:text-red-500 font-mono transition"
             >
               Sign Out of Account

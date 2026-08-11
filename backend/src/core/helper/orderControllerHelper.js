@@ -44,10 +44,10 @@ export const resolveUserIdFromReference = async (reference) => {
 // Normalize checkout items into the order schema shape expected by the database.
 export const normalizeOrderItems = (items = []) =>
   (items || []).map((item) => ({
-    name: item.name ?? 'Unknown product',
+    name: item.name ?? item.productName ?? 'Unknown product',
     quantity: Number(item.quantity || 1),
-    unitPrice: Number(item.unitPrice || 0),
-    size: item.size ?? '',
+    unitPrice: Number(item.unitPrice ?? item.price ?? 0),
+    size: item.size ?? item.variant ?? '',
     concentration: item.concentration ?? '',
     productDid: item.productDid ?? '',
   }));
@@ -58,7 +58,7 @@ export const buildOrderDocument = async (payload) => {
 
   return {
     orderNumber: await buildOrderNumber(payload.orderType === 'instore'),
-    status: 'received',
+    status: 'processing',
     createdBy: createdByUserId,
     updatedBy: null,
     member: payload.memberId && Types.ObjectId.isValid(payload.memberId) ? payload.memberId : undefined,
@@ -79,32 +79,65 @@ export const buildOrderDocument = async (payload) => {
     couponCode: payload.couponCode ? String(payload.couponCode).trim().toUpperCase() : null,
     items: normalizeOrderItems(payload.items),
     totals: {
-      subtotal: Number(payload.subtotal || 0),
-      shippingFee: Number(payload.shippingFee || 0),
+      subtotal: Number(payload.subtotal || payload.subTotal || 0),
+      shippingFee: Number(payload.shippingFee || payload.shippingTotalAmount || payload.shipping || 0),
       tax: Number(payload.tax || 0),
-      total: Number(payload.total || 0),
+      total: Number(payload.total || payload.totalAmount || (Number(payload.subtotal || 0) + Number(payload.shippingFee || 0) - Number(payload.discountTotalAmount || 0))),
     },
   };
 };
 
 // Upsert the linked payment record so it reflects the created order totals.
-export const syncPaymentDocument = async (orderData) => {
+// Supports advance, partial, and full payments for COD, Cash, bKash, Nagad, Bank, Card.
+export const syncPaymentDocument = async (orderData, payload = {}) => {
   const totalAmount = Number(orderData.totals?.total || 0);
-  const paidAmount = isPaidPaymentMethod(orderData.paymentMethod) ? totalAmount : 0;
+
+  let paidAmount = 0;
+  if (payload.paidAmount !== undefined && payload.paidAmount !== null) {
+    paidAmount = Number(payload.paidAmount);
+  } else if (orderData.paidAmount !== undefined && orderData.paidAmount !== null) {
+    paidAmount = Number(orderData.paidAmount);
+  } else if (orderData.paymentDetails?.paidAmount !== undefined) {
+    paidAmount = Number(orderData.paymentDetails.paidAmount);
+  } else {
+    const method = normalizeText(orderData.paymentMethod).toLowerCase();
+    if (method === 'cash' || method === 'instore' || method === 'in-store') {
+      paidAmount = totalAmount;
+    } else {
+      paidAmount = 0;
+    }
+  }
+
+  paidAmount = Math.min(totalAmount, Math.max(0, paidAmount));
   const pendingAmount = Math.max(0, totalAmount - paidAmount);
-  const paymentStatus = getPaymentStatus(orderData.paymentMethod, totalAmount, paidAmount);
+
+  let paymentStatus = 'pending';
+  if (paidAmount >= totalAmount && totalAmount > 0) {
+    paymentStatus = 'paid';
+  } else if (paidAmount > 0) {
+    paymentStatus = 'partial';
+  } else {
+    paymentStatus = 'pending';
+  }
+
+  const paymentPhone =
+    orderData.paymentPhone ||
+    orderData.paymentDetails?.paymentPhone ||
+    orderData.customer?.phone ||
+    '';
 
   await PaymentModel.findOneAndUpdate(
     { orderId: orderData._id },
     {
       paymentMethod: orderData.paymentMethod,
-      paymentPhone: orderData.customer?.phone || '',
+      paymentPhone,
       totalAmount,
       paidAmount,
       pendingAmount,
       amount: paidAmount,
-      paymentStatus,
+      status: paymentStatus,
       createdBy: orderData.createdBy || null,
+      updatedBy: orderData.updatedBy || null,
     },
     { upsert: true, new: true, setDefaultsOnInsert: true },
   );
@@ -172,13 +205,21 @@ export const buildAllowedOrderUpdates = async (payload, existingOrder) => {
   const allowedUpdates = {};
 
   if (payload.status) {
-    allowedUpdates.status = payload.status;
+    const s = String(payload.status).toLowerCase();
+    const validEnums = ['processing', 'shipped', 'completed', 'cancelled'];
+    allowedUpdates.status = validEnums.includes(s) ? s : 'processing';
   }
   if (payload.shippingAddress) {
     allowedUpdates.shippingAddress = payload.shippingAddress;
   }
   if (payload.paymentMethod) {
     allowedUpdates.paymentMethod = payload.paymentMethod;
+  }
+  if (payload.paidAmount !== undefined) {
+    allowedUpdates.paidAmount = Number(payload.paidAmount || 0);
+  }
+  if (payload.paymentPhone !== undefined) {
+    allowedUpdates.paymentPhone = normalizeText(payload.paymentPhone);
   }
   if (payload.totals) {
     allowedUpdates.totals = payload.totals;

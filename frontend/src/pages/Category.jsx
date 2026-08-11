@@ -1,30 +1,37 @@
 'use client';
 
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { useQuery } from '@tanstack/react-query';
-import { fetchProducts, fetchCategories } from '@/lib/api';
-import { Sparkles, SlidersHorizontal, ArrowUpDown, Layers } from 'lucide-react';
+import { useAppStore } from '@/core/store/useAppStore';
+import { Sparkles, ArrowUpDown } from 'lucide-react';
 
 export default function CategoryPage() {
   const { slug } = useParams();
-  const navigate = useNavigate();
 
   const [sortBy, setSortBy] = useState('featured');
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: fetchCategories
-  });
+  // Store bindings
+  const products = useAppStore((state) => state.products);
+  const fetchProducts = useAppStore((state) => state.fetchProducts);
+  const isProductsLoading = useAppStore((state) => state.isProductsLoading);
+  const categories = useAppStore((state) => state.categories);
+
+  // Fetch category products whenever slug or sortBy changes
+  useEffect(() => {
+    fetchProducts({
+      category: slug,
+      sortBy: sortBy === 'newest' ? 'createdAt' : sortBy === 'name-asc' ? 'name' : 'createdAt',
+      order: sortBy === 'price-asc' ? 'asc' : 'desc'
+    });
+  }, [slug, sortBy, fetchProducts]);
 
   const categoryMeta = categories.find((c) => c.slug === slug) || {
     name: slug ? slug.replace(/-/g, ' ').toUpperCase() : '',
@@ -32,11 +39,6 @@ export default function CategoryPage() {
     image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=1200',
     tagline: 'Signature Engulfic Archive'
   };
-
-  const { data: filteredProducts = [], isLoading: isLoadingProducts } = useQuery({
-    queryKey: ['products', slug, sortBy],
-    queryFn: () => fetchProducts({ category: slug, sortBy })
-  });
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -61,7 +63,7 @@ export default function CategoryPage() {
         {/* Hero Category Banner */}
         <div className="relative h-[260px] sm:h-[320px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-4 rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10">
           <img
-            src={categoryMeta.image}
+            src={categoryMeta.image || categoryMeta.imageUrl || 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=1200'}
             alt={categoryMeta.name}
             className="absolute inset-0 w-full h-full object-cover object-center"
             referrerPolicy="no-referrer"
@@ -89,7 +91,7 @@ export default function CategoryPage() {
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <span className="text-xs font-mono text-slate-500 dark:text-white/50">
-              SHOWING <strong className="text-slate-900 dark:text-white">{filteredProducts.length}</strong> GARMENTS
+              SHOWING <strong className="text-slate-900 dark:text-white">{products.length}</strong> GARMENTS
             </span>
 
             <div className="flex items-center gap-2">
@@ -100,6 +102,7 @@ export default function CategoryPage() {
                 className="bg-slate-200 dark:bg-white/10 border border-slate-300 dark:border-white/20 rounded-xl px-3 py-1.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
               >
                 <option value="featured" className="dark:bg-zinc-900">Featured</option>
+                <option value="newest" className="dark:bg-zinc-900">Newest</option>
                 <option value="price-asc" className="dark:bg-zinc-900">Price: Low to High</option>
                 <option value="price-desc" className="dark:bg-zinc-900">Price: High to Low</option>
               </select>
@@ -109,13 +112,13 @@ export default function CategoryPage() {
 
         {/* Product Catalog Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {isLoadingProducts ? (
+          {isProductsLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                 <div key={n} className="animate-pulse bg-slate-200 dark:bg-white/5 rounded-3xl aspect-[3/4]"></div>
               ))}
             </div>
-          ) : filteredProducts.length === 0 ? (
+          ) : products.length === 0 ? (
             <div className="text-center py-16 bg-slate-100 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
               <p className="text-xs font-mono text-slate-500 dark:text-white/60">
                 NO PRODUCTS FOUND.
@@ -123,7 +126,7 @@ export default function CategoryPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
-              {filteredProducts.map((product) => (
+              {products.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}

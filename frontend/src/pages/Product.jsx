@@ -8,8 +8,8 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { useQuery } from '@tanstack/react-query';
-import { fetchProductById, fetchProducts } from '@/lib/api';
+import { fetchProductDetails, fetchProducts } from '@/core/lib/api';
+import { useAppStore } from '@/core/store/useAppStore';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
@@ -30,16 +30,61 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { data: product, isLoading } = useQuery({
-    queryKey: ['product', id],
-    queryFn: () => fetchProductById(id),
-    enabled: !!id
-  });
+  const [product, setProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
-  const { data: relatedProducts = [] } = useQuery({
-    queryKey: ['products', 'latest'],
-    queryFn: () => fetchProducts({ limit: 4 })
-  });
+  // Multi-tier product detail resolving logic: 1. API details 2. State cache 3. Full catalog search
+  useEffect(() => {
+    const loadProductDetail = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const fetched = await fetchProductDetails(id);
+        if (fetched) {
+          setProduct(fetched);
+          return;
+        }
+
+        const stateProducts = useAppStore.getState().products;
+        if (stateProducts && stateProducts.length > 0) {
+          const found = stateProducts.find(p => p.id === id || String(p.raw?.id) === String(id) || p.slug === id);
+          if (found) {
+            setProduct(found);
+            return;
+          }
+        }
+
+        const allProds = await fetchProducts({ limit: 100 });
+        const found = allProds.find(p => p.id === id || String(p.raw?.id) === String(id) || p.slug === id);
+        if (found) {
+          setProduct(found);
+        } else {
+          setError('Product not found');
+        }
+      } catch (err) {
+        setError('Failed to fetch details');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      loadProductDetail();
+    }
+  }, [id]);
+
+  // Load related products on load
+  useEffect(() => {
+    const loadRelated = async () => {
+      try {
+        const items = await fetchProducts({ limit: 4 });
+        setRelatedProducts(items);
+      } catch (_) {}
+    };
+    loadRelated();
+  }, []);
 
   const [activeImage, setActiveImage] = useState('');
   const [selectedSize, setSelectedSize] = useState('');

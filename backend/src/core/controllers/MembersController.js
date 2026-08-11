@@ -16,7 +16,7 @@ const { Types } = mongoose;
 
 const createAccessToken = (member) => {
   return jwt.sign(
-    { userId: member.id, role: member.role, email: member.email },
+    { userId: member.id },
     env.ACCESS_TOKEN_SECRET,
     { expiresIn: env.ACCESS_TOKEN_EXPIRES_IN || "20m" },
   );
@@ -188,7 +188,7 @@ export const updateMember = async (req, res, next) => {
 
     const payload = req.body ?? {};
     const updates = {};
-    updates.updatedBy = payload.updatedBy || req.user?.userId || req.user?.id || null;
+    updates.updatedBy = payload.updatedBy || req.user?.userId || re.user?._id || req.user?.did || null;
 
     if (payload.name) {
       updates.name = payload.name.trim();
@@ -196,8 +196,28 @@ export const updateMember = async (req, res, next) => {
     if (payload.email) {
       updates.email = payload.email.toLowerCase().trim();
     }
-    if (payload.phone) {
-      updates.phone = payload.phone.trim();
+    if (payload.phone !== undefined) {
+      const trimmedPhone = typeof payload.phone === "string" ? payload.phone.trim() : "";
+      if (trimmedPhone) {
+        if (!/^\+8801[3-9]\d{8}$/.test(trimmedPhone)) {
+          return res.status(400).json({
+            status: "error",
+            message: "phone must be a valid Bangladeshi number in format +8801[3-9]XXXXXXXXX",
+          });
+        }
+        // Check uniqueness excluding the current member being updated
+        const existingPhoneMember = await MemberModel.findOne({
+          phone: trimmedPhone,
+          _id: { $ne: memberId },
+        }).lean();
+        if (existingPhoneMember) {
+          return res.status(409).json({
+            status: "error",
+            message: "A member with this phone number already exists",
+          });
+        }
+      }
+      updates.phone = trimmedPhone;
     }
     if (payload.password) {
       if (typeof payload.password !== "string" || payload.password.length < 6) {
@@ -272,8 +292,9 @@ export const registerMember = async (req, res, next) => {
     if (!trimmedEmail) {
       errors.push("email is required");
     }
-    if (!trimmedPhone) {
-      errors.push("phone is required");
+    if (trimmedPhone && !/^\+8801[3-9]\d{8}$/.test(trimmedPhone)) {
+      // Enforce Bangladeshi number format as a backend gatekeep if provided
+      errors.push("phone must be a valid Bangladeshi number in format +8801[3-9]XXXXXXXXX");
     }
     if (!trimmedPassword || trimmedPassword.length < 6) {
       errors.push("password is required and must be at least 6 characters");
@@ -295,6 +316,17 @@ export const registerMember = async (req, res, next) => {
         status: "error",
         message: "A member with this email already exists",
       });
+    }
+
+    // Only check phone uniqueness if a phone was provided
+    if (trimmedPhone) {
+      const existingPhoneMember = await MemberModel.findOne({ phone: trimmedPhone }).lean();
+      if (existingPhoneMember) {
+        return res.status(409).json({
+          status: "error",
+          message: "A member with this phone number already exists",
+        });
+      }
     }
 
     const otp = String(Math.floor(100000 + Math.random() * 900000));
@@ -392,6 +424,33 @@ export const verifyMemberOtp = async (req, res, next) => {
     }
 
     if (!member.isEmailVerified) {
+      if (req.body.context === "register") {
+        member.emailOtp = undefined;
+        member.emailOtpExpiresAt = undefined;
+        member.isEmailVerified = true;
+        member.emailVerifiedAt = new Date();
+        await member.save();
+
+        const tokenBundle = await issueMemberTokens(member);
+
+        return res.json({
+          status: "success",
+          message: "Verified successfully",
+          isEmailVerified: true,
+          data: {
+            user: {
+              id: member.id,
+              did: member.did,
+              name: member.name,
+              email: member.email,
+              phone: member.phone,
+              role: member.role,
+            },
+            ...tokenBundle,
+          },
+        });
+      }
+
       return res.json({
         status: "success",
         requiresPasswordReset: true,
@@ -416,6 +475,7 @@ export const verifyMemberOtp = async (req, res, next) => {
       data: {
         user: {
           id: member.id,
+          did: member.did,
           name: member.name,
           email: member.email,
           phone: member.phone,
@@ -648,6 +708,7 @@ export const loginMember = async (req, res, next) => {
       data: {
         user: {
           id: member.id,
+          did: member.did,
           name: member.name,
           email: member.email,
           phone: member.phone,

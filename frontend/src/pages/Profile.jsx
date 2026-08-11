@@ -10,6 +10,7 @@ import CartDrawer from '@/components/CartDrawer';
 import QuickViewModal from '@/components/QuickViewModal';
 import SearchModal from '@/components/SearchModal';
 import { useAuthStore } from '@/store/useAuthStore';
+import { updateMember } from '@/core/lib/api';
 import {
   User,
   ShoppingCart,
@@ -30,7 +31,8 @@ import {
   Mail,
   ArrowLeft,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -42,6 +44,7 @@ export default function ProfilePage() {
   const [selectedQuickView, setSelectedQuickView] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null); // For order detail drawer
   const [toastMessage, setToastMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Editable Profile Form State
   const [formData, setFormData] = useState({
@@ -58,11 +61,45 @@ export default function ProfilePage() {
     setTimeout(() => setToastMessage(''), 3500);
   };
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    updateProfile(formData);
-    setIsEditing(false);
-    showToast('Profile updated successfully!');
+    setIsSaving(true);
+    try {
+      // Build billingInfo and shippingInfo payload structures as requested by Section 5.4
+      const billingInfo = {
+        firstName: formData.name.split(' ')[0] || '',
+        lastName: formData.name.split(' ').slice(1).join(' ') || '',
+        address1: formData.address,
+        city: formData.city,
+        postcode: formData.zipCode,
+        phone: formData.phone
+      };
+      
+      const shippingInfo = { ...billingInfo };
+
+      const updatedUser = await updateMember(user.id || user._id, {
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        billingInfo,
+        shippingInfo
+      });
+
+      // Update local storage/Zustand store session
+      updateProfile({
+        name: updatedUser.name || formData.name,
+        phone: updatedUser.phone || formData.phone,
+        address: updatedUser.billingInfo?.address1 || formData.address,
+        city: updatedUser.billingInfo?.city || formData.city,
+        zipCode: updatedUser.billingInfo?.postcode || formData.zipCode
+      });
+
+      setIsEditing(false);
+      showToast('Profile updated successfully!');
+    } catch (err) {
+      showToast(err.message || 'Profile update failed.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!isLoggedIn) {
@@ -323,8 +360,12 @@ export default function ProfilePage() {
                         type="submit"
                         className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition shadow-lg flex items-center gap-2"
                       >
-                        <Save className="w-4 h-4" />
-                        <span>Save Profile Changes</span>
+                        {isSaving ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Save className="w-4 h-4" />
+                        )}
+                        <span>{isSaving ? 'Saving Changes...' : 'Save Profile Changes'}</span>
                       </button>
                     </div>
                   </form>

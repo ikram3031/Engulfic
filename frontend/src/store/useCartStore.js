@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { fetchCouponByCode } from '@/core/lib/api';
 
 export const useCartStore = create((set, get) => ({
   cart: [],
@@ -71,16 +72,14 @@ export const useCartStore = create((set, get) => ({
     }));
   },
 
-  applyPromoCode: (code) => {
-    const trimmed = code.trim().toUpperCase();
-    if (trimmed === 'ENGULF20') {
-      set({ promoCode: 'ENGULF20', discountPercentage: 20 });
-      return { success: true, message: '20% Discount applied!' };
-    } else if (trimmed === 'VIP50') {
-      set({ promoCode: 'VIP50', discountPercentage: 50 });
-      return { success: true, message: '50% VIP Discount applied!' };
-    } else {
-      return { success: false, message: 'Invalid promo code. Try ENGULF20' };
+  applyPromoCode: async (code) => {
+    try {
+      const coupon = await fetchCouponByCode(code);
+      const discountPct = coupon.discountPercentage ?? coupon.percentage ?? coupon.value ?? 0;
+      set({ promoCode: code.trim().toUpperCase(), discountPercentage: Number(discountPct) });
+      return { success: true, message: `${discountPct}% Discount applied!` };
+    } catch (err) {
+      return { success: false, message: err.message || 'Invalid promo code.' };
     }
   },
 

@@ -48,8 +48,8 @@ const orderSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["received", "processing", "shipped", "completed", "cancelled"],
-      default: "received",
+      enum: [ "processing", "shipped", "completed", "cancelled"],
+      default: "processing",
     },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
     updatedBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
@@ -62,6 +62,7 @@ const orderSchema = new Schema(
     couponCode: { type: String, default: null, trim: true, uppercase: true },
     items: { type: [orderItemSchema], required: true, validate: [(items) => items.length > 0, "items must contain at least one item"] },
     totals: { type: orderTotalsSchema, required: true },
+    active: { type: Boolean, default: true, index: true },
   },
   {
     collection: "orders",

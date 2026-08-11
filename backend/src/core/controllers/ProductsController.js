@@ -9,7 +9,6 @@ import {
   buildProductFilter,
   buildProductSort,
   parsePagination,
-  isPlaceholderImageUrl,
 } from "../utils/productUtils.js";
 
 // ==========================================
@@ -81,8 +80,15 @@ export const createProduct = async (req, res, next) => {
       }
     }
 
-    // Handle image URLs
-    const imageUrl = body.imageUrl || body.image_url || PLACEHOLDER_IMAGE_URL;
+    // Validate image URL — must be a non-empty string
+    const rawImageUrl = body.imageUrl || body.image_url;
+    if (!rawImageUrl || !rawImageUrl.trim()) {
+      return res.status(400).json({
+        status: "error",
+        message: "Product image is required. Please upload an image before saving.",
+      });
+    }
+    const imageUrl = rawImageUrl.trim();
 
     const productData = {
       name: body.name,
@@ -110,8 +116,6 @@ export const createProduct = async (req, res, next) => {
               v.offerPrice !== undefined && v.offerPrice !== null
                 ? Number(v.offerPrice)
                 : null,
-            stockQuantity:
-              v.stockQuantity !== undefined ? Number(v.stockQuantity) : 0,
             sku: v.sku || "",
             sortOrder: v.sortOrder !== undefined ? Number(v.sortOrder) : i,
             imageUrl: v.imageUrl || null,
@@ -123,8 +127,6 @@ export const createProduct = async (req, res, next) => {
         body.offerPrice !== undefined && body.offerPrice !== null
           ? Number(body.offerPrice)
           : null;
-      productData.stockQuantity =
-        body.stockQuantity !== undefined ? Number(body.stockQuantity) : 0;
       productData.sku = body.sku || "";
     }
 
@@ -184,14 +186,10 @@ export const listProducts = async (req, res, next) => {
     const filterInput = method === "POST" ? req.body || {} : req.query || {};
     const filter = await buildProductFilter(filterInput);
 
-    const filteredQuery = {
-      ...filter,
-      imageUrl: { $ne: PLACEHOLDER_IMAGE_URL },
-    };
-
     const [total, rows] = await Promise.all([
-      ProductModel.countDocuments(filteredQuery),
-      ProductModel.find(filteredQuery)
+      ProductModel.countDocuments(filter),
+      ProductModel.find(filter)
+        .populate('categories', 'did name slug')
         .sort(sort)
         .skip(skip)
         .limit(limit)
@@ -232,7 +230,7 @@ export const getSingleProduct = async (req, res, next) => {
 
     const product = await ProductModel.findOne(filter).lean();
 
-    if (!product || isPlaceholderImageUrl(product.imageUrl)) {
+    if (!product) {
       res.status(404).json({ status: "error", message: "Product not found" });
       return;
     }
@@ -268,17 +266,25 @@ export const updateProduct = async (req, res, next) => {
       if (fallbackUser) userId = fallbackUser._id;
     }
 
+    // Validate image URL on update — must be a non-empty string if provided
+    const incomingImageUrl = body.imageUrl || body.image_url;
+    if (incomingImageUrl !== undefined && incomingImageUrl !== null && !incomingImageUrl.trim()) {
+      return res.status(400).json({
+        status: "error",
+        message: "Product image is required. Please upload an image before saving.",
+      });
+    }
+
     // Update primitive properties
     if (body.name !== undefined) product.name = body.name;
     if (body.slug !== undefined) product.slug = body.slug;
     if (body.description !== undefined) product.description = body.description;
     if (body.type !== undefined) product.type = body.type;
-    if (body.imageUrl !== undefined) product.imageUrl = body.imageUrl;
-    if (body.image_url !== undefined) product.imageUrl = body.image_url;
-    if (body.thumbnailUrl !== undefined)
-      product.thumbnailUrl = body.thumbnailUrl;
-    if (body.thumbnail_url !== undefined)
-      product.thumbnailUrl = body.thumbnail_url;
+    if (incomingImageUrl && incomingImageUrl.trim()) product.imageUrl = incomingImageUrl.trim();
+    if (body.thumbnailUrl && body.thumbnailUrl.trim())
+      product.thumbnailUrl = body.thumbnailUrl.trim();
+    if (body.thumbnail_url && body.thumbnail_url.trim())
+      product.thumbnailUrl = body.thumbnail_url.trim();
     if (body.season !== undefined) product.season = body.season;
     if (body.tags !== undefined) product.tags = body.tags;
     if (body.notes !== undefined) product.notes = body.notes;
@@ -334,8 +340,6 @@ export const updateProduct = async (req, res, next) => {
                 v.offerPrice !== undefined && v.offerPrice !== null
                   ? Number(v.offerPrice)
                   : null,
-              stockQuantity:
-                v.stockQuantity !== undefined ? Number(v.stockQuantity) : 0,
               sku: v.sku || "",
               sortOrder: v.sortOrder !== undefined ? Number(v.sortOrder) : i,
               imageUrl: v.imageUrl || null,
@@ -344,15 +348,12 @@ export const updateProduct = async (req, res, next) => {
       }
       product.price = undefined;
       product.offerPrice = undefined;
-      product.stockQuantity = undefined;
       product.sku = undefined;
     } else {
       if (body.price !== undefined) product.price = Number(body.price);
       if (body.offerPrice !== undefined)
         product.offerPrice =
           body.offerPrice !== null ? Number(body.offerPrice) : null;
-      if (body.stockQuantity !== undefined)
-        product.stockQuantity = Number(body.stockQuantity);
       if (body.sku !== undefined) product.sku = body.sku;
       product.variants = undefined;
     }

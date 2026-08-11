@@ -1,20 +1,40 @@
 'use client';
 
-import { useState } from 'react';
-import {  useNavigate  } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { searchProducts } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchProducts } from '@/core/lib/api';
 import { X, Search, ArrowRight, Loader2, PackageX } from 'lucide-react';
 
 export default function SearchModal({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const { data: results = [], isLoading } = useQuery({
-    queryKey: ['searchProducts', query],
-    queryFn: () => searchProducts(query),
-    enabled: isOpen && query.trim().length > 0,
-  });
+  // Debounced search logic (300ms delay) to prevent spamming backend API
+  useEffect(() => {
+    if (!query || String(query).trim().length === 0) {
+      setResults([]);
+      return;
+    }
+    const q = String(query).trim();
+    setIsLoading(true);
+    setError('');
+
+    const timer = setTimeout(async () => {
+      try {
+        const items = await fetchProducts({ q, limit: 12 });
+        setResults(items.slice(0, 12));
+      } catch (err) {
+        setError('Failed to load results');
+      } finally {
+        setIsLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   if (!isOpen) return null;
 
@@ -46,6 +66,12 @@ export default function SearchModal({ isOpen, onClose }) {
 
         {/* Results Container */}
         <div className="max-h-[60vh] overflow-y-auto space-y-3 pt-2">
+          {error && (
+            <div className="text-center py-4 text-red-500 text-xs font-mono">
+              {error}
+            </div>
+          )}
+
           {query.trim().length === 0 ? (
             <div className="text-center py-8 text-slate-400 dark:text-white/40 text-xs font-mono">
               Type to search Engulfic&apos;s modern fashion collection...
