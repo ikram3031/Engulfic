@@ -18,11 +18,13 @@ import RefundPolicy from './pages/RefundPolicy';
 import SizeGuide from './pages/SizeGuide';
 import Terms from './pages/Terms';
 import Wishlist from './pages/Wishlist';
+import ScrollToTopOnRouteChange from './components/ScrollToTopOnRouteChange';
 
 function App() {
   return (
     <AppProvider>
       <BrowserRouter>
+        <ScrollToTopOnRouteChange />
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow">
           <Routes>
