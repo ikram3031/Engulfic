@@ -5,8 +5,6 @@ import {  useNavigate  } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import HeroBanner from '@/components/HeroBanner';
 import CategoryGrid from '@/components/CategoryGrid';
-import BestSellingProducts from '@/components/BestSellingProducts';
-import LookbookSection from '@/components/LookbookSection';
 import CartDrawer from '@/components/CartDrawer';
 
 import SearchModal from '@/components/SearchModal';
@@ -55,12 +53,6 @@ export default function Home() {
 
       {/* Category Cards Section (1 per row mobile, 2 per row desktop) */}
       <CategoryGrid />
-
-      {/* Best Selling Products Section with All / Men / Women Tabs */}
-      <BestSellingProducts onShowToast={showToast} />
-
-      {/* Interactive Runway Lookbook Section */}
-      <LookbookSection />
 
       {/* Footer with Policy & Info Links */}
       <Footer />
