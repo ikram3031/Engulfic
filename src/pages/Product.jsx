@@ -23,7 +23,9 @@ import {
   Sparkles,
   CheckCircle2,
   Zap,
-  ArrowRight
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 export default function ProductDetailPage() {
@@ -87,16 +89,35 @@ export default function ProductDetailPage() {
   }, []);
 
   const [activeImage, setActiveImage] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   
   useEffect(() => {
     if (product) {
       setActiveImage(product.image);
+      setActiveIndex(0);
       setSelectedSize(product.sizes?.[0] || (product.variants?.[0]?.name) || 'M');
       setSelectedColor(product.colors?.[0]?.name || 'Default');
     }
   }, [product]);
+
+  const handlePrevImage = () => {
+    if (product?.images && product.images.length > 0) {
+      const newIndex = (activeIndex - 1 + product.images.length) % product.images.length;
+      setActiveIndex(newIndex);
+      setActiveImage(product.images[newIndex]);
+    }
+  };
+
+  const handleNextImage = () => {
+    if (product?.images && product.images.length > 0) {
+      const newIndex = (activeIndex + 1) % product.images.length;
+      setActiveIndex(newIndex);
+      setActiveImage(product.images[newIndex]);
+    }
+  };
+
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
@@ -146,44 +167,69 @@ export default function ProductDetailPage() {
         {/* Product Details Main Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            {/* Left Image Gallery */}
+            {/* Left Image Gallery / Carousel */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="relative aspect-[3/4] w-full rounded-3xl overflow-hidden bg-slate-200 dark:bg-black/40 border border-slate-200 dark:border-white/10 shadow-2xl">
+              <div className="relative aspect-[3/4] w-full rounded-3xl overflow-hidden bg-slate-200 dark:bg-black/40 border border-slate-200 dark:border-white/10 shadow-2xl group">
                 <img
                   src={activeImage}
                   alt={product.name}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-center transition-all duration-300 ease-in-out"
                   referrerPolicy="no-referrer"
                 />
 
                 {product.isNew && (
-                  <span className="absolute top-4 left-4 px-3 py-1 bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-lg shadow-lg border border-orange-400/30">
+                  <span className="absolute top-4 left-4 px-3 py-1 bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-lg shadow-lg border border-orange-400/30 z-10">
                     NEW RUNWAY
                   </span>
+                )}
+
+                {/* Carousel Controls */}
+                {product.images && product.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={handlePrevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 dark:bg-black/60 text-slate-800 dark:text-white hover:bg-white dark:hover:bg-black transition shadow-lg opacity-0 group-hover:opacity-100 z-10"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={handleNextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 dark:bg-black/60 text-slate-800 dark:text-white hover:bg-white dark:hover:bg-black transition shadow-lg opacity-0 group-hover:opacity-100 z-10"
+                      aria-label="Next image"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
                 )}
               </div>
 
               {/* Thumbnails */}
-              <div className="flex items-center gap-4 overflow-x-auto pb-2">
-                <button
-                  onClick={() => setActiveImage(product.image)}
-                  className={`w-20 h-24 rounded-2xl overflow-hidden border-2 transition ${
-                    activeImage === product.image ? 'border-orange-500 scale-105 shadow-lg' : 'border-slate-300 dark:border-white/10 opacity-70'
-                  }`}
-                >
-                  <img src={product.image} alt="Primary" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                </button>
-                {product.secondaryImage && (
-                  <button
-                    onClick={() => setActiveImage(product.secondaryImage)}
-                    className={`w-20 h-24 rounded-2xl overflow-hidden border-2 transition ${
-                      activeImage === product.secondaryImage ? 'border-orange-500 scale-105 shadow-lg' : 'border-slate-300 dark:border-white/10 opacity-70'
-                    }`}
-                  >
-                    <img src={product.secondaryImage} alt="Secondary" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  </button>
-                )}
-              </div>
+              {product.images && product.images.length > 1 && (
+                <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-white/10">
+                  {product.images.map((imgUrl, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setActiveImage(imgUrl);
+                        setActiveIndex(index);
+                      }}
+                      className={`w-20 h-24 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0 ${
+                        activeImage === imgUrl
+                          ? 'border-orange-500 scale-105 shadow-md opacity-100'
+                          : 'border-slate-300 dark:border-white/10 opacity-60 hover:opacity-90'
+                      }`}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Gallery view ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Right Product Options & Purchase */}
