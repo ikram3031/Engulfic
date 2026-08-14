@@ -57,13 +57,15 @@
 
 | Payload Field | Status | Source / Notes |
 |---|---|---|
-| `name` | Required | `name` state (trimmed) |
-| `email` | Required | `email` state (trimmed) |
-| `password` | Required | `password` state (min 6 chars) |
-| `phone` | Required | Enforced as required on frontend & normalized to `+8801[3-9]XXXXXXXXX` format |
-| `role` | Not sent | Backend defaults to `"Customer"` automatically |
-| `billingInfo` | Not sent | Optional field; collected during Checkout or Profile update |
-| `shippingInfo` | Not sent | Optional field; collected during Checkout or Profile update |
+| `name` | `name` state | সরাসরি |
+| `email` | `email` state | সরাসরি |
+| `phone` | `phone` state | `+880` prefix normalize করা হয় |
+| `password` | `password` state | সরাসরি |
+| `role` | হার্ডকোড | সবসময় `"Customer"` |
+| `billingInfo.firstName` | `name.split(' ')[0]` | name split করা |
+| `billingInfo.lastName` | `name.split(' ').slice(1)` | name split করা |
+| `billingInfo.address1` | `''` (empty) | Registration-এ address নেওয়া হয় না |
+| `billingInfo.country` | হার্ডকোড | সবসময় `"Bangladesh"` |
 
 ### Phone Normalization Logic
 
