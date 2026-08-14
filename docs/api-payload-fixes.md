@@ -1,5 +1,24 @@
 # Engulfic Frontend — API Payload Documentation
 
+> **Change Logging Rules:**
+> - এই ফাইলে হওয়া প্রতিটা ফিক্স বা পরিবর্তনের জন্য একটি কমেন্ট লগ অ্যাড করতে হবে।
+> - কমেন্ট লগের আইডি শুরু হবে `E01` থেকে এবং ক্রমান্বয়ে ইনক্রিমেন্ট হবে (`E01`, `E02`, `E03`...)।
+> - নতুন লগগুলো সবসময় এই লগের তালিকার সবার উপরে (টপে) অ্যাড করতে হবে।
+
+## Comment Logs
+
+### [E01] 2026-08-15: Fixed Cart, Checkout and Navigation Routing Issues
+- **সমস্যা:** `<Link>` কম্পোনেন্টে ভুল করে `href` এট্রিবিউট ব্যবহার করা হয়েছিল এবং `Navbar.jsx` ফাইলে `useLocation()` সরাসরি `pathname` ভেরিয়েবলে অ্যাসাইন করা হয়েছিল (ডিস্ট্রাকচার করা হয়নি)।
+- **Fix:** 
+  - `Cart.jsx` ও `CategoryGrid.jsx` এ `<Link href="...">` পরিবর্তন করে `<Link to="...">` করা হয়েছে।
+  - `Navbar.jsx` ফাইলে `const { pathname } = useLocation();` করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/Navbar.jsx`](file:///f:/Engulfic/src/components/Navbar.jsx)
+  - [`src/components/CategoryGrid.jsx`](file:///f:/Engulfic/src/components/CategoryGrid.jsx)
+  - [`src/pages/Cart.jsx`](file:///f:/Engulfic/src/pages/Cart.jsx)
+
+---
+
 > **Last Updated:** 2026-08-15
 > **Reference:** `F:\AFull\backend\docs\api\`
 
@@ -20,42 +39,22 @@
 {
   "name": "Full Name",
   "email": "user@example.com",
-  "phone": "+8801XXXXXXXXX",
-  "password": "securePassword123",
-  "role": "Customer",
-  "billingInfo": {
-    "firstName": "Full",
-    "lastName": "Name",
-    "email": "user@example.com",
-    "phone": "+8801XXXXXXXXX",
-    "address1": "",
-    "address2": "",
-    "city": "",
-    "district": "",
-    "state": "",
-    "postcode": "",
-    "country": "Bangladesh",
-    "company": ""
-  },
-  "shippingInfo": {
-    /* billingInfo এর মতোই */
-  }
+  "phone": "+8801712345678",
+  "password": "securePassword123"
 }
 ```
 
 ### Field Mapping (Form → Payload)
 
-| Payload Field | Form State | নোট |
+| Payload Field | Status | Source / Notes |
 |---|---|---|
-| `name` | `name` state | সরাসরি |
-| `email` | `email` state | সরাসরি |
-| `phone` | `phone` state | `+880` prefix normalize করা হয় |
-| `password` | `password` state | সরাসরি |
-| `role` | হার্ডকোড | সবসময় `"Customer"` |
-| `billingInfo.firstName` | `name.split(' ')[0]` | name split করা |
-| `billingInfo.lastName` | `name.split(' ').slice(1)` | name split করা |
-| `billingInfo.address1` | `''` (empty) | Registration-এ address নেওয়া হয় না |
-| `billingInfo.country` | হার্ডকোড | সবসময় `"Bangladesh"` |
+| `name` | Required | `name` state (trimmed) |
+| `email` | Required | `email` state (trimmed) |
+| `password` | Required | `password` state (min 6 chars) |
+| `phone` | Optional | Normalized to `+8801[3-9]XXXXXXXXX` format (regex enforced by backend if provided) |
+| `role` | Not sent | Backend defaults to `"Customer"` automatically |
+| `billingInfo` | Not sent | Optional field; collected during Checkout or Profile update |
+| `shippingInfo` | Not sent | Optional field; collected during Checkout or Profile update |
 
 ### Phone Normalization Logic
 
