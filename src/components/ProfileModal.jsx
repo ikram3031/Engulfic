@@ -95,7 +95,19 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
     setIsLoading(true);
     setErrorMsg('');
     try {
-      await registerMember({ name, email, phone, password });
+      // Normalize phone to +880 format
+      const normalizedPhone = phone.startsWith('+')
+        ? phone
+        : `+880${phone.replace(/^0/, '')}`;
+
+      // billingInfo & shippingInfo are optional — not sent at registration
+      await registerMember({
+        name,
+        email,
+        phone: normalizedPhone,
+        password,
+        role: 'Customer'
+      });
       setOtpContext('register');
       setMode('otp');
       setResendTimer(180);

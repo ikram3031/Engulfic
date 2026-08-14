@@ -32,7 +32,7 @@ export default function Navbar({ onOpenSearch }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
 
-  const pathname = useLocation();
+  const { pathname } = useLocation();
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories });
 
   const totalCartCount = useCartStore((state) => state.getTotalItemsCount());

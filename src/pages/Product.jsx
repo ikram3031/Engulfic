@@ -350,11 +350,20 @@ export default function ProductDetailPage() {
               {/* Fabric & Fit Details Box */}
               <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-4 text-xs font-mono">
                 <div className="space-y-1">
-                  <span className="text-orange-500 font-bold uppercase">DESCRIPTION</span>
+                  <span className="text-orange-500 font-bold uppercase">Short Description</span>
                   <p className="text-slate-700 dark:text-white/80 leading-relaxed font-sans text-xs">
                     {product.description}
                   </p>
                 </div>
+                {product.longDescription && (
+                  <div className="pt-4 border-t border-slate-200 dark:border-white/10 space-y-1">
+                    <span className="text-orange-500 font-bold uppercase">Long Description</span>
+                    <div 
+                      className="text-slate-700 dark:text-white/80 leading-relaxed font-sans text-xs prose dark:prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: product.longDescription }}
+                    />
+                  </div>
+                )}
                 {(product.fabric || product.fit || product.care) && (
                   <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200 dark:border-white/10">
                     {product.fabric && (

@@ -78,7 +78,7 @@ export default function CategoryGrid() {
 
             {/* Bottom Content Area */}
             <div className="relative z-10 space-y-3">
-              <Link href={`/category/${cat.slug}`} className="block">
+              <Link to={`/category/${cat.slug}`} className="block">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider font-sans group-hover:text-orange-400 transition-colors line-clamp-1">
                     {idx + 1}. {cat.name}

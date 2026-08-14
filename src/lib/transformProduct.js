@@ -129,6 +129,7 @@ export function transformProduct(p) {
     // Display text
     tagline,
     description: p.description || '',
+    longDescription: p.longDescription || '',
 
     // Pricing
     price,

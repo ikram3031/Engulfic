@@ -68,45 +68,45 @@ export default function CheckoutPage() {
   const [promoInput, setPromoInput] = useState('');
   const [promoMessage, setPromoMessage] = useState(null);
 
-  // Billing address form with prefilled dummy information for easy testing
+  // Billing address form
   const [billingForm, setBillingForm] = useState({
-    firstName: 'Ahsan',
-    lastName: 'Rahman',
-    email: 'ahsan.rahman@engulfic.com',
-    phone: '01712345678',
-    address: 'House 42, Road 11, Block D, Banani',
-    town: 'Dhaka',
-    district: 'Dhaka',
-    thana: 'Mohammadpur'
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    town: '',
+    district: '',
+    thana: ''
   });
 
   // Shipping address form (different address)
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [shippingForm, setShippingForm] = useState({
-    firstName: 'Ahsan',
-    lastName: 'Rahman',
-    email: 'ahsan.rahman@engulfic.com',
-    phone: '01712345678',
-    address: 'House 42, Road 11, Block D, Banani',
-    town: 'Dhaka',
-    district: 'Dhaka',
-    thana: 'Mohammadpur'
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    town: '',
+    district: '',
+    thana: ''
   });
 
-  // Pre-fill fields if user is logged in
+  // Pre-fill billing form from logged-in user data
   useEffect(() => {
     if (isLoggedIn && user) {
       const nameParts = user.name ? user.name.split(' ') : ['', ''];
       const timer = setTimeout(() => {
         setBillingForm((prev) => ({
           ...prev,
-          firstName: nameParts[0] || 'Ahsan',
-          lastName: nameParts.slice(1).join(' ') || 'Rahman',
-          email: user.email || 'ahsan.rahman@engulfic.com',
-          phone: user.phone || '01712345678',
-          address: user.address || 'House 42, Road 11, Block D, Banani',
-          town: user.city || 'Dhaka',
-          district: 'Dhaka'
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          address: user.address || '',
+          town: user.city || '',
+          district: user.district || ''
         }));
       }, 0);
       return () => clearTimeout(timer);
@@ -215,27 +215,34 @@ export default function CheckoutPage() {
     }
 
     try {
-      // Build order payload for backend Order API submission
+      // Build billingInfo and shippingInfo matching API spec (06_orders-api.md)
+      const buildAddressInfo = (form) => ({
+        fullName: `${form.firstName} ${form.lastName}`.trim(),
+        phone: form.phone,
+        email: form.email,
+        address: form.address,
+        thana: form.thana || '',
+        district: form.district,
+        zip: form.zip || ''
+      });
+
       const orderPayload = {
-        items: cart.map(item => ({
-          product: item.id || item._id,
-          name: item.name,
-          size: item.selectedSize || 'Standard',
-          price: item.price,
-          quantity: item.quantity
-        })),
-        shippingAddress: shipToDifferent ? shippingForm : billingForm,
-        billingAddress: billingForm,
+        billingInfo: buildAddressInfo(billingForm),
+        shippingInfo: buildAddressInfo(shipToDifferent ? shippingForm : billingForm),
+        paymentMethod: 'cod',
         subtotal,
         shippingFee: shippingCost,
-        discount,
-        promoCode,
-        totalAmount: grandTotal,
-        paymentMethod: 'COD' // Cash on Delivery
+        total: grandTotal,
+        items: cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          size: item.selectedSize || 'Standard'
+        }))
       };
 
       const response = await createOrder(orderPayload);
-      const generatedId = response.data?.orderId || response.orderId || `ENG-${Math.floor(100000 + Math.random() * 900000)}`;
+      const generatedId = response.data?.orderNumber || response.orderNumber || `ENG-${Math.floor(100000 + Math.random() * 900000)}`;
 
       const now = new Date();
       const formattedDate = now.toLocaleDateString('en-US', {

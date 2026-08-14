@@ -139,7 +139,7 @@ export default function CartPage() {
                       className="p-4 sm:p-6 bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col sm:flex-row items-center gap-6 shadow-sm hover:border-orange-500/30 transition"
                     >
                       {/* Product Image */}
-                      <Link href={`/product/${item.id}`} className="w-24 h-32 shrink-0 rounded-xl overflow-hidden bg-slate-200 dark:bg-black/40 border border-slate-300 dark:border-white/10">
+                      <Link to={`/product/${item.id}`} className="w-24 h-32 shrink-0 rounded-xl overflow-hidden bg-slate-200 dark:bg-black/40 border border-slate-300 dark:border-white/10">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -153,7 +153,7 @@ export default function CartPage() {
                         <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 dark:text-white/50">
                           {item.category}
                         </span>
-                        <Link href={`/product/${item.id}`}>
+                        <Link to={`/product/${item.id}`}>
                           <h3 className="text-base font-bold text-slate-900 dark:text-white hover:text-orange-500 transition line-clamp-1">
                             {item.name}
                           </h3>
