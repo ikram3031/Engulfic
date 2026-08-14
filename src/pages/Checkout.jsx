@@ -227,6 +227,9 @@ export default function CheckoutPage() {
       });
 
       const orderPayload = {
+        memberId: isLoggedIn && user ? user.id : undefined,
+        couponCode: promoCode || undefined,
+        discountTotalAmount: discount || 0,
         billingInfo: buildAddressInfo(billingForm),
         shippingInfo: buildAddressInfo(shipToDifferent ? shippingForm : billingForm),
         paymentMethod: 'cod',

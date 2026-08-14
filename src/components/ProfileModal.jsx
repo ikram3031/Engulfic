@@ -95,18 +95,28 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
     setIsLoading(true);
     setErrorMsg('');
     try {
-      // Normalize phone to +880 format
-      const normalizedPhone = phone.startsWith('+')
-        ? phone
-        : `+880${phone.replace(/^0/, '')}`;
+      if (!phone.trim()) {
+        setErrorMsg('Phone number is required.');
+        setIsLoading(false);
+        return;
+      }
 
-      // billingInfo & shippingInfo are optional — not sent at registration
+      // Normalize phone to +880 format
+      const normalizedPhone = phone.trim().startsWith('+')
+        ? phone.trim()
+        : `+880${phone.trim().replace(/^0/, '')}`;
+
+      if (!/^\+8801[3-9]\d{8}$/.test(normalizedPhone)) {
+        setErrorMsg('Please enter a valid Bangladeshi phone number (+8801XXXXXXXXX or 01XXXXXXXXX).');
+        setIsLoading(false);
+        return;
+      }
+
       await registerMember({
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim(),
         phone: normalizedPhone,
-        password,
-        role: 'Customer'
+        password
       });
       setOtpContext('register');
       setMode('otp');

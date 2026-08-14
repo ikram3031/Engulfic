@@ -1,11 +1,20 @@
 # Engulfic Frontend — API Payload Documentation
 
 > **Change Logging Rules:**
-> - এই ফাইলে হওয়া প্রতিটা ফিক্স বা পরিবর্তনের জন্য একটি কমেন্ট লগ অ্যাড করতে হবে।
-> - কমেন্ট লগের আইডি শুরু হবে `E01` থেকে এবং ক্রমান্বয়ে ইনক্রিমেন্ট হবে (`E01`, `E02`, `E03`...)।
-> - নতুন লগগুলো সবসময় এই লগের তালিকার সবার উপরে (টপে) অ্যাড করতে হবে।
+> - এই ফাইলে হওয়া প্রতিটা ফিক্স বা পরিবর্তনের জন্য একটি কমেন্ট লগ `E01` থেকে ক্রমান্বয়ে ইনক্রিমেন্ট হবে (`E01`, `E02`, `E03`...)।
+> - সমস্ত কমেন্ট লগ ডেডিকেটেড ব্যাকলগ ফাইল [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)-এ সংরক্ষণ ও আপডেট করা হবে।
 
 ## Comment Logs
+
+### [E02] 2026-08-15: Enforced Required Phone Validation & Payload Formatting for Registration
+- **সমস্যা:** রেজিস্ট্রেশনের সময় ফোন নাম্বার অপশনাল হিসেবে হ্যান্ডেল করা হয়েছিল এবং ক্লায়েন্ট-সাইডে ফোন নাম্বারের সঠিক ফরম্যাট ভ্যালিডেশন ছিল না।
+- **Fix:**
+  - `ProfileModal.jsx`-এ ফোন নাম্বারকে রিকোয়ার্ড (Required) করা হয়েছে।
+  - ইউজার `017XXXXXXXX` বা `+88017XXXXXXXX` যাই ইনপুট দেউক, সাবমিটের আগে এটি স্বয়ংক্রিয়ভাবে `+8801[3-9]XXXXXXXXX` ফরম্যাটে রূপান্তর/নরমালাইজ হবে।
+  - বাংলাদেশি ফোন নাম্বারের সঠিক Regex ভ্যালিডেশন চেক যোগ করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/ProfileModal.jsx`](file:///f:/Engulfic/src/components/ProfileModal.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
 
 ### [E01] 2026-08-15: Fixed Cart, Checkout and Navigation Routing Issues
 - **সমস্যা:** `<Link>` কম্পোনেন্টে ভুল করে `href` এট্রিবিউট ব্যবহার করা হয়েছিল এবং `Navbar.jsx` ফাইলে `useLocation()` সরাসরি `pathname` ভেরিয়েবলে অ্যাসাইন করা হয়েছিল (ডিস্ট্রাকচার করা হয়নি)।
@@ -51,7 +60,7 @@
 | `name` | Required | `name` state (trimmed) |
 | `email` | Required | `email` state (trimmed) |
 | `password` | Required | `password` state (min 6 chars) |
-| `phone` | Optional | Normalized to `+8801[3-9]XXXXXXXXX` format (regex enforced by backend if provided) |
+| `phone` | Required | Enforced as required on frontend & normalized to `+8801[3-9]XXXXXXXXX` format |
 | `role` | Not sent | Backend defaults to `"Customer"` automatically |
 | `billingInfo` | Not sent | Optional field; collected during Checkout or Profile update |
 | `shippingInfo` | Not sent | Optional field; collected during Checkout or Profile update |
