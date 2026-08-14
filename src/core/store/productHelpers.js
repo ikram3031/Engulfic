@@ -1,13 +1,24 @@
+const API_BASE = (
+  import.meta.env?.VITE_IMAGE_BASE_URL ||
+  import.meta.env?.NEXT_PUBLIC_IMAGE_BASE_URL ||
+  import.meta.env?.VITE_API_URL ||
+  import.meta.env?.NEXT_PUBLIC_API_URL ||
+  'https://server.engulfic.com'
+).replace(/\/$/, '');
+
 export const normalizeProductImage = (url) => {
   if (!url) return "";
-  if (url.startsWith("http")) return url;
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:") || url.startsWith("data:")) {
+    return url;
+  }
   
   let cleanUrl = url;
   if (cleanUrl.startsWith("/content/")) {
     cleanUrl = cleanUrl.replace("/content/", "/uploads/");
   }
   
-  return cleanUrl; 
+  const cleanPath = cleanUrl.startsWith('/') ? cleanUrl : `/${cleanUrl}`;
+  return `${API_BASE}${cleanPath}`;
 };
 
 export const resolveCategoryName = (categoryId) => {

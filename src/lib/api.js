@@ -1,6 +1,15 @@
 import { transformProduct, transformProducts } from './transformProduct';
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://server.engulfic.com';
+
+export const getImageBaseUrl = () => {
+  const envImgUrl =
+    import.meta.env.VITE_IMAGE_BASE_URL ||
+    import.meta.env.NEXT_PUBLIC_IMAGE_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    'https://server.engulfic.com';
+  return envImgUrl.replace(/\/$/, '');
+};
 
 // ── Sort key mapping (frontend → backend) ─────────────────────
 const SORT_MAP = {

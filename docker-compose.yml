@@ -12,6 +12,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-https://server.engulfic.com}
+        VITE_IMAGE_BASE_URL: ${VITE_IMAGE_BASE_URL:-https://server.engulfic.com}
     container_name: ${FRONTEND_CONTAINER_NAME:-engulfic-frontend}
     restart: always
     ports:

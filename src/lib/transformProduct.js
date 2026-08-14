@@ -20,6 +20,23 @@
  *   createdAt     → createdAt, isNew (< 30 days)
  */
 
+const API_BASE = (
+  import.meta.env?.VITE_IMAGE_BASE_URL ||
+  import.meta.env?.NEXT_PUBLIC_IMAGE_BASE_URL ||
+  import.meta.env?.VITE_API_URL ||
+  import.meta.env?.NEXT_PUBLIC_API_URL ||
+  'https://server.engulfic.com'
+).replace(/\/$/, '');
+
+function formatImageUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url;
+  }
+  const clean = url.startsWith('/') ? url : `/${url}`;
+  return `${API_BASE}${clean}`;
+}
+
 export function transformProduct(p) {
   if (!p) return null;
 
@@ -48,10 +65,11 @@ export function transformProduct(p) {
   }
 
   // --- Image logic ---
-  const image = p.imageUrl || p.image_url || '';
+  const rawImage = p.imageUrl || p.image_url || '';
+  const image = formatImageUrl(rawImage);
   const galleryImages = (p.images || [])
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-    .map((img) => img.url)
+    .map((img) => formatImageUrl(img?.url || img))
     .filter(Boolean);
   const secondaryImage = galleryImages.length > 0 ? galleryImages[0] : image;
 
@@ -71,7 +89,7 @@ export function transformProduct(p) {
     originalPrice: v.offerPrice && v.offerPrice < v.price ? v.price : null,
     stockQuantity: v.stockQuantity || 0,
     sku: v.sku || '',
-    imageUrl: v.imageUrl || null,
+    imageUrl: v.imageUrl ? formatImageUrl(v.imageUrl) : null,
     sortOrder: v.sortOrder || 0,
   }));
   const sizes = variants.map((v) => v.size).filter(Boolean);
