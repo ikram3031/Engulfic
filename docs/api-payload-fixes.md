@@ -6,6 +6,15 @@
 
 ## Comment Logs
 
+### [E08] 2026-08-17: Fixed Carousel Container Alignment to Match Page Width
+- **সমস্যা:** হোমপেজের হরিজন্টাল প্রোডাক্ট ক্যারোসেল কন্টেইনারের বাইরে চলে যাচ্ছিল (negative margins এর কারণে), যার ফলে অন্যান্য সেকশনের (যেমন: Best Selling Products) সাথে অ্যালাইনমেন্ট মিলছিল না।
+- **Fix:**
+  - `NewArrivalsSection.jsx` ফাইলের ক্যারোসেল লিস্ট এলিমেন্ট থেকে `-mx-*` এবং `px-*` ক্লাস রিমুভ করে স্ট্যান্ডার্ড `max-w-7xl` গ্রিড কন্টেইনারের সাথে অ্যালাইনমেন্ট সমান করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/NewArrivalsSection.jsx`](file:///f:/Engulfic/src/components/NewArrivalsSection.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E07] 2026-08-17: Removed Hardcoded Mock Customer Data & Default Orders
 - **সমস্যা:** প্রোফাইল পেজ এবং জাস্ট্যান্ড স্টোরে হার্ডকোডেড ডামি কাস্টমার ইনফরমেশন (নাম, ইমেইল, অ্যাড্রেস) এবং ফেক অর্ডার হিস্ট্রি রাখা ছিল।
 - **Fix:**
