@@ -192,39 +192,6 @@ export default function HeroBanner({ onExploreClick }) {
             </button>
           </div>
         </div>
-
-        {/* E-Commerce Value Props Bar */}
-        <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4 text-xs text-white/80">
-          <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-md">
-            <div className="p-1.5 sm:p-2 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex-shrink-0">
-              <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </div>
-            <div>
-              <p className="font-bold text-white uppercase tracking-wide text-[11px] sm:text-xs">Nationwide Free Home Delivery</p>
-              <p className="text-white/60 text-[10px] sm:text-[11px]">Fast doorstep delivery across all regions</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-md">
-            <div className="p-1.5 sm:p-2 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex-shrink-0">
-              <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </div>
-            <div>
-              <p className="font-bold text-white uppercase tracking-wide text-[11px] sm:text-xs">100% Pure & Authentic Products</p>
-              <p className="text-white/60 text-[10px] sm:text-[11px]">Directly sourced artisan craftsmanship</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-md">
-            <div className="p-1.5 sm:p-2 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex-shrink-0">
-              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </div>
-            <div>
-              <p className="font-bold text-white uppercase tracking-wide text-[11px] sm:text-xs">Money Back Guarantee</p>
-              <p className="text-white/60 text-[10px] sm:text-[11px]">30-day effortless risk-free returns</p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

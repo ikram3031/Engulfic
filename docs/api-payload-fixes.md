@@ -6,6 +6,24 @@
 
 ## Comment Logs
 
+### [E10] 2026-08-17: Fixed Slider Height Cutoffs, Sticky Desktop Header, and Mobile Bottom Navigation Bar
+- **সমস্যা:** 
+  - হোম স্লাইডারে থাকা ভ্যালু প্রপস বারের কারণে স্লাইডারের উচ্চতা অসম হয়ে যাচ্ছিল এবং মোবাইলে কন্টেন্ট কেটে যাচ্ছিল।
+  - ডেক্সটপে স্ক্রল করার সময় উপরের অ্যানাউন্সমেন্ট মার্কি সহ পুরো হেডার স্টিকি হয়ে থাকত।
+  - মোবাইলের জন্য স্টিকি হেডারের পরিবর্তে ফুটারে একটি বটম নেভিগেশন বার প্রয়োজন ছিল।
+- **Fix:**
+  - `HeroBanner.jsx` থেকে ভ্যালু প্রপস বার সরিয়ে `Home.jsx` এ স্লাইডারের নিচে আলাদা কন্টেইনার সেকশনে যোগ করা হয়েছে, যা স্লাইডারের হাইট কাট-অফ ইস্যু সমাধান করে।
+  - `Navbar.jsx` এর মার্কি অ্যানাউন্সমেন্ট বারকে হেডারের বাইরে নিয়ে আসা হয়েছে এবং হেডারকে রেসপন্সিভ স্টিকি করা হয়েছে (`relative lg:sticky lg:top-0`), যেন ডেক্সটপে শুধু হেডার ফিক্সড থাকে এবং মোবাইলে তা স্ক্রল হয়ে চলে যায়।
+  - মোবাইলের জন্য একটি দৃষ্টিনন্দন বটম নেভিগেশন বার (`lg:hidden fixed bottom-0`) যোগ করা হয়েছে, যেখানে বামে মেনু ও শপ, মাঝে হোম বাটন এবং ডানে সার্চ ও কার্ট অ্যাকশন রয়েছে।
+  - মোবাইলে বটম বারের জন্য কন্টেন্ট ঢেকে যাওয়া আটকাতে `App.jsx` এর মেইন কন্টেইনারে `pb-16 lg:pb-0` প্যাডিং যোগ করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/HeroBanner.jsx`](file:///f:/Engulfic/src/components/HeroBanner.jsx)
+  - [`src/components/Navbar.jsx`](file:///f:/Engulfic/src/components/Navbar.jsx)
+  - [`src/pages/Home.jsx`](file:///f:/Engulfic/src/pages/Home.jsx)
+  - [`src/App.jsx`](file:///f:/Engulfic/src/App.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E09] 2026-08-17: Centered Bestsellers Header, Added Category Tabs & Smooth Image Hover Transitions
 - **সমস্যা:** বেস্ট সেলিং প্রোডাক্টস সেকশনের হেডার টেক্সট সেন্টারে ছিল না এবং ক্যাটাগরি অনুযায়ী প্রোডাক্ট ফিল্টার করার জন্য কোনো ট্যাব ছিল না। তাছাড়া, প্রোডাক্ট কার্ডে মাউস হোভার করলে হুট করে ছবি পরিবর্তন হয়ে যেত (ফ্লিপ করত), যা দেখতে প্রীতিকর ছিল না।
 - **Fix:**

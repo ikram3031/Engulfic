@@ -47,29 +47,30 @@ export default function Navbar({ onOpenSearch }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-zinc-950/85 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-zinc-100 transition-colors duration-300">
-        {/* Top Announcement Bar with Scrolling Marquee Text */}
-        <div className="bg-zinc-950 text-white border-b border-white/10 py-2 overflow-hidden text-xs font-mono select-none relative z-10 flex items-center">
-          <div className="animate-marquee whitespace-nowrap flex items-center gap-8 py-0.5">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex items-center gap-4">
-                <span className="text-orange-400 font-bold uppercase tracking-wider">
-                  Membership sign-in.
-                </span>
-                <span className="text-zinc-200">
-                  Sign in and get <strong className="text-orange-400">5% extra discount</strong>.
-                </span>
-                <span className="text-zinc-600">•</span>
-                <span className="text-zinc-300">Nationwide Free Home Delivery</span>
-                <span className="text-zinc-600">•</span>
-                <span className="text-orange-400 font-bold">CODE: ENGULF20 FOR 20% OFF</span>
-                <span className="text-zinc-600">•</span>
-                <span className="text-zinc-300">100% Pure & Authentic Couture</span>
-                <span className="text-zinc-600">•</span>
-              </div>
-            ))}
-          </div>
+      {/* Top Announcement Bar with Scrolling Marquee Text (Non-sticky, scrolls off screen) */}
+      <div className="bg-zinc-950 text-white border-b border-white/10 py-2 overflow-hidden text-xs font-mono select-none relative z-50 flex items-center">
+        <div className="animate-marquee whitespace-nowrap flex items-center gap-8 py-0.5">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center gap-4">
+              <span className="text-orange-400 font-bold uppercase tracking-wider">
+                Membership sign-in.
+              </span>
+              <span className="text-zinc-200">
+                Sign in and get <strong className="text-orange-400">5% extra discount</strong>.
+              </span>
+              <span className="text-zinc-600">•</span>
+              <span className="text-zinc-300">Nationwide Free Home Delivery</span>
+              <span className="text-zinc-600">•</span>
+              <span className="text-orange-400 font-bold">CODE: ENGULF20 FOR 20% OFF</span>
+              <span className="text-zinc-600">•</span>
+              <span className="text-zinc-300">100% Pure & Authentic Couture</span>
+              <span className="text-zinc-600">•</span>
+            </div>
+          ))}
         </div>
+      </div>
+
+      <header className="relative lg:sticky lg:top-0 z-40 bg-white/80 dark:bg-zinc-950/85 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-zinc-100 transition-colors duration-300">
 
         {/* MOBILE NAVIGATION BAR (lg:hidden) */}
         <div className="lg:hidden max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
@@ -561,6 +562,66 @@ export default function Navbar({ onOpenSearch }) {
       {toastMessage && (
         <Toast message={toastMessage} onClose={() => setToastMessage('')} />
       )}
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 shadow-[0_-4px_16px_rgba(0,0,0,0.1)] px-4 py-2 flex items-center justify-between pb-safe">
+        {/* Left: Menu & Shop (Categories) */}
+        <div className="flex items-center gap-6">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="flex flex-col items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition gap-0.5 active:scale-95"
+            aria-label="Toggle Mobile Menu"
+          >
+            <Menu className="w-5 h-5" />
+            <span className="text-[9px] font-mono font-bold uppercase tracking-wider">Menu</span>
+          </button>
+          
+          <Link
+            to="/catalog"
+            className="flex flex-col items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition gap-0.5"
+          >
+            <Sparkles className="w-5 h-5 text-orange-500" />
+            <span className="text-[9px] font-mono font-bold uppercase tracking-wider">Shop</span>
+          </Link>
+        </div>
+
+        {/* Center: Home Floating Button */}
+        <div className="absolute left-1/2 -translate-x-1/2 -top-4">
+          <Link
+            to="/"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg shadow-orange-500/30 border-2 border-white dark:border-zinc-950 hover:scale-105 active:scale-95 transition-all"
+            title="Home"
+          >
+            <span className="font-black text-xs font-mono uppercase tracking-tighter">EG</span>
+          </Link>
+        </div>
+
+        {/* Right: Search & Cart */}
+        <div className="flex items-center gap-6">
+          <button
+            onClick={onOpenSearch}
+            className="flex flex-col items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition gap-0.5 active:scale-95"
+            aria-label="Search Catalog"
+          >
+            <Search className="w-5 h-5" />
+            <span className="text-[9px] font-mono font-bold uppercase tracking-wider">Search</span>
+          </button>
+
+          <button
+            onClick={toggleCart}
+            className="flex flex-col items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition gap-0.5 relative active:scale-95"
+            aria-label="Toggle Cart"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {totalCartCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-black text-white font-mono shadow-[0_0_8px_rgba(249,115,22,0.6)]">
+                {totalCartCount}
+              </span>
+            )}
+            <span className="text-[9px] font-mono font-bold uppercase tracking-wider">Cart</span>
+          </button>
+        </div>
+      </div>
     </>
   );
 }

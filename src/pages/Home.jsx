@@ -15,6 +15,7 @@ import BestSellingProducts from '@/components/BestSellingProducts';
 import LookbookSection from '@/components/LookbookSection';
 import QuickViewModal from '@/components/QuickViewModal';
 import { useThemeStore } from '@/store/useThemeStore';
+import { Truck, ShieldCheck, RefreshCw } from 'lucide-react';
 
 export default function Home() {
   const router = useNavigate();
@@ -53,6 +54,41 @@ export default function Home() {
 
       {/* Hero Section */}
       <HeroBanner onExploreClick={handleScrollToCategories} />
+
+      {/* E-Commerce Value Props Bar */}
+      <div className="bg-white dark:bg-[#080808] border-b border-slate-200 dark:border-white/5 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md">
+            <div className="p-2 rounded-xl bg-orange-500/20 text-orange-500 border border-orange-500/30 flex-shrink-0">
+              <Truck className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold text-slate-850 dark:text-white uppercase tracking-wide text-[11px] sm:text-xs">Nationwide Free Home Delivery</p>
+              <p className="text-slate-500 dark:text-white/60 text-[10px] sm:text-[11px]">Fast doorstep delivery across all regions</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md">
+            <div className="p-2 rounded-xl bg-orange-500/20 text-orange-500 border border-orange-500/30 flex-shrink-0">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold text-slate-855 dark:text-white uppercase tracking-wide text-[11px] sm:text-xs">100% Pure & Authentic Products</p>
+              <p className="text-slate-500 dark:text-white/60 text-[10px] sm:text-[11px]">Directly sourced artisan craftsmanship</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md">
+            <div className="p-2 rounded-xl bg-orange-500/20 text-orange-500 border border-orange-500/30 flex-shrink-0">
+              <RefreshCw className="w-4 h-4 animate-spin-slow" />
+            </div>
+            <div>
+              <p className="font-bold text-slate-855 dark:text-white uppercase tracking-wide text-[11px] sm:text-xs">Money Back Guarantee</p>
+              <p className="text-slate-500 dark:text-white/60 text-[10px] sm:text-[11px]">30-day effortless risk-free returns</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Category Cards Section (1 per row mobile, 2 per row desktop) */}
       <CategoryGrid />
