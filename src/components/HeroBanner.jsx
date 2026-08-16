@@ -66,7 +66,7 @@ export default function HeroBanner({ onExploreClick }) {
 
   return (
     <section 
-      className="relative overflow-hidden bg-zinc-950 text-white h-[600px] sm:h-[680px] md:h-[720px] lg:h-[750px] flex flex-col justify-between"
+      className="relative overflow-hidden bg-zinc-950 text-white min-h-[580px] sm:min-h-[650px] md:min-h-[700px] lg:h-[720px] flex flex-col justify-between pb-8"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

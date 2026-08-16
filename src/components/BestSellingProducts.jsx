@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProducts } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
@@ -6,6 +6,12 @@ import { Sparkles, TrendingUp } from 'lucide-react';
 
 export default function BestSellingProducts({ onShowToast }) {
   const [activeTab, setActiveTab] = useState('All');
+
+  // Fetch all products to find which categories actually have products
+  const { data: allProducts = [] } = useQuery({
+    queryKey: ['allProductsForBestSellersFilter'],
+    queryFn: () => fetchProducts({ limit: 100 })
+  });
 
   const tabs = [
     { name: 'All', slug: 'All' },
@@ -16,6 +22,27 @@ export default function BestSellingProducts({ onShowToast }) {
     { name: 'Jerseys', slug: 'jerseys' }
   ];
 
+  // Determine active categories slugs based on fetched products
+  const activeCategorySlugs = new Set(
+    allProducts.map(p => {
+      if (!p) return '';
+      if (typeof p.category === 'object') return p.category?.slug || '';
+      return p.category || '';
+    }).filter(Boolean).map(s => s.toLowerCase())
+  );
+
+  // Filter tabs to only show categories that contain products
+  const availableTabs = tabs.filter(tab => 
+    tab.slug === 'All' || activeCategorySlugs.has(tab.slug.toLowerCase())
+  );
+
+  // If the active tab gets hidden, reset it to 'All'
+  useEffect(() => {
+    if (availableTabs.length > 0 && !availableTabs.some(t => t.name === activeTab)) {
+      setActiveTab('All');
+    }
+  }, [availableTabs, activeTab]);
+
   const currentTab = tabs.find(t => t.name === activeTab);
 
   const { data: displayedProducts = [], isLoading } = useQuery({
@@ -23,7 +50,7 @@ export default function BestSellingProducts({ onShowToast }) {
     queryFn: () => fetchProducts({
       category: currentTab.slug === 'All' ? undefined : currentTab.slug,
       sortBy: 'rating',
-      limit: 8
+      limit: 4
     })
   });
 
@@ -42,7 +69,7 @@ export default function BestSellingProducts({ onShowToast }) {
 
       {/* Tabs Menu (Vertical Stack on Mobile, Horizontal Row on Desktop) */}
       <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-2 sm:gap-3 mb-10 w-full max-w-3xl mx-auto px-4">
-        {tabs.map((tab) => (
+        {availableTabs.map((tab) => (
           <button
             key={tab.name}
             onClick={() => setActiveTab(tab.name)}
@@ -60,7 +87,7 @@ export default function BestSellingProducts({ onShowToast }) {
       {/* Grid: Mobile = 2 products per row (grid-cols-2), Desktop = 4 products per row (lg:grid-cols-4) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
         {isLoading
-          ? Array.from({ length: 8 }).map((_, i) => (
+          ? Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="animate-pulse bg-slate-200 dark:bg-white/10 rounded-3xl aspect-[3/4]" />
             ))
           : displayedProducts.length === 0

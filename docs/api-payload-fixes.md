@@ -6,6 +6,27 @@
 
 ## Comment Logs
 
+### [E12] 2026-08-17: Removed Value Props Bar, Fixed Slider Pagination, Reordered Home Sections, and Refined Bestsellers Tabs
+- **সমস্যা:** 
+  - স্লাইডারের নিচের ভ্যালু প্রপস বারটি বাদ দেওয়ার প্রয়োজন ছিল।
+  - স্লাইডারের একদম নিচের পেজিনেশন ডটগুলো কেটে যাচ্ছিল।
+  - হোমপেজ সেকশনগুলো ভুল অর্ডারে সাজানো ছিল (ক্যাটাগরি আগে, নিউ অ্যারাইভাল পরে)।
+  - ক্যাটাগরি হেডারটিতে "CATEGORIES & SUBCATEGORIES" লেখা ছিল, যেখানে শুধু "CATEGORIES" থাকা বাঞ্ছনীয়।
+  - বেস্ট সেলিং সেকশনে ৮টির জায়গায় ৪টি প্রোডাক্ট দেখানোর কথা ছিল এবং ফাঁকা বা প্রোডাক্টহীন ক্যাটাগরি ট্যাবগুলোও সেখানে দেখা যাচ্ছিল।
+- **Fix:**
+  - `Home.jsx` থেকে ভ্যালু প্রপস বার সেকশনটি সরিয়ে ফেলা হয়েছে।
+  - `HeroBanner.jsx`-এ উচ্চতার লিমিট ও প্যাডিং অ্যাডজাস্ট করা হয়েছে যেন পেজিনেশন ডটগুলো কখনো কেটে না যায়।
+  - হোমপেজের অর্ডারিং ঠিক করা হয়েছে: `HeroBanner` -> `NewArrivalsSection` -> `CategoryGrid` -> `BestSellingProducts`।
+  - `CategoryGrid.jsx` এর হেডার টেক্সট আপডেট করে শুধু "CATEGORIES" করা হয়েছে।
+  - `BestSellingProducts.jsx`-এ লিমিট কমিয়ে `4` প্রোডাক্ট করা হয়েছে এবং এপিআই প্রোডাক্ট লিস্ট অ্যানালাইসিস করে প্রোডাক্টহীন ফাঁকা ক্যাটাগরি ট্যাবগুলোকে ডায়নামিকালি রিমুভ করার লজিক দেওয়া হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/BestSellingProducts.jsx`](file:///f:/Engulfic/src/components/BestSellingProducts.jsx)
+  - [`src/components/CategoryGrid.jsx`](file:///f:/Engulfic/src/components/CategoryGrid.jsx)
+  - [`src/components/HeroBanner.jsx`](file:///f:/Engulfic/src/components/HeroBanner.jsx)
+  - [`src/pages/Home.jsx`](file:///f:/Engulfic/src/pages/Home.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E11] 2026-08-17: Fixed Rich Text Descriptions, Interactive Cursors, Badges, and Trust Features in Product View
 - **সমস্যা:** 
   - প্রোডাক্ট ডেসক্রিপশনে রিচ টেক্সট এডিটর থেকে আসা `<p>` ট্যাগ টেক্সট আকারে রেন্ডার হচ্ছিল।

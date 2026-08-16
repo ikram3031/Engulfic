@@ -61,7 +61,7 @@ export default function CategoryGrid() {
               <span>CURATED ARCHIVE</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-slate-900 dark:text-white font-sans">
-              CATEGORIES & SUBCATEGORIES
+              CATEGORIES
             </h2>
           </div>
           <p className="text-xs text-slate-600 dark:text-white/60 max-w-md font-mono">
