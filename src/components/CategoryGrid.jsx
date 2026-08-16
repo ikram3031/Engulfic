@@ -100,7 +100,7 @@ export default function CategoryGrid() {
                     {cat.subcategories.map((sub, sIdx) => (
                       <Link
                         key={sIdx}
-                        href={`/category/${cat.slug}?sub=${encodeURIComponent(sub)}`}
+                        to={`/category/${cat.slug}?sub=${encodeURIComponent(sub)}`}
                         className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-orange-500 hover:scale-105 text-white text-xs font-semibold backdrop-blur-md border border-white/20 hover:border-orange-400 transition-all shadow-md active:scale-95 cursor-pointer z-20"
                       >
                         {sub}
@@ -115,7 +115,7 @@ export default function CategoryGrid() {
                   {cat.description}
                 </p>
                 <Link
-                  href={`/category/${cat.slug}`}
+                  to={`/category/${cat.slug}`}
                   className="flex items-center gap-1 text-xs font-bold uppercase text-orange-400 tracking-widest font-mono hover:underline flex-shrink-0"
                 >
                   <span>Explore</span>

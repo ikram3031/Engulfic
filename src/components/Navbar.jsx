@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import {  useLocation  } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useThemeStore } from '@/store/useThemeStore';
@@ -27,6 +26,83 @@ import {
 import ProfileModal from '@/components/ProfileModal';
 import Toast from '@/components/Toast';
 
+function buildGroupedCategories(rawCategories) {
+  if (!rawCategories || rawCategories.length === 0) {
+    return [
+      {
+        name: 'Drop Shoulder T-Shirts',
+        slug: 'drop-shoulder-t-shirts',
+        subcategories: [
+          { name: 'Graphic Drop Shoulder Tee', slug: 'graphic-drop-shoulder-tee' },
+          { name: 'Drop Shoulder Tee', slug: 'drop-shoulder-tee' },
+        ]
+      },
+      {
+        name: 'Shirts',
+        slug: 'shirts',
+        subcategories: [
+          { name: 'Casual Shirt', slug: 'casual-shirt' },
+          { name: 'Oversized Shirt', slug: 'oversized-shirt' },
+        ]
+      },
+      {
+        name: 'Sweatshirts',
+        slug: 'sweatshirts',
+        subcategories: [
+          { name: 'Solid Sweatshirt', slug: 'solid-sweatshirt' },
+          { name: 'Oversized Graphic Sweatshirt', slug: 'oversized-graphic-sweatshirt' },
+        ]
+      },
+      {
+        name: 'Baggy Pants',
+        slug: 'baggy-pants',
+        subcategories: [
+          { name: 'Baggy Sweatpants', slug: 'baggy-sweatpants' },
+          { name: 'Baggy Graphic Sweatpants', slug: 'baggy-graphic-sweatpants' },
+        ]
+      },
+      {
+        name: 'Jerseys',
+        slug: 'jerseys',
+        subcategories: [
+          { name: 'Player Edition', slug: 'player-edition' },
+          { name: 'Fan Edition', slug: 'fan-edition' },
+          { name: 'Retro Edition', slug: 'retro-edition' },
+        ]
+      }
+    ];
+  }
+
+  const parents = rawCategories.filter(c => !c.parent);
+  const children = rawCategories.filter(c => c.parent);
+
+  if (parents.length === 0) {
+    return rawCategories.map(c => ({
+      name: c.name,
+      slug: c.slug,
+      subcategories: []
+    }));
+  }
+
+  return parents.map(p => {
+    const pId = String(p.id || p._id || p.slug);
+    const pSlug = p.slug;
+    const subcats = children.filter(c => {
+      const cParentId = typeof c.parent === 'object' ? String(c.parent.id || c.parent._id || c.parent.slug) : String(c.parent);
+      return cParentId === pId || cParentId === pSlug;
+    }).map(c => ({
+      name: c.name,
+      slug: c.slug
+    }));
+
+    return {
+      name: p.name,
+      slug: p.slug,
+      subcategories: subcats
+    };
+  });
+}
+
 export default function Navbar({ onOpenSearch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -35,13 +111,15 @@ export default function Navbar({ onOpenSearch }) {
   const { pathname } = useLocation();
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories });
 
+  const groupedCategories = useMemo(() => buildGroupedCategories(categories), [categories]);
+
   const totalCartCount = useCartStore((state) => state.getTotalItemsCount());
   const toggleCart = useCartStore((state) => state.toggleCart);
   const toastMessage = useCartStore((state) => state.toastMessage);
   const setToastMessage = useCartStore((state) => state.setToastMessage);
   const wishlistCount = useWishlistStore((state) => state.wishlist.length);
   const { theme, toggleTheme, initTheme } = useThemeStore();
-  const { isLoggedIn, user, logout } = useAuthStore();
+  const { isLoggedIn, logout } = useAuthStore();
 
   useEffect(() => {
     initTheme();
@@ -123,14 +201,12 @@ export default function Navbar({ onOpenSearch }) {
 
         {/* DESKTOP TWO-TIER NAVBAR LAYOUT (hidden on mobile, visible lg+) */}
         <div className="hidden lg:block">
-          {/* TOP TIER: Left Search Button | Center Brand Logo | Right User, Wishlist, Cart & Theme */}
+          {/* TOP TIER */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-3 items-center">
-            {/* Left Column: Logout (arrow left), Profile & Search Buttons */}
+            {/* Left Column */}
             <div className="flex items-center justify-start gap-3">
-              {/* Logout & Profile / Login Buttons */}
               {isLoggedIn ? (
                 <div className="flex items-center gap-3">
-                  {/* 1. Logout Button at the far left with arrow pointing left */}
                   <button
                     onClick={logout}
                     className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 hover:bg-red-500/10 text-slate-600 dark:text-zinc-300 hover:text-red-500 border border-slate-200 dark:border-zinc-800 transition text-xs font-mono flex items-center justify-center cursor-pointer"
@@ -140,7 +216,6 @@ export default function Navbar({ onOpenSearch }) {
                     <LogOut className="w-5 h-5 rotate-180" />
                   </button>
 
-                  {/* 2. Profile / My Account Button beside Logout */}
                   <Link to="/profile"
                     className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
                     title="My Account"
@@ -150,7 +225,6 @@ export default function Navbar({ onOpenSearch }) {
                   </Link>
                 </div>
               ) : (
-                /* Login / User Register Button if not logged in */
                 <button
                   onClick={() => setIsProfileOpen(true)}
                   className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
@@ -161,7 +235,6 @@ export default function Navbar({ onOpenSearch }) {
                 </button>
               )}
 
-              {/* 3. Search Icon Button after Profile */}
               <button
                 onClick={onOpenSearch}
                 className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 dark:hover:text-orange-400 hover:border-orange-500 transition shadow-sm flex items-center justify-center cursor-pointer group"
@@ -172,7 +245,7 @@ export default function Navbar({ onOpenSearch }) {
               </button>
             </div>
 
-            {/* Center Column: Prominent Brand Logo */}
+            {/* Center Column */}
             <div className="flex items-center justify-center">
               <Link to="/" className="inline-block group">
                 <span className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans group-hover:text-orange-500 transition-colors">
@@ -181,9 +254,8 @@ export default function Navbar({ onOpenSearch }) {
               </Link>
             </div>
 
-            {/* Right Column: Wishlist, Cart, Theme Toggle */}
+            {/* Right Column */}
             <div className="flex items-center justify-end gap-3">
-              {/* Wishlist Button */}
               <Link to="/wishlist"
                 className="relative p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
                 title="Wishlist"
@@ -196,7 +268,6 @@ export default function Navbar({ onOpenSearch }) {
                 )}
               </Link>
 
-              {/* Shopping Cart Drawer Button */}
               <button
                 onClick={toggleCart}
                 className="relative p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
@@ -211,7 +282,6 @@ export default function Navbar({ onOpenSearch }) {
                 )}
               </button>
 
-              {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
                 className={`p-3 rounded-full border transition flex items-center justify-center ${
@@ -236,13 +306,13 @@ export default function Navbar({ onOpenSearch }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest">
                 {/* 1. T-SHIRT */}
-                <Link to="/category/tees"
+                <Link to="/category/drop-shoulder-t-shirts"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
-                    pathname === '/category/tees' ? 'text-orange-500 font-extrabold' : ''
+                    pathname.includes('drop-shoulder-t-shirts') || pathname.includes('tees') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   T-Shirt
-                  {pathname === '/category/tees' && (
+                  {(pathname.includes('drop-shoulder-t-shirts') || pathname.includes('tees')) && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
                   )}
                 </Link>
@@ -250,11 +320,11 @@ export default function Navbar({ onOpenSearch }) {
                 {/* 2. SHIRTS */}
                 <Link to="/category/shirts"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
-                    pathname === '/category/shirts' ? 'text-orange-500 font-extrabold' : ''
+                    pathname.includes('/category/shirts') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   Shirts
-                  {pathname === '/category/shirts' && (
+                  {pathname.includes('/category/shirts') && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
                   )}
                 </Link>
@@ -262,16 +332,16 @@ export default function Navbar({ onOpenSearch }) {
                 {/* 3. SWEATSHIRTS */}
                 <Link to="/category/sweatshirts"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
-                    pathname === '/category/sweatshirts' ? 'text-orange-500 font-extrabold' : ''
+                    pathname.includes('sweatshirts') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   Sweatshirts
                 </Link>
 
                 {/* 4. PANTS */}
-                <Link to="/category/pants"
+                <Link to="/category/baggy-pants"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
-                    pathname === '/category/pants' ? 'text-orange-500 font-extrabold' : ''
+                    pathname.includes('pants') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   Pants
@@ -280,7 +350,7 @@ export default function Navbar({ onOpenSearch }) {
                 {/* 5. JERSEYS */}
                 <Link to="/category/jerseys"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
-                    pathname === '/category/jerseys' ? 'text-orange-500 font-extrabold' : ''
+                    pathname.includes('jerseys') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   Jerseys
@@ -296,11 +366,36 @@ export default function Navbar({ onOpenSearch }) {
                   {/* Shop Mega Menu Dropdown Container */}
                   <div className="absolute left-0 right-0 top-full hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-zinc-800 shadow-2xl p-8 z-50 text-slate-900 dark:text-white animate-fadeIn cursor-default">
                     <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 text-left">
-                      {categories.map((cat) => (
-                        <div key={cat._id} className="space-y-3">
-                          <Link to={`/category/${cat.slug}`} className="text-xs font-black hover:text-orange-500 text-slate-800 dark:text-zinc-200 uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-zinc-800 block transition-colors">
-                            {cat.name}
+                      {groupedCategories.map((parentCat, pIdx) => (
+                        <div key={parentCat.slug || pIdx} className="space-y-3">
+                          <Link 
+                            to={`/category/${parentCat.slug}`} 
+                            className="text-xs font-black hover:text-orange-500 text-slate-800 dark:text-zinc-200 uppercase tracking-wider pb-1.5 border-b border-slate-200 dark:border-zinc-800 block transition-colors flex items-center justify-between group/title"
+                          >
+                            <span>{parentCat.name}</span>
+                            <ArrowRight className="w-3 h-3 text-orange-500 opacity-0 group-hover/title:opacity-100 transition-opacity" />
                           </Link>
+                          
+                          <div className="space-y-2 text-xs font-mono">
+                            {parentCat.subcategories && parentCat.subcategories.length > 0 ? (
+                              parentCat.subcategories.map((sub, sIdx) => (
+                                <Link
+                                  key={sub.slug || sIdx}
+                                  to={`/category/${sub.slug}`}
+                                  className="block text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors py-0.5"
+                                >
+                                  {sub.name}
+                                </Link>
+                              ))
+                            ) : (
+                              <Link
+                                to={`/category/${parentCat.slug}`}
+                                className="block text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors py-0.5"
+                              >
+                                All {parentCat.name}
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -356,7 +451,6 @@ export default function Navbar({ onOpenSearch }) {
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 px-6 py-6 animate-fadeIn text-slate-900 dark:text-white space-y-6">
-            {/* Category Navigation Links (AT TOP) */}
             <div className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-widest">
               <Link to="/"
                 onClick={() => setMobileMenuOpen(false)}
@@ -366,7 +460,7 @@ export default function Navbar({ onOpenSearch }) {
                 <ArrowRight className="w-4 h-4 text-orange-500" />
               </Link>
 
-              <Link to="/category/new-arrivals"
+              <Link to="/category/drop-shoulder-t-shirts"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-2 border-b border-slate-100 dark:border-white/5 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
               >
@@ -385,16 +479,27 @@ export default function Navbar({ onOpenSearch }) {
                   <ChevronDown className={`w-4 h-4 text-orange-500 transition-transform duration-200 ${shopOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {shopOpen && (
-                  <div className="pl-3 space-y-3 text-[11px] capitalize normal-case text-slate-600 dark:text-zinc-400 animate-fadeIn pt-1 pb-2">
-                    {categories.map((cat) => (
-                      <Link 
-                        key={cat._id}
-                        to={`/category/${cat.slug}`} 
-                        onClick={() => setMobileMenuOpen(false)} 
-                        className="block font-bold text-slate-800 dark:text-zinc-200 hover:text-orange-500 transition-colors"
-                      >
-                        {cat.name}
-                      </Link>
+                  <div className="pl-3 space-y-4 text-xs font-mono animate-fadeIn pt-2 pb-2">
+                    {groupedCategories.map((parentCat, pIdx) => (
+                      <div key={parentCat.slug || pIdx} className="space-y-1.5">
+                        <Link 
+                          to={`/category/${parentCat.slug}`}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="font-extrabold text-slate-900 dark:text-white hover:text-orange-500 uppercase tracking-wide block border-b border-slate-100 dark:border-white/5 pb-1"
+                        >
+                          {parentCat.name}
+                        </Link>
+                        {parentCat.subcategories && parentCat.subcategories.map((sub, sIdx) => (
+                          <Link 
+                            key={sub.slug || sIdx}
+                            to={`/category/${sub.slug}`} 
+                            onClick={() => setMobileMenuOpen(false)} 
+                            className="block text-slate-600 dark:text-zinc-400 hover:text-orange-500 pl-2 py-0.5"
+                          >
+                            • {sub.name}
+                          </Link>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -425,9 +530,8 @@ export default function Navbar({ onOpenSearch }) {
               </Link>
             </div>
 
-            {/* Bottom Actions Section (PLACED AT THE BOTTOM) */}
+            {/* Bottom Actions Section */}
             <div className="pt-2 space-y-4">
-              {/* 1. Membership Offer Text Banner */}
               <div className="p-3 bg-orange-500/10 border border-orange-500/25 rounded-2xl text-xs font-mono text-slate-800 dark:text-zinc-200 flex items-center gap-2.5 shadow-sm">
                 <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
                 <span className="text-[11px] leading-tight">
@@ -435,7 +539,6 @@ export default function Navbar({ onOpenSearch }) {
                 </span>
               </div>
 
-              {/* 2. Grid of 2 Buttons: Login & Register or My Account & Logout */}
               <div className="grid grid-cols-2 gap-3">
                 {!isLoggedIn ? (
                   <>
@@ -485,7 +588,6 @@ export default function Navbar({ onOpenSearch }) {
                 )}
               </div>
 
-              {/* 3. Mobile Search Bar */}
               <div>
                 <button
                   onClick={() => {
@@ -504,7 +606,6 @@ export default function Navbar({ onOpenSearch }) {
                 </button>
               </div>
 
-              {/* 4. High-Contrast Theme Bar */}
               <div className="flex items-center justify-between pt-2">
                 <span className="text-xs font-mono font-bold text-slate-500 dark:text-zinc-400 uppercase">
                   Appearance Theme
@@ -532,17 +633,14 @@ export default function Navbar({ onOpenSearch }) {
         )}
       </header>
 
-      {/* Member Profile Modal */}
       <ProfileModal
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
       />
 
-      {/* Global Toast Notification */}
       {toastMessage && (
         <Toast message={toastMessage} onClose={() => setToastMessage('')} />
       )}
     </>
   );
 }
-

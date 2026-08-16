@@ -22,6 +22,18 @@ const SORT_MAP = {
   'rating': 'newest', // no rating field in backend, fall back
 };
 
+const CATEGORY_SLUG_MAP = {
+  'tees': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
+  't-shirt': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
+  't-shirts': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
+  'drop-shoulder-t-shirts': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
+  'shirts': ['casual-shirt', 'oversized-shirt', 'shirts'],
+  'sweatshirts': ['baggy-sweatpants', 'oversized-graphic-sweatshirt', 'solid-sweatshirt', 'sweatshirts'],
+  'pants': ['baggy-sweatpants', 'baggy-graphic-sweatpants', 'baggy-pants'],
+  'baggy-pants': ['baggy-sweatpants', 'baggy-graphic-sweatpants', 'baggy-pants'],
+  'jerseys': ['player-edition', 'fan-edition', 'retro-edition', 'jerseys']
+};
+
 /**
  * Fetch a paginated, filtered list of products.
  * Returns: { products: TransformedProduct[], meta: {...} }
@@ -37,7 +49,7 @@ export async function fetchProducts({
   const url = new URL(`${BASE_URL}/api/v1/products`);
   const params = new URLSearchParams();
 
-  if (category && category !== 'All') params.append('category', category);
+  if (category && category !== 'All' && category !== 'all') params.append('category', category);
   if (searchQuery && searchQuery.trim() !== '') params.append('q', searchQuery.trim());
   if (inStockOnly) params.append('stockStatus', 'instock');
   if (sortBy && SORT_MAP[sortBy]) params.append('sort', SORT_MAP[sortBy]);
@@ -55,7 +67,29 @@ export async function fetchProducts({
   const json = await response.json();
 
   // Backend returns { success, message, meta, data: [...] }
-  const rawProducts = json.data || json || [];
+  let rawProducts = json.data || json || [];
+  
+  if (rawProducts.length === 0 && category && CATEGORY_SLUG_MAP[category]) {
+    const altSlugs = CATEGORY_SLUG_MAP[category];
+    for (const alt of altSlugs) {
+      if (alt === category) continue;
+      try {
+        const altUrl = new URL(`${BASE_URL}/api/v1/products`);
+        const altParams = new URLSearchParams(params);
+        altParams.set('category', alt);
+        altUrl.search = altParams.toString();
+        const altRes = await fetch(altUrl.toString());
+        if (altRes.ok) {
+          const altJson = await altRes.json();
+          const altList = altJson.data || [];
+          if (altList.length > 0) {
+            rawProducts = rawProducts.concat(altList);
+          }
+        }
+      } catch (_) {}
+    }
+  }
+
   return transformProducts(rawProducts);
 }
 

@@ -102,6 +102,18 @@ export const authFetch = async (url, options = {}, timeout = 10000) => {
 
 import { mapRemoteProduct } from "../store/productHelpers";
 
+const CATEGORY_SLUG_MAP = {
+  'tees': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
+  't-shirt': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
+  't-shirts': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
+  'drop-shoulder-t-shirts': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
+  'shirts': ['casual-shirt', 'oversized-shirt', 'shirts'],
+  'sweatshirts': ['baggy-sweatpants', 'oversized-graphic-sweatshirt', 'solid-sweatshirt', 'sweatshirts'],
+  'pants': ['baggy-sweatpants', 'baggy-graphic-sweatpants', 'baggy-pants'],
+  'baggy-pants': ['baggy-sweatpants', 'baggy-graphic-sweatpants', 'baggy-pants'],
+  'jerseys': ['player-edition', 'fan-edition', 'retro-edition', 'jerseys']
+};
+
 export async function fetchProducts(opts = {}) {
   const apiBaseUrl = getApiBaseUrl();
   const skip = opts.skip ?? opts.offset ?? 0;
@@ -112,7 +124,9 @@ export async function fetchProducts(opts = {}) {
 
   const params = new URLSearchParams();
   if (q) params.set("q", q);
-  if (opts.category) params.set("category", opts.category);
+  if (opts.category && opts.category !== 'All' && opts.category !== 'all') {
+    params.set("category", opts.category);
+  }
   // Removed brand support as requested
   if (opts.season) params.set("season", opts.season);
   if (opts.tags) params.set("tags", opts.tags);
@@ -133,10 +147,31 @@ export async function fetchProducts(opts = {}) {
     if (!res.ok) throw new Error(`Server error: ${res.status}`);
     
     const json = await res.json();
-    const list = Array.isArray(json.data) ? json.data : Array.isArray(json) ? json : [];
+    let list = Array.isArray(json.data) ? json.data : Array.isArray(json) ? json : [];
+    
+    // If querying a category returns 0 items, try fallback to child category slugs
+    if (list.length === 0 && opts.category && CATEGORY_SLUG_MAP[opts.category]) {
+      const altSlugs = CATEGORY_SLUG_MAP[opts.category];
+      for (const alt of altSlugs) {
+        if (alt === opts.category) continue;
+        try {
+          const altParams = new URLSearchParams(params);
+          altParams.set("category", alt);
+          const altRes = await fetchWithRetry(`${apiBaseUrl}/api/v1/products?${altParams.toString()}`, { method: "GET" }, 8000, 2);
+          if (altRes.ok) {
+            const altJson = await altRes.json();
+            const altList = Array.isArray(altJson.data) ? altJson.data : Array.isArray(altJson) ? altJson : [];
+            if (altList.length > 0) {
+              list = list.concat(altList);
+            }
+          }
+        } catch (_) {}
+      }
+    }
+
     const mapped = list.map(mapRemoteProduct);
     mapped._meta = json.meta || null;
-    mapped._totalRows = json.meta?.total_products ?? json.totalRows ?? list.length;
+    mapped._totalRows = json.meta?.total_products ?? json.totalRows ?? mapped.length;
     return mapped;
   } catch (err) {
     console.error("fetchProducts Error:", err);
