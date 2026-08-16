@@ -6,22 +6,7 @@ import { setStoredMemberTokens, clearStoredMemberTokens } from '../core/lib/api'
 export const useAuthStore = create((set) => ({
   isLoggedIn: !!useAppStore.getState().user,
   user: useAppStore.getState().user,
-  orders: [
-    {
-      id: 'ENG-89421',
-      date: '2026-07-22',
-      status: 'Delivered',
-      statusColor: 'emerald',
-      total: 340.00,
-      items: [
-        { id: '1', name: 'OVERSIZED HEAVYWEIGHT HOODIE', color: 'Midnight Black', size: 'L', price: 180.00, quantity: 1, image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80' },
-        { id: '2', name: 'ARCHIVAL UTILITY CARGO PANTS', color: 'Olive Green', size: 'M', price: 160.00, quantity: 1, image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=600&q=80' }
-      ],
-      shippingAddress: 'House 42, Road 11, Block D, Banani, Dhaka, Bangladesh',
-      paymentMethod: 'Credit Card (**** 4242)',
-      trackingNumber: 'TRK-902184912'
-    }
-  ],
+  orders: [],
 
   // Logs in the member, sets tokens, and updates the global user session
   login: (userData, tokens) => {

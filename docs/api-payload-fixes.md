@@ -6,6 +6,17 @@
 
 ## Comment Logs
 
+### [E07] 2026-08-17: Removed Hardcoded Mock Customer Data & Default Orders
+- **সমস্যা:** প্রোফাইল পেজ এবং জাস্ট্যান্ড স্টোরে হার্ডকোডেড ডামি কাস্টমার ইনফরমেশন (নাম, ইমেইল, অ্যাড্রেস) এবং ফেক অর্ডার হিস্ট্রি রাখা ছিল।
+- **Fix:**
+  - `useAuthStore.js` থেকে হার্ডকোডেড ডামি অর্ডার সরিয়ে খালি অ্যারে (`[]`) করা হয়েছে।
+  - `Profile.jsx` এর স্টেট এবং রিড-অনলি ভিউ থেকে ডামি ডেটা রিমুভ করে ডাইনামিক ডেটা লোডিং এবং `useEffect` সিঙ্ক্রোনাইজেশন অ্যাড করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/pages/Profile.jsx`](file:///f:/Engulfic/src/pages/Profile.jsx)
+  - [`src/store/useAuthStore.js`](file:///f:/Engulfic/src/store/useAuthStore.js)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E06] 2026-08-17: Replaced CATEGORY with SALE in On-Sale Card Badge
 - **সমস্যা:** ক্যাটাগরি গ্রিডে "On Sale" কার্ডের উপরের ব্যাজে স্ট্যাটিকভাবে "CATEGORY" লেখা দেখাচ্ছিল।
 - **Fix:**

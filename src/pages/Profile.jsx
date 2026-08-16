@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import {  useNavigate  } from 'react-router-dom';
@@ -48,13 +48,26 @@ export default function ProfilePage() {
 
   // Editable Profile Form State
   const [formData, setFormData] = useState({
-    name: user?.name || 'Ikramul Hossen',
-    email: user?.email || 'ikramul.hossen3031@gmail.com',
-    phone: user?.phone || '+880 1712-345678',
-    address: user?.address || 'House 42, Road 11, Block D, Banani',
-    city: user?.city || 'Dhaka',
-    zipCode: user?.zipCode || '1213'
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    address: user?.address || '',
+    city: user?.city || '',
+    zipCode: user?.zipCode || ''
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: user.address || user.billingInfo?.address1 || '',
+        city: user.city || user.billingInfo?.city || '',
+        zipCode: user.zipCode || user.billingInfo?.postcode || ''
+      });
+    }
+  }, [user]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -267,7 +280,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-4 bg-slate-50 dark:bg-zinc-950 rounded-2xl border border-slate-200/80 dark:border-zinc-800/80 space-y-1">
                       <span className="text-[11px] font-mono text-slate-400 dark:text-zinc-500 uppercase">Full Name</span>
-                      <p className="font-bold text-sm text-slate-900 dark:text-white">{user?.name || 'Ikramul Hossen'}</p>
+                      <p className="font-bold text-sm text-slate-900 dark:text-white">{user?.name || ''}</p>
                     </div>
 
                     <div className="p-4 bg-slate-50 dark:bg-zinc-950 rounded-2xl border border-slate-200/80 dark:border-zinc-800/80 space-y-1">
