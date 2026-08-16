@@ -229,7 +229,10 @@ export default function ProductDetailPage() {
             {/* Clickable Breadcrumbs */}
             <Breadcrumb
               items={[
-                { label: product.category || 'Catalog', href: `/category/${product.categorySlug || (product.category || 'all').toLowerCase().replace(/\s+/g, '-')}` },
+                { 
+                  label: (typeof product.category === 'object' ? (product.category?.name || '') : product.category) || 'Catalog', 
+                  href: `/category/${product.categorySlug || (typeof product.category === 'object' ? (product.category?.slug || '') : (product.category || 'all')).toLowerCase().replace(/\s+/g, '-')}` 
+                },
                 { label: product.name }
               ]}
             />
@@ -316,7 +319,7 @@ export default function ProductDetailPage() {
                   <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
                     <span className="flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-full font-bold">
                       <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                      {product.category || 'LUXURY'}
+                      {typeof product.category === 'object' ? (product.category?.name || '') : (product.category || 'LUXURY')}
                     </span>
 
                     {product.season && (
@@ -560,7 +563,7 @@ export default function ProductDetailPage() {
             {relatedProducts.length > 0 && (
               <div className="mt-20 pt-10 border-t border-slate-200 dark:border-white/10 space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 className="text-2xl font-black uppercase tracking-wide">
-                  MORE FROM {product.category ? product.category.toUpperCase() : 'THE COLLECTION'}
+                  MORE FROM {(typeof product.category === 'object' ? (product.category?.name || '') : (product.category || '')).toUpperCase() || 'THE COLLECTION'}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {relatedProducts.map((p) => (

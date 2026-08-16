@@ -983,7 +983,7 @@ export default function CheckoutPage() {
                                   )}
                                   <div>
                                     <p className="font-bold text-slate-900 uppercase">{item.name}</p>
-                                    <p className="text-[10px] text-slate-500">{item.category || 'Garment'}</p>
+                                    <p className="text-[10px] text-slate-500">{(typeof item.category === 'object' ? (item.category?.name || '') : item.category) || 'Garment'}</p>
                                   </div>
                                 </div>
                               </td>

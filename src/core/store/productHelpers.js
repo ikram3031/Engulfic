@@ -23,6 +23,9 @@ export const normalizeProductImage = (url) => {
 
 export const resolveCategoryName = (categoryId) => {
   if (!categoryId) return "";
+  if (typeof categoryId === 'object') {
+    return categoryId.name || categoryId.title || categoryId.slug || "";
+  }
   if (typeof categoryId === 'string' && !categoryId.match(/^[0-9a-fA-F]{24}$/)) return categoryId;
   
   try {
@@ -30,12 +33,12 @@ export const resolveCategoryName = (categoryId) => {
     if (cached) {
       const categories = JSON.parse(cached);
       const found = categories.find(c => c._id === categoryId || c.id === categoryId);
-      if (found) return found.name || found.title;
+      if (found) return found.name || found.title || categoryId;
     }
   } catch (err) {
     // Ignore cache parse errors
   }
-  return categoryId;
+  return typeof categoryId === 'string' ? categoryId : "";
 }
 
 export const mapRemoteProduct = (product = {}) => {

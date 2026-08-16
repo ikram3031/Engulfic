@@ -127,7 +127,7 @@ export default function CartDrawer({ onCheckout }) {
                     <div>
                       {/* Category Pill */}
                       <span className="inline-block text-[10px] font-mono uppercase font-bold tracking-wider text-orange-600 dark:text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/20 mb-1">
-                        {item.category || 'Garment'}
+                        {(typeof item.category === 'object' ? (item.category?.name || '') : item.category) || 'Garment'}
                       </span>
                       {/* Product Name */}
                       <h4 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">{item.name}</h4>

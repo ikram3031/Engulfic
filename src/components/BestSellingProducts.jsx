@@ -8,7 +8,7 @@ import { Sparkles, TrendingUp } from 'lucide-react';
 export default function BestSellingProducts({ onShowToast }) {
   const { data: displayedProducts = [], isLoading } = useQuery({
     queryKey: ['bestSellingProducts'],
-    queryFn: () => fetchProducts({ sortBy: 'newest', limit: 12 })
+    queryFn: () => fetchProducts({ sortBy: 'rating', limit: 8 })
   });
 
   return (

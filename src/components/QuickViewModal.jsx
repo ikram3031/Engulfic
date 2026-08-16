@@ -91,7 +91,7 @@ export default function QuickViewModal({ product, onClose, onShowToast }) {
           <div>
             <div className="flex items-center gap-2 text-xs text-orange-500 font-mono mb-2">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{product.category?.toUpperCase()} {product.gender ? `• ${product.gender.toUpperCase()}` : ''}</span>
+              <span>{(typeof product.category === 'object' ? (product.category?.name || '') : (product.category || '')).toUpperCase()} {product.gender ? `• ${product.gender.toUpperCase()}` : ''}</span>
             </div>
 
             <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">{product.name}</h2>

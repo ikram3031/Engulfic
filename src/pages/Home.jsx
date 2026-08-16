@@ -6,18 +6,21 @@ import Navbar from '@/components/Navbar';
 import HeroBanner from '@/components/HeroBanner';
 import CategoryGrid from '@/components/CategoryGrid';
 import CartDrawer from '@/components/CartDrawer';
-
 import SearchModal from '@/components/SearchModal';
 import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
 import Toast from '@/components/Toast';
+import NewArrivalsSection from '@/components/NewArrivalsSection';
+import BestSellingProducts from '@/components/BestSellingProducts';
+import LookbookSection from '@/components/LookbookSection';
+import QuickViewModal from '@/components/QuickViewModal';
 import { useThemeStore } from '@/store/useThemeStore';
 
 export default function Home() {
   const router = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   const initTheme = useThemeStore((state) => state.initTheme);
 
@@ -54,6 +57,15 @@ export default function Home() {
       {/* Category Cards Section (1 per row mobile, 2 per row desktop) */}
       <CategoryGrid />
 
+      {/* New Arrivals Section */}
+      <NewArrivalsSection onShowToast={showToast} />
+
+      {/* Best Selling Products Section */}
+      <BestSellingProducts onShowToast={showToast} />
+
+      {/* Interactive Lookbook Section */}
+      <LookbookSection onQuickView={setQuickViewProduct} />
+
       {/* Footer with Policy & Info Links */}
       <Footer />
 
@@ -66,8 +78,13 @@ export default function Home() {
         onClose={() => setIsSearchOpen(false)}
       />
 
-
-
+      {quickViewProduct && (
+        <QuickViewModal
+          product={quickViewProduct}
+          onClose={() => setQuickViewProduct(null)}
+          onShowToast={showToast}
+        />
+      )}
       {/* Scroll To Top Global Button */}
       <ScrollToTop />
 
