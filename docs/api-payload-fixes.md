@@ -6,6 +6,52 @@
 
 ## Comment Logs
 
+### [E05] 2026-08-17: Fixed Product Cards Alignment, Carousel Controls, HTML Tagline & /shop/ URLs
+- **সমস্যা:** প্রোডাক্ট কার্ডের ট্যাগলাইনে র HTML ট্যাগ চলে আসছিল, কার্ডের উচ্চতা অসমান ছিল, ক্যারোসেলে স্ক্রলবার দেখা যাচ্ছিল এবং কোনো নেভিগেশন অ্যারো ছিল না। তাছাড়াও সিঙ্গেল প্রোডাক্ট ডিটেইলস এর URL পাথ `/shop/:id` হওয়া প্রয়োজন ছিল।
+- **Fix:**
+  - `transformProduct.js` এ ট্যাগলাইন তৈরির সময় Regex দিয়ে HTML ট্যাগ ফিল্টার/রিমুভ করা হয়েছে।
+  - `ProductCard.jsx` এর সম্পূর্ণ কার্ডকে `/shop/:id` লিংকে র‍্যাপ করা হয়েছে এবং সাব-বাটনগুলোতে প্রপাগেশন বন্ধ করা হয়েছে।
+  - কার্ডগুলোর হাইট ঠিক রাখতে সাইজ/কালার অপশন অংশে `min-h-[44px]` দিয়ে অ্যালাইনমেন্ট সমান করা হয়েছে।
+  - `NewArrivalsSection.jsx` ক্যারোসেলে ডেক্সটপ নেভিগেশন অ্যারো এবং স্ক্রলবার হাইড করার ক্লাস যোগ করা হয়েছে।
+  - `App.jsx` এ নতুন `/shop/:id` রাউট যোগ করা হয়েছে এবং সব লিঙ্ক `/product/` থেকে `/shop/` এ পরিবর্তন করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/lib/transformProduct.js`](file:///f:/Engulfic/src/lib/transformProduct.js)
+  - [`src/components/ProductCard.jsx`](file:///f:/Engulfic/src/components/ProductCard.jsx)
+  - [`src/components/NewArrivalsSection.jsx`](file:///f:/Engulfic/src/components/NewArrivalsSection.jsx)
+  - [`src/components/SearchModal.jsx`](file:///f:/Engulfic/src/components/SearchModal.jsx)
+  - [`src/pages/Cart.jsx`](file:///f:/Engulfic/src/pages/Cart.jsx)
+  - [`src/App.jsx`](file:///f:/Engulfic/src/App.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
+### [E04] 2026-08-17: Adjusted Category Grid layout to 3 Columns on Large Screens
+- **সমস্যা:** ক্যাটাগরি সেকশনে এক লাইনে ৪টি কলাম ছিল, যা পরিবর্তন করে প্রতি রো-তে ৩টি কলাম করার রিকোয়ারমেন্ট ছিল।
+- **Fix:**
+  - `CategoryGrid.jsx` ফাইলের মেইন গ্রিড এবং স্কেলেটন লোডিং গ্রিড উভয় জায়গায় `lg:grid-cols-4` পরিবর্তন করে `lg:grid-cols-3` করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/CategoryGrid.jsx`](file:///f:/Engulfic/src/components/CategoryGrid.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
+### [E03] 2026-08-17: Fixed React Child Object Crash with Raw Backend Category Objects
+- **সমস্যা:** ব্যাকএন্ড থেকে আসা `category` বা `categories` পপুলেটেড অবজেক্ট হলে, তা রিঅ্যাক্ট কম্পোনেন্টে রেন্ডার করার সময় "Objects are not valid as a React child" ইরর আসছিল।
+- **Fix:**
+  - `resolveCategoryName` এবং `transformProduct.js`-এ অবজেক্ট ইনপুট চেক যোগ করে ক্যাটাগরির `name` এক্সট্র্যাক্ট করা হয়েছে।
+  - সমস্ত ক্যাটাগরি রেন্ডার করা রিঅ্যাক্ট কম্পোনেন্টে (`ProductCard`, `QuickViewModal`, `SearchModal`, `CartDrawer`, `Cart`, `Checkout`, `Product`) সেফ চেক এবং অবজেক্ট হ্যান্ডলিং যুক্ত করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/core/store/productHelpers.js`](file:///f:/Engulfic/src/core/store/productHelpers.js)
+  - [`src/lib/transformProduct.js`](file:///f:/Engulfic/src/lib/transformProduct.js)
+  - [`src/lib/api.js`](file:///f:/Engulfic/src/lib/api.js)
+  - [`src/components/ProductCard.jsx`](file:///f:/Engulfic/src/components/ProductCard.jsx)
+  - [`src/components/QuickViewModal.jsx`](file:///f:/Engulfic/src/components/QuickViewModal.jsx)
+  - [`src/components/SearchModal.jsx`](file:///f:/Engulfic/src/components/SearchModal.jsx)
+  - [`src/components/CartDrawer.jsx`](file:///f:/Engulfic/src/components/CartDrawer.jsx)
+  - [`src/pages/Cart.jsx`](file:///f:/Engulfic/src/pages/Cart.jsx)
+  - [`src/pages/Checkout.jsx`](file:///f:/Engulfic/src/pages/Checkout.jsx)
+  - [`src/pages/Product.jsx`](file:///f:/Engulfic/src/pages/Product.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E02] 2026-08-15: Enforced Required Phone Validation & Payload Formatting for Registration
 - **সমস্যা:** রেজিস্ট্রেশনের সময় ফোন নাম্বার অপশনাল হিসেবে হ্যান্ডেল করা হয়েছিল এবং ক্লায়েন্ট-সাইডে ফোন নাম্বারের সঠিক ফরম্যাট ভ্যালিডেশন ছিল না।
 - **Fix:**

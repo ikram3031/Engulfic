@@ -100,10 +100,11 @@ export function transformProduct(p) {
     : false;
 
   // --- Tagline: first 120 chars of description ---
-  const tagline = p.description
-    ? p.description.length > 120
-      ? p.description.substring(0, 117) + '...'
-      : p.description
+  const cleanDescription = p.description ? p.description.replace(/<[^>]*>/g, '') : '';
+  const tagline = cleanDescription
+    ? cleanDescription.length > 120
+      ? cleanDescription.substring(0, 117) + '...'
+      : cleanDescription
     : '';
 
   // --- Category: resolve to display name if populated ---
@@ -111,12 +112,25 @@ export function transformProduct(p) {
   let categoryName = '';
   let categorySlug = '';
   if (p._populatedCategories && p._populatedCategories.length > 0) {
-    categoryName = p._populatedCategories[0].name || '';
-    categorySlug = p._populatedCategories[0].slug || '';
+    const firstPop = p._populatedCategories[0];
+    categoryName = typeof firstPop === 'object' ? (firstPop.name || firstPop.title || '') : String(firstPop || '');
+    categorySlug = typeof firstPop === 'object' ? (firstPop.slug || '') : '';
+  } else if (p.category && typeof p.category === 'object') {
+    categoryName = p.category.name || p.category.title || '';
+    categorySlug = p.category.slug || '';
+  } else if (Array.isArray(p.categories) && p.categories.length > 0 && typeof p.categories[0] === 'object') {
+    categoryName = p.categories[0].name || p.categories[0].title || '';
+    categorySlug = p.categories[0].slug || '';
   } else if (p.categoryName) {
     // If the API enriches category name
     categoryName = p.categoryName;
     categorySlug = p.categorySlug || '';
+  } else if (typeof p.category === 'string') {
+    categoryName = p.category;
+    categorySlug = p.categorySlug || '';
+  } else if (Array.isArray(p.categories) && p.categories.length > 0 && typeof p.categories[0] === 'string') {
+    categoryName = p.categories[0];
+    categorySlug = p.categories[0];
   }
 
   return {

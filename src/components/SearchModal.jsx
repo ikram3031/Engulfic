@@ -92,7 +92,7 @@ export default function SearchModal({ isOpen, onClose }) {
                 key={product.id}
                 onClick={() => {
                   onClose();
-                  navigate(`/product/${product.slug || product.id}`);
+                  navigate(`/shop/${product.slug || product.id}`);
                 }}
                 className="flex items-center justify-between p-3 bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl hover:border-orange-500/50 hover:bg-slate-200/60 dark:hover:bg-white/10 transition cursor-pointer group backdrop-blur-md"
               >
@@ -108,7 +108,7 @@ export default function SearchModal({ isOpen, onClose }) {
                       {product.name}
                     </h4>
                     <p className="text-[11px] text-slate-500 dark:text-white/50 font-mono mt-0.5">
-                      {product.category}
+                      {typeof product.category === 'object' ? (product.category?.name || '') : product.category}
                     </p>
                   </div>
                 </div>

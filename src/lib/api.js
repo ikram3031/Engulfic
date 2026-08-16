@@ -144,7 +144,7 @@ export async function searchProducts(query, limit = 12) {
   return results.map((item) => ({
     id: item.id || item._id || '',
     name: item.name || '',
-    category: item.category || '',
+    category: typeof item.category === 'object' ? (item.category?.name || '') : (item.category || ''),
     brand: item.brand || '',
     image: item.image || item.imageUrl || item.image_url || '',
     slug: item.slug || '',
