@@ -6,6 +6,26 @@
 
 ## Comment Logs
 
+### [E14] 2026-08-17: Unified All API Calls from a Single Entrypoint (src/lib/api.js)
+- **সমস্যা:** ওয়েবসাইটটিতে এপিআই রিকোয়েস্ট দুটি ভিন্ন ফাইলে ভাগ করা ছিল (`src/lib/api.js` এবং `src/core/lib/api.js`), যার ফলে ইমপোর্টগুলো ফ্র্যাগমেন্টেড হয়ে পড়ছিল।
+- **Fix:**
+  - পুরো ওয়েবসাইটের সকল এপিআই রিকোয়েস্টকে একটি একক উৎস `src/lib/api.js`-এ একীভূত করা হয়েছে।
+  - `src/core/lib/api.js` এর সকল মেম্বারশিপ, অথেনটিকেশন, অর্ডার এবং কুপন ফাংশনসমূহকে `src/lib/api.js` থেকে রি-এক্সপোর্ট করা হয়েছে।
+  - কোর এপিআই ইউজারদের সাথে সামঞ্জস্যতা বজায় রাখতে `fetchProductDetails` মেথডটিকে কাস্টম ইমপ্লিমেন্টেড `fetchProductById` এর একটি এলিয়াস (Alias) হিসেবে যুক্ত করা হয়েছে।
+  - পুরো প্রজেক্টের সব ফাইল, কম্পোনেন্ট, পেজ এবং জাস্ট্যান্ড স্টোরে থাকা `core/lib/api` ইমপোর্টগুলো আপডেট করে `@/lib/api` এ রিডাইরেক্ট করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/lib/api.js`](file:///f:/Engulfic/src/lib/api.js)
+  - [`src/components/ProfileModal.jsx`](file:///f:/Engulfic/src/components/ProfileModal.jsx)
+  - [`src/components/SearchModal.jsx`](file:///f:/Engulfic/src/components/SearchModal.jsx)
+  - [`src/core/store/useAppStore.js`](file:///f:/Engulfic/src/core/store/useAppStore.js)
+  - [`src/pages/Checkout.jsx`](file:///f:/Engulfic/src/pages/Checkout.jsx)
+  - [`src/pages/Product.jsx`](file:///f:/Engulfic/src/pages/Product.jsx)
+  - [`src/pages/Profile.jsx`](file:///f:/Engulfic/src/pages/Profile.jsx)
+  - [`src/store/useAuthStore.js`](file:///f:/Engulfic/src/store/useAuthStore.js)
+  - [`src/store/useCartStore.js`](file:///f:/Engulfic/src/store/useCartStore.js)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E12] 2026-08-17: Removed Value Props Bar, Fixed Slider Pagination, Reordered Home Sections, and Refined Bestsellers Tabs
 - **সমস্যা:** 
   - স্লাইডারের নিচের ভ্যালু প্রপস বারটি বাদ দেওয়ার প্রয়োজন ছিল।

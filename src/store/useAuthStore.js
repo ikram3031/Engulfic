@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { useAppStore } from '../core/store/useAppStore';
-import { setStoredMemberTokens, clearStoredMemberTokens } from '../core/lib/api';
+import { setStoredMemberTokens, clearStoredMemberTokens } from '../lib/api';
 
 // A bridge store to maintain compatibility with legacy components while using the new core/store state.
 export const useAuthStore = create((set) => ({

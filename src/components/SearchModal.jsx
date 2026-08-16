@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchProducts } from '@/core/lib/api';
+import { fetchProducts } from '@/lib/api';
 import { X, Search, ArrowRight, Loader2, PackageX } from 'lucide-react';
 
 export default function SearchModal({ isOpen, onClose }) {

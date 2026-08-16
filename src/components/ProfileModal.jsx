@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, User, ShieldCheck, Tag, Sparkles, CheckCircle2, LogIn, Heart, ShoppingCart, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
-import { checkMemberEmail, loginMember, registerMember, verifyMemberOtp, resendMemberOtp, forgotMemberPassword, resetMemberPassword } from '@/core/lib/api';
+import { checkMemberEmail, loginMember, registerMember, verifyMemberOtp, resendMemberOtp, forgotMemberPassword, resetMemberPassword } from '@/lib/api';
 
 export default function ProfileModal({ isOpen, onClose, onShowToast }) {
   const { isLoggedIn, user, login, logout } = useAuthStore();

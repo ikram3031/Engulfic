@@ -176,3 +176,31 @@ export async function fetchCategories() {
     parent: cat.parent || null,
   }));
 }
+
+// Alias for search and details to align core API consumers
+export const fetchProductDetails = fetchProductById;
+
+// Re-export authentication and membership functions from core API
+export {
+  refreshMemberSession,
+  fetchCombos,
+  fetchCouponByCode,
+  createOrder,
+  checkMemberEmail,
+  loginMember,
+  registerMember,
+  verifyMemberOtp,
+  resendMemberOtp,
+  forgotMemberPassword,
+  resetMemberPassword,
+  refreshMemberToken,
+  logoutMember,
+  fetchMembers,
+  fetchMemberById,
+  createMember,
+  updateMember,
+  deleteMember,
+  getStoredMemberTokens,
+  clearStoredMemberTokens,
+  setStoredMemberTokens
+} from '@/core/lib/api';

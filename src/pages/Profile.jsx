@@ -10,7 +10,7 @@ import CartDrawer from '@/components/CartDrawer';
 import QuickViewModal from '@/components/QuickViewModal';
 import SearchModal from '@/components/SearchModal';
 import { useAuthStore } from '@/store/useAuthStore';
-import { updateMember } from '@/core/lib/api';
+import { updateMember } from '@/lib/api';
 import {
   User,
   ShoppingCart,

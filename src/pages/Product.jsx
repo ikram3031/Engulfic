@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { fetchProductDetails, fetchProducts } from '@/core/lib/api';
+import { fetchProductDetails, fetchProducts } from '@/lib/api';
 import { useAppStore } from '@/core/store/useAppStore';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { fetchProducts as apiFetchProducts, fetchCombos as apiFetchCombos, fetchCategories as apiFetchCategories, fetchProductDetails as apiFetchProductDetails, fetchCouponByCode as apiFetchCouponByCode } from "../lib/api";
+import { fetchProducts as apiFetchProducts, fetchCombos as apiFetchCombos, fetchCategories as apiFetchCategories, fetchProductDetails as apiFetchProductDetails, fetchCouponByCode as apiFetchCouponByCode } from "../../lib/api";
 
 // The main Zustand store for the application state
 export const useAppStore = create((set, get) => ({

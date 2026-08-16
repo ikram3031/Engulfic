@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { fetchCouponByCode } from '@/core/lib/api';
+import { fetchCouponByCode } from '@/lib/api';
 
 export const useCartStore = create((set, get) => ({
   cart: [],

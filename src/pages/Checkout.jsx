@@ -11,7 +11,7 @@ import SearchModal from '@/components/SearchModal';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatPrice } from '@/lib/utils';
-import { createOrder } from '@/core/lib/api';
+import { createOrder } from '@/lib/api';
 import {
   ShoppingCart,
   ShieldCheck,
