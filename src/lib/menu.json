@@ -1,0 +1,76 @@
+[
+  {
+    "name": "T-Shirt",
+    "slug": "drop-shoulder-t-shirts",
+    "subcategories": [
+      {
+        "name": "Drop Shoulder Tee",
+        "slug": "drop-shoulder-tee"
+      },
+      {
+        "name": "Graphic Drop Shoulder Tee",
+        "slug": "graphic-drop-shoulder-tee"
+      }
+    ]
+  },
+  {
+    "name": "Shirts",
+    "slug": "shirts",
+    "subcategories": [
+      {
+        "name": "Oversized Shirt",
+        "slug": "oversized-shirt"
+      },
+      {
+        "name": "Casual Shirt",
+        "slug": "casual-shirt"
+      }
+    ]
+  },
+  {
+    "name": "Sweatshirts",
+    "slug": "sweatshirts",
+    "subcategories": [
+      {
+        "name": "Oversized Sweatshirt",
+        "slug": "oversized-sweatshirt"
+      },
+      {
+        "name": "Oversized Graphic Sweatshirt",
+        "slug": "oversized-graphic-sweatshirt"
+      }
+    ]
+  },
+  {
+    "name": "Pants",
+    "slug": "baggy-pants",
+    "subcategories": [
+      {
+        "name": "Baggy Sweatpants",
+        "slug": "baggy-sweatpants"
+      },
+      {
+        "name": "Baggy Graphic Sweatpants",
+        "slug": "baggy-graphic-sweatpants"
+      }
+    ]
+  },
+  {
+    "name": "Jerseys",
+    "slug": "jerseys",
+    "subcategories": [
+      {
+        "name": "Player Edition",
+        "slug": "player-edition"
+      },
+      {
+        "name": "Fan Edition",
+        "slug": "fan-edition"
+      },
+      {
+        "name": "Retro Edition",
+        "slug": "retro-edition"
+      }
+    ]
+  }
+]

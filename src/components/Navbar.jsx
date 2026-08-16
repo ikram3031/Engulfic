@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useQuery } from '@tanstack/react-query';
-import { fetchCategories } from '@/lib/api';
+import menuData from '@/lib/menu.json';
 import {
   ShoppingCart,
   Heart,
@@ -26,92 +25,13 @@ import {
 import ProfileModal from '@/components/ProfileModal';
 import Toast from '@/components/Toast';
 
-function buildGroupedCategories(rawCategories) {
-  if (!rawCategories || rawCategories.length === 0) {
-    return [
-      {
-        name: 'Drop Shoulder T-Shirts',
-        slug: 'drop-shoulder-t-shirts',
-        subcategories: [
-          { name: 'Graphic Drop Shoulder Tee', slug: 'graphic-drop-shoulder-tee' },
-          { name: 'Drop Shoulder Tee', slug: 'drop-shoulder-tee' },
-        ]
-      },
-      {
-        name: 'Shirts',
-        slug: 'shirts',
-        subcategories: [
-          { name: 'Casual Shirt', slug: 'casual-shirt' },
-          { name: 'Oversized Shirt', slug: 'oversized-shirt' },
-        ]
-      },
-      {
-        name: 'Sweatshirts',
-        slug: 'sweatshirts',
-        subcategories: [
-          { name: 'Solid Sweatshirt', slug: 'solid-sweatshirt' },
-          { name: 'Oversized Graphic Sweatshirt', slug: 'oversized-graphic-sweatshirt' },
-        ]
-      },
-      {
-        name: 'Baggy Pants',
-        slug: 'baggy-pants',
-        subcategories: [
-          { name: 'Baggy Sweatpants', slug: 'baggy-sweatpants' },
-          { name: 'Baggy Graphic Sweatpants', slug: 'baggy-graphic-sweatpants' },
-        ]
-      },
-      {
-        name: 'Jerseys',
-        slug: 'jerseys',
-        subcategories: [
-          { name: 'Player Edition', slug: 'player-edition' },
-          { name: 'Fan Edition', slug: 'fan-edition' },
-          { name: 'Retro Edition', slug: 'retro-edition' },
-        ]
-      }
-    ];
-  }
-
-  const parents = rawCategories.filter(c => !c.parent);
-  const children = rawCategories.filter(c => c.parent);
-
-  if (parents.length === 0) {
-    return rawCategories.map(c => ({
-      name: c.name,
-      slug: c.slug,
-      subcategories: []
-    }));
-  }
-
-  return parents.map(p => {
-    const pId = String(p.id || p._id || p.slug);
-    const pSlug = p.slug;
-    const subcats = children.filter(c => {
-      const cParentId = typeof c.parent === 'object' ? String(c.parent.id || c.parent._id || c.parent.slug) : String(c.parent);
-      return cParentId === pId || cParentId === pSlug;
-    }).map(c => ({
-      name: c.name,
-      slug: c.slug
-    }));
-
-    return {
-      name: p.name,
-      slug: p.slug,
-      subcategories: subcats
-    };
-  });
-}
-
 export default function Navbar({ onOpenSearch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
 
   const { pathname } = useLocation();
-  const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories });
-
-  const groupedCategories = useMemo(() => buildGroupedCategories(categories), [categories]);
+  const groupedCategories = menuData;
 
   const totalCartCount = useCartStore((state) => state.getTotalItemsCount());
   const toggleCart = useCartStore((state) => state.toggleCart);
@@ -358,10 +278,10 @@ export default function Navbar({ onOpenSearch }) {
 
                 {/* 6. SHOP (MEGA MENU) */}
                 <div className="group py-3.5 cursor-pointer">
-                  <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
-                    Shop
+                  <Link to="/shop" className="hover:text-orange-500 transition-colors flex items-center gap-1">
+                    <span>Shop</span>
                     <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
-                  </span>
+                  </Link>
 
                   {/* Shop Mega Menu Dropdown Container */}
                   <div className="absolute left-0 right-0 top-full hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-zinc-800 shadow-2xl p-8 z-50 text-slate-900 dark:text-white animate-fadeIn cursor-default">
