@@ -51,40 +51,85 @@ export const mapRemoteProduct = (product = {}) => {
 
   let variations = [];
   if (Array.isArray(product.variants) && product.variants.length > 0) {
-    variations = product.variants.map((v, idx) => ({
-      id: v._id || v.id || `var-${idx}`,
-      name: `${product.name || product.title} - ${v.size}`,
-      size: v.size || "Standard",
-      price: Number(v.offerPrice || v.price || 0),
-      originalPrice: v.offerPrice ? Number(v.price) : null,
-      stockQuantity: v.stockQuantity ?? 0,
-      stockStatus: (v.stockQuantity ?? 1) > 0 ? "instock" : "outofstock",
-      sku: v.sku || "",
-    }));
+    variations = product.variants.map((v, idx) => {
+      const vPrice = Number(v.price || 0);
+      const vOffer = v.offerPrice !== undefined && v.offerPrice !== null && v.offerPrice !== "" ? Number(v.offerPrice) : null;
+      const hasOffer = vOffer !== null && vOffer > 0 && vOffer < vPrice;
+      
+      return {
+        id: v._id || v.id || `var-${idx}`,
+        name: `${product.name || product.title || ""} - ${v.size}`,
+        size: v.size || "Standard",
+        price: hasOffer ? vOffer : vPrice,
+        originalPrice: hasOffer ? vPrice : null,
+        regularPrice: vPrice,
+        offerPrice: vOffer,
+        sku: v.sku || "",
+        sortOrder: v.sortOrder || 0,
+        imageUrl: v.imageUrl ? normalizeProductImage(v.imageUrl) : null,
+        stockQuantity: v.stockQuantity ?? product.stockAmount ?? 0,
+        stockStatus: v.stockStatus || product.stockStatus || "instock",
+      };
+    });
   }
+
+  const rawPrice = Number(product.price || 0);
+  const rawOffer = product.offerPrice !== undefined && product.offerPrice !== null && product.offerPrice !== "" ? Number(product.offerPrice) : null;
+  const hasMainOffer = rawOffer !== null && rawOffer > 0 && rawOffer < rawPrice;
 
   // Create default fallback variation if empty
   if (variations.length === 0) {
     variations.push({
       id: product.id || product._id || "var-default",
       name: product.name || product.title || "",
-      size: "Full Bottle",
-      price: Number(product.offerPrice || product.price || 0),
-      originalPrice: product.offerPrice ? Number(product.price) : null,
+      size: "Standard",
+      price: hasMainOffer ? rawOffer : rawPrice,
+      originalPrice: hasMainOffer ? rawPrice : null,
+      regularPrice: rawPrice,
+      offerPrice: rawOffer,
+      sku: product.sku || "",
+      sortOrder: 0,
+      imageUrl: null,
+      stockQuantity: product.stockAmount ?? 0,
       stockStatus: product.stockStatus || "instock",
     });
   }
 
+  const activePrice = hasMainOffer 
+    ? rawOffer 
+    : (rawPrice > 0 ? rawPrice : (variations.length > 0 ? Math.min(...variations.map((v) => v.price)) : 0));
+
+  const origPrice = hasMainOffer ? rawPrice : null;
+
+  const catVal = product.category || (Array.isArray(product.categories) && product.categories.length > 0 ? product.categories[0] : "");
+
   return {
     id: product.id || product._id || product.slug || String(Math.random()),
+    did: product.did || "",
     name: product.name || product.title || "",
     slug: product.slug || "",
-    category: resolveCategoryName(product.category),
-    // brand logic omitted as requested
-    basePrice: variations.length > 0 ? Math.min(...variations.map((v) => v.price)) : 0,
+    type: product.type || (variations.length > 1 ? "variant" : "simple"),
+    description: product.description || "",
+    longDescription: product.longDescription || "",
+    category: resolveCategoryName(catVal),
+    price: activePrice,
+    originalPrice: origPrice,
+    regularPrice: rawPrice,
+    offerPrice: rawOffer,
+    basePrice: activePrice,
+    sku: product.sku || (variations[0]?.sku) || "",
+    season: product.season || "All-Season",
+    tags: Array.isArray(product.tags) ? product.tags : [],
+    notes: Array.isArray(product.notes) ? product.notes : [],
+    stockStatus: product.stockStatus || "instock",
+    stockAmount: product.stockAmount ?? 0,
+    chargeTax: Boolean(product.chargeTax),
+    taxRate: product.taxRate || null,
+    metaData: product.metaData || null,
     image: normalizeProductImage(rawImage),
     images: galleryImages.length > 0 ? galleryImages : [normalizeProductImage(rawImage)],
-    variations,
+    sizes: Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : variations.map(v => v.size),
+    variants: variations,
     raw: product,
   };
 };

@@ -232,9 +232,9 @@ export default function Navbar({ onOpenSearch }) {
           </div>
 
           {/* BOTTOM TIER: Centered Menu Items Row */}
-          <div className="border-t border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-black/20">
+          <div className="border-t border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-black/20 relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest relative">
+              <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest">
                 {/* 1. T-SHIRT */}
                 <Link to="/category/tees"
                   className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
@@ -287,14 +287,14 @@ export default function Navbar({ onOpenSearch }) {
                 </Link>
 
                 {/* 6. SHOP (MEGA MENU) */}
-                <div className="group py-3.5 cursor-pointer relative">
+                <div className="group py-3.5 cursor-pointer">
                   <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
                     Shop
                     <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
                   </span>
 
                   {/* Shop Mega Menu Dropdown Container */}
-                  <div className="fixed left-0 right-0 top-32 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-zinc-800 shadow-2xl p-8 z-50 text-slate-900 dark:text-white animate-fadeIn">
+                  <div className="absolute left-0 right-0 top-full hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-zinc-800 shadow-2xl p-8 z-50 text-slate-900 dark:text-white animate-fadeIn cursor-default">
                     <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 text-left">
                       {categories.map((cat) => (
                         <div key={cat._id} className="space-y-3">
