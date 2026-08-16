@@ -6,6 +6,15 @@
 
 ## Comment Logs
 
+### [E06] 2026-08-17: Replaced CATEGORY with SALE in On-Sale Card Badge
+- **সমস্যা:** ক্যাটাগরি গ্রিডে "On Sale" কার্ডের উপরের ব্যাজে স্ট্যাটিকভাবে "CATEGORY" লেখা দেখাচ্ছিল।
+- **Fix:**
+  - `CategoryGrid.jsx` ফাইলে টপ ব্যাজের টেক্সটটি কন্ডিশনাল করা হয়েছে যেন ক্যাটাগরির স্ল্যাগ `sale` হলে সেখানে "SALE" লেখা প্রদর্শন করে।
+- **ফাইলসমূহ:**
+  - [`src/components/CategoryGrid.jsx`](file:///f:/Engulfic/src/components/CategoryGrid.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E05] 2026-08-17: Fixed Product Cards Alignment, Carousel Controls, HTML Tagline & /shop/ URLs
 - **সমস্যা:** প্রোডাক্ট কার্ডের ট্যাগলাইনে র HTML ট্যাগ চলে আসছিল, কার্ডের উচ্চতা অসমান ছিল, ক্যারোসেলে স্ক্রলবার দেখা যাচ্ছিল এবং কোনো নেভিগেশন অ্যারো ছিল না। তাছাড়াও সিঙ্গেল প্রোডাক্ট ডিটেইলস এর URL পাথ `/shop/:id` হওয়া প্রয়োজন ছিল।
 - **Fix:**

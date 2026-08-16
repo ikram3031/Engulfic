@@ -90,7 +90,7 @@ export default function CategoryGrid() {
               {/* Top Pill / Badge */}
               <div className="relative z-10 flex items-center justify-between gap-1">
                 <span className="px-3 py-1 bg-black/70 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-mono font-bold uppercase rounded-full tracking-wider shadow-lg">
-                  0{idx + 1}. CATEGORY
+                  0{idx + 1}. {cat.slug === 'sale' ? 'SALE' : 'CATEGORY'}
                 </span>
                 <span className="px-2.5 py-1 bg-orange-500/90 text-white text-[10px] sm:text-[11px] font-mono font-bold uppercase rounded-full tracking-wider shadow-lg">
                   {cat.productCount}
