@@ -6,6 +6,27 @@
 
 ## Comment Logs
 
+### [E11] 2026-08-17: Fixed Rich Text Descriptions, Interactive Cursors, Badges, and Trust Features in Product View
+- **সমস্যা:** 
+  - প্রোডাক্ট ডেসক্রিপশনে রিচ টেক্সট এডিটর থেকে আসা `<p>` ট্যাগ টেক্সট আকারে রেন্ডার হচ্ছিল।
+  - গ্লোবালি `a` এবং `button` ইত্যাদিতে কার্সার পয়েন্টার ছিল না।
+  - প্রোডাক্ট পেইজে অপ্রয়োজনীয় `DID` ফিল্ড প্রদর্শিত হচ্ছিল, ক্যাটাগরি ব্যাজ ও ব্রেডক্রাম্বগুলো ক্লিকযোগ্য ছিল না (ব্রেডক্রাম্ব-এ `<Link>` এর `to` এর বদলে `href` ছিল)।
+  - `longDescription` ডানদিকের ছোট প্যানেলে আঁটসাঁট হয়ে আসছিল।
+  - ট্রাস্ট ব্যাজে গ্লোবাল DHL ও রিফান্ড পলিসি লেখা ছিল যা লোকাল সার্ভিসের সাথে মিলছিল না।
+- **Fix:**
+  - `Product.jsx` এর ডেসক্রিপশন এবং ডিটেইলড ওভারভিউতে `dangerouslySetInnerHTML` ব্যবহার করা হয়েছে।
+  - `index.css`-এ গ্লোবাল রুলস যোগ করে লিংক ও বাটনসমূহে `cursor: pointer` নিশ্চিত করা হয়েছে।
+  - `Product.jsx` থেকে `DID`, `season` ও `type` ব্যাজ রিমুভ করে ক্যাটাগরি ব্যাজকে ক্লিকযোগ্য ক্যাটাগরি লিংকে রূপান্তর করা হয়েছে।
+  - `Breadcrumb.jsx`-এ ভুল `href` প্রপ পরিবর্তন করে সঠিক `to` প্রপ ব্যবহার করা হয়েছে।
+  - `longDescription` (Detailed Overview) কে মেইন দুই কলামের লে-আউট গ্রিড থেকে বের করে নিচে ফুল-উইডথ সেকশন হিসেবে সাজানো হয়েছে।
+  - ট্রাস্ট ব্যাজের আইকন ও লেখা আপডেট করে `Nationwide Delivery`, `Pure & Authentic Product` এবং `Best Customer Service` করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/Breadcrumb.jsx`](file:///f:/Engulfic/src/components/Breadcrumb.jsx)
+  - [`src/index.css`](file:///f:/Engulfic/src/index.css)
+  - [`src/pages/Product.jsx`](file:///f:/Engulfic/src/pages/Product.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E10] 2026-08-17: Fixed Slider Height Cutoffs, Sticky Desktop Header, and Mobile Bottom Navigation Bar
 - **সমস্যা:** 
   - হোম স্লাইডারে থাকা ভ্যালু প্রপস বারের কারণে স্লাইডারের উচ্চতা অসম হয়ে যাচ্ছিল এবং মোবাইলে কন্টেন্ট কেটে যাচ্ছিল।

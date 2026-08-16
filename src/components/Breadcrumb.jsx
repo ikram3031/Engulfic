@@ -27,7 +27,7 @@ export default function Breadcrumb({ items = [] }) {
                 </span>
               ) : (
                 <Link
-                  href={item.href}
+                  to={item.href}
                   className="hover:text-slate-900 dark:hover:text-white transition-colors py-1"
                 >
                   {item.label}

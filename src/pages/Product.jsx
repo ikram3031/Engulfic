@@ -315,47 +315,31 @@ export default function ProductDetailPage() {
                 {/* Right Product Options & Purchase */}
                 <div className="lg:col-span-5 space-y-6">
                   
-                  {/* Schema Badges: Category, Season, Product Type */}
+                  {/* Schema Badges: Category */}
                   <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
-                    <span className="flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-full font-bold">
+                    <Link
+                      to={`/category/${product.categorySlug || (typeof product.category === 'object' ? (product.category?.slug || '') : (product.category || 'all')).toLowerCase().replace(/\s+/g, '-')}`}
+                      className="flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-full font-bold hover:bg-orange-500 hover:text-white transition duration-300 shadow-sm"
+                    >
                       <Sparkles className="w-3.5 h-3.5 animate-pulse" />
                       {typeof product.category === 'object' ? (product.category?.name || '') : (product.category || 'LUXURY')}
-                    </span>
-
-                    {product.season && (
-                      <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white/80 border border-slate-300 dark:border-white/10 rounded-full">
-                        {getSeasonIcon(product.season)}
-                        <span>{product.season}</span>
-                      </span>
-                    )}
-
-                    {product.type && (
-                      <span className="flex items-center gap-1.5 px-2.5 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-full capitalize">
-                        <Layers className="w-3 h-3" />
-                        <span>{product.type} Product</span>
-                      </span>
-                    )}
+                    </Link>
                   </div>
 
-                  {/* Product Title & Identifiers (DID / SKU) */}
+                  {/* Product Title & Identifiers (SKU) */}
                   <div className="space-y-2">
                     <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-wide">
                       {product.name}
                     </h1>
 
-                    {/* Product DID & SKU Metadata Bar */}
-                    <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-500 dark:text-white/60">
-                      {product.did && (
-                        <span className="bg-slate-200 dark:bg-white/5 px-2.5 py-1 rounded-md border border-slate-300 dark:border-white/10">
-                          DID: <strong className="text-slate-800 dark:text-white">{product.did}</strong>
-                        </span>
-                      )}
-                      {currentSku && (
+                    {/* Product SKU Metadata Bar */}
+                    {currentSku && (
+                      <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-500 dark:text-white/60">
                         <span className="bg-slate-200 dark:bg-white/5 px-2.5 py-1 rounded-md border border-slate-300 dark:border-white/10">
                           SKU: <strong className="text-slate-800 dark:text-white">{currentSku}</strong>
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Stock Status & Stock Amount Schema Display */}
@@ -477,30 +461,18 @@ export default function ProductDetailPage() {
                     </button>
                   </div>
 
-                  {/* Descriptions: Short Description & Long Description */}
+                  {/* Descriptions: Short Description */}
                   <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-4 text-xs font-mono">
                     <div className="space-y-1">
                       <span className="text-orange-500 font-bold uppercase flex items-center gap-1.5">
                         <FileText className="w-3.5 h-3.5" />
                         <span>Description</span>
                       </span>
-                      <p className="text-slate-700 dark:text-white/80 leading-relaxed font-sans text-xs">
-                        {product.description}
-                      </p>
+                      <div 
+                        className="text-slate-700 dark:text-white/80 leading-relaxed font-sans text-xs prose dark:prose-invert max-w-none pt-1"
+                        dangerouslySetInnerHTML={{ __html: product.description }}
+                      />
                     </div>
-
-                    {product.longDescription && (
-                      <div className="pt-4 border-t border-slate-200 dark:border-white/10 space-y-1">
-                        <span className="text-orange-500 font-bold uppercase flex items-center gap-1.5">
-                          <Info className="w-3.5 h-3.5" />
-                          <span>Detailed Overview</span>
-                        </span>
-                        <div 
-                          className="text-slate-700 dark:text-white/80 leading-relaxed font-sans text-xs prose dark:prose-invert max-w-none pt-1"
-                          dangerouslySetInnerHTML={{ __html: product.longDescription }}
-                        />
-                      </div>
-                    )}
                   </div>
 
                   {/* Notes Schema Section (Fragrance / Key Notes) */}
@@ -543,21 +515,34 @@ export default function ProductDetailPage() {
                   <div className="grid grid-cols-3 gap-3 text-center text-[10px] font-mono text-slate-500 dark:text-white/60">
                     <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-1">
                       <Truck className="w-4 h-4 text-orange-500 mx-auto" />
-                      <span>Global DHL Express</span>
-                    </div>
-                    <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-1">
-                      <RotateCcw className="w-4 h-4 text-orange-500 mx-auto" />
-                      <span>30-Day Easy Returns</span>
+                      <span>Nationwide Delivery</span>
                     </div>
                     <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-1">
                       <ShieldCheck className="w-4 h-4 text-orange-500 mx-auto" />
-                      <span>Authenticity Guaranteed</span>
+                      <span>Pure & Authentic Product</span>
+                    </div>
+                    <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-1">
+                      <Sparkles className="w-4 h-4 text-orange-500 mx-auto" />
+                      <span>Best Customer Service</span>
                     </div>
                   </div>
 
                 </div>
-              </div>
             </div>
+
+            {/* Long Description Section */}
+            {product.longDescription && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 py-10 border-t border-slate-200 dark:border-white/10 space-y-4">
+                <h2 className="text-2xl font-black uppercase tracking-wide flex items-center gap-2">
+                  <Info className="w-5 h-5 text-orange-500" />
+                  <span>Detailed Overview</span>
+                </h2>
+                <div 
+                  className="text-slate-700 dark:text-zinc-300 leading-relaxed font-sans text-sm prose dark:prose-invert max-w-none pt-2"
+                  dangerouslySetInnerHTML={{ __html: product.longDescription }}
+                />
+              </div>
+            )}
 
             {/* Related Products Section */}
             {relatedProducts.length > 0 && (
