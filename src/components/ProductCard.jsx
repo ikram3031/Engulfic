@@ -43,12 +43,27 @@ export default function ProductCard({ product, onShowToast }) {
     >
       {/* Top Image Container - Part of card click link */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-200 dark:bg-black/40 block">
+        {/* Base Image */}
         <img
-          src={hovered && product.secondaryImage ? product.secondaryImage : product.image}
+          src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-[1200ms] cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-110 ${
+            hovered && product.secondaryImage ? 'opacity-0' : 'opacity-100'
+          }`}
           referrerPolicy="no-referrer"
         />
+
+        {/* Hover Secondary Image */}
+        {product.secondaryImage && (
+          <img
+            src={product.secondaryImage}
+            alt={`${product.name} alternate`}
+            className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-[1200ms] cubic-bezier(0.16, 1, 0.3, 1) ${
+              hovered ? 'opacity-100 scale-110' : 'opacity-0 scale-100'
+            }`}
+            referrerPolicy="no-referrer"
+          />
+        )}
 
         {/* Badges - Render at most one chip based on priority */}
         <div className="absolute top-3 left-3 z-10">

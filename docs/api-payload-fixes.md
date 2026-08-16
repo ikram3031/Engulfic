@@ -6,6 +6,18 @@
 
 ## Comment Logs
 
+### [E09] 2026-08-17: Centered Bestsellers Header, Added Category Tabs & Smooth Image Hover Transitions
+- **সমস্যা:** বেস্ট সেলিং প্রোডাক্টস সেকশনের হেডার টেক্সট সেন্টারে ছিল না এবং ক্যাটাগরি অনুযায়ী প্রোডাক্ট ফিল্টার করার জন্য কোনো ট্যাব ছিল না। তাছাড়া, প্রোডাক্ট কার্ডে মাউস হোভার করলে হুট করে ছবি পরিবর্তন হয়ে যেত (ফ্লিপ করত), যা দেখতে প্রীতিকর ছিল না।
+- **Fix:**
+  - `BestSellingProducts.jsx`-এ "BEST SELLING PRODUCTS" হেডার টেক্সট সেন্টারে অ্যালাইন করা হয়েছে।
+  - ক্যাটাগরি ফিল্টারিং-এর জন্য রেসপন্সিভ ট্যাব (All, T-Shirt, Shirts, Sweatshirts, Pants, Jerseys) যোগ করা হয়েছে, যা মোবাইলে ভার্টিক্যালি এবং ডেক্সটপে হরিজন্টালি প্রদর্শিত হয়।
+  - `ProductCard.jsx` এ হোভার করার সময় ছবির ঝটকা পরিবর্তন রোধ করতে দুটি ইমেজ লেয়ার করে `1200ms` ট্রানজিশন ডুরেশন সহ স্মুথ ফেড ও জুম-ইন এফেক্ট ইমপ্লিমেন্ট করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/BestSellingProducts.jsx`](file:///f:/Engulfic/src/components/BestSellingProducts.jsx)
+  - [`src/components/ProductCard.jsx`](file:///f:/Engulfic/src/components/ProductCard.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E08] 2026-08-17: Fixed Carousel Container Alignment to Match Page Width
 - **সমস্যা:** হোমপেজের হরিজন্টাল প্রোডাক্ট ক্যারোসেল কন্টেইনারের বাইরে চলে যাচ্ছিল (negative margins এর কারণে), যার ফলে অন্যান্য সেকশনের (যেমন: Best Selling Products) সাথে অ্যালাইনমেন্ট মিলছিল না।
 - **Fix:**
