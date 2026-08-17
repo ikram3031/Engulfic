@@ -29,6 +29,7 @@ export default function Navbar({ onOpenSearch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const { pathname } = useLocation();
   const groupedCategories = menuData;
@@ -43,6 +44,15 @@ export default function Navbar({ onOpenSearch }) {
 
   useEffect(() => {
     initTheme();
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [initTheme]);
 
   return (
@@ -70,7 +80,7 @@ export default function Navbar({ onOpenSearch }) {
         </div>
       </div>
 
-      <header className="relative lg:sticky lg:top-0 z-40 bg-white/80 dark:bg-zinc-950/85 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-zinc-100 transition-colors duration-300">
+      <header className="relative lg:sticky lg:top-0 z-40 bg-white/80 dark:bg-zinc-950/85 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-zinc-100 transition-all duration-300 group/header">
 
         {/* MOBILE NAVIGATION BAR (lg:hidden) */}
         <div className="lg:hidden max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
@@ -123,65 +133,79 @@ export default function Navbar({ onOpenSearch }) {
         {/* DESKTOP TWO-TIER NAVBAR LAYOUT (hidden on mobile, visible lg+) */}
         <div className="hidden lg:block">
           {/* TOP TIER */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-3 items-center">
+          <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-3 items-center transition-all duration-300 ${
+            isScrolled ? 'py-2' : 'py-4'
+          }`}>
             {/* Left Column */}
-            <div className="flex items-center justify-start gap-3">
+            <div className="flex items-center justify-start gap-2">
               {isLoggedIn ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <button
                     onClick={logout}
-                    className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 hover:bg-red-500/10 text-slate-600 dark:text-zinc-300 hover:text-red-500 border border-slate-200 dark:border-zinc-800 transition text-xs font-mono flex items-center justify-center cursor-pointer"
+                    className={`rounded-full bg-slate-100 dark:bg-zinc-900/80 hover:bg-red-500/10 text-slate-600 dark:text-zinc-300 hover:text-red-500 border border-slate-200 dark:border-zinc-800 transition-all duration-300 text-xs font-mono flex items-center justify-center cursor-pointer ${
+                      isScrolled ? 'p-2' : 'p-3'
+                    }`}
                     title="Sign Out"
                     aria-label="Sign Out"
                   >
-                    <LogOut className="w-5 h-5 rotate-180" />
+                    <LogOut className={`transition-all duration-300 rotate-180 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                   </button>
 
                   <Link to="/profile"
-                    className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                    className={`rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition-all duration-300 flex items-center justify-center ${
+                      isScrolled ? 'p-2' : 'p-3'
+                    }`}
                     title="My Account"
                     aria-label="My Account"
                   >
-                    <UserCheck className="w-5 h-5 text-orange-500" />
+                    <UserCheck className={`transition-all duration-300 text-orange-500 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                   </Link>
                 </div>
               ) : (
                 <button
                   onClick={() => setIsProfileOpen(true)}
-                  className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                  className={`rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition-all duration-300 flex items-center justify-center ${
+                    isScrolled ? 'p-2' : 'p-3'
+                  }`}
                   title="Sign In / Register"
                   aria-label="Sign In / Register"
                 >
-                  <User className="w-5 h-5" />
+                  <User className={`transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                 </button>
               )}
 
               <button
                 onClick={onOpenSearch}
-                className="p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 dark:hover:text-orange-400 hover:border-orange-500 transition shadow-sm flex items-center justify-center cursor-pointer group"
+                className={`rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 dark:hover:text-orange-400 hover:border-orange-500 transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer group ${
+                  isScrolled ? 'p-2' : 'p-3'
+                }`}
                 title="Search Archive"
                 aria-label="Search Archive"
               >
-                <Search className="w-5 h-5 text-slate-700 dark:text-zinc-200 group-hover:text-orange-500 transition-colors" />
+                <Search className={`text-slate-700 dark:text-zinc-200 group-hover:text-orange-500 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
               </button>
             </div>
 
             {/* Center Column */}
             <div className="flex items-center justify-center">
               <Link to="/" className="inline-block group">
-                <span className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans group-hover:text-orange-500 transition-colors">
+                <span className={`font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans group-hover:text-orange-500 transition-all duration-300 ${
+                  isScrolled ? 'text-xl' : 'text-3xl'
+                }`}>
                   ENGULFIC
                 </span>
               </Link>
             </div>
 
             {/* Right Column */}
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex items-center justify-end gap-2">
               <Link to="/wishlist"
-                className="relative p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                className={`relative rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition-all duration-300 flex items-center justify-center ${
+                  isScrolled ? 'p-2' : 'p-3'
+                }`}
                 title="Wishlist"
               >
-                <Heart className="w-5 h-5" />
+                <Heart className={`transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                 {wishlistCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white font-mono font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center border border-white dark:border-zinc-950 shadow-md">
                     {wishlistCount}
@@ -191,11 +215,13 @@ export default function Navbar({ onOpenSearch }) {
 
               <button
                 onClick={toggleCart}
-                className="relative p-3 rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition flex items-center justify-center"
+                className={`relative rounded-full bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 hover:text-orange-500 transition-all duration-300 flex items-center justify-center ${
+                  isScrolled ? 'p-2' : 'p-3'
+                }`}
                 title="Open Cart Drawer"
                 aria-label="Open Shopping Cart Drawer"
               >
-                <ShoppingCart className="w-5 h-5 text-slate-800 dark:text-zinc-100" />
+                <ShoppingCart className={`text-slate-800 dark:text-zinc-100 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                 {totalCartCount > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white font-mono font-bold text-[10px] min-w-5 h-5 px-1 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-zinc-950">
                     {totalCartCount}
@@ -205,30 +231,32 @@ export default function Navbar({ onOpenSearch }) {
 
               <button
                 onClick={toggleTheme}
-                className={`p-3 rounded-full border transition flex items-center justify-center ${
+                className={`rounded-full border transition-all duration-300 flex items-center justify-center ${
                   theme === 'light'
                     ? 'bg-slate-900 text-white border-slate-900 hover:bg-slate-800'
                     : 'bg-zinc-900 text-amber-400 border-zinc-800 hover:bg-zinc-800'
-                }`}
+                } ${isScrolled ? 'p-2' : 'p-3'}`}
                 title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
                 aria-label="Toggle Theme"
               >
                 {theme === 'light' ? (
-                  <Moon className="w-5 h-5 text-amber-300 fill-amber-300" />
+                  <Moon className={`text-amber-300 fill-amber-300 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                 ) : (
-                  <Sun className="w-5 h-5 text-amber-400 fill-amber-400" />
+                  <Sun className={`text-amber-400 fill-amber-400 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                 )}
               </button>
             </div>
           </div>
 
           {/* BOTTOM TIER: Centered Menu Items Row */}
-          <div className="border-t border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-black/20 relative">
+          <div className="border-t border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-black/20 relative transition-all duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest">
+              <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest transition-all duration-300">
                 {/* 1. T-SHIRT */}
                 <Link to="/category/drop-shoulder-t-shirts"
-                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                  className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
+                    isScrolled ? 'py-1.5' : 'py-3.5'
+                  } ${
                     pathname.includes('drop-shoulder-t-shirts') || pathname.includes('tees') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
@@ -240,7 +268,9 @@ export default function Navbar({ onOpenSearch }) {
 
                 {/* 2. SHIRTS */}
                 <Link to="/category/shirts"
-                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                  className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
+                    isScrolled ? 'py-1.5' : 'py-3.5'
+                  } ${
                     pathname.includes('/category/shirts') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
@@ -252,7 +282,9 @@ export default function Navbar({ onOpenSearch }) {
 
                 {/* 3. SWEATSHIRTS */}
                 <Link to="/category/sweatshirts"
-                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                  className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
+                    isScrolled ? 'py-1.5' : 'py-3.5'
+                  } ${
                     pathname.includes('sweatshirts') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
@@ -261,24 +293,19 @@ export default function Navbar({ onOpenSearch }) {
 
                 {/* 4. PANTS */}
                 <Link to="/category/baggy-pants"
-                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
+                  className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
+                    isScrolled ? 'py-1.5' : 'py-3.5'
+                  } ${
                     pathname.includes('pants') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   Pants
                 </Link>
 
-                {/* 5. JERSEYS */}
-                <Link to="/category/jerseys"
-                  className={`py-3.5 hover:text-orange-500 transition-colors relative flex items-center ${
-                    pathname.includes('jerseys') ? 'text-orange-500 font-extrabold' : ''
-                  }`}
-                >
-                  Jerseys
-                </Link>
-
                 {/* 6. SHOP (MEGA MENU) */}
-                <div className="group py-3.5 cursor-pointer">
+                <div className={`group cursor-pointer transition-all duration-300 ${
+                  isScrolled ? 'py-1.5' : 'py-3.5'
+                }`}>
                   <Link to="/shop" className="hover:text-orange-500 transition-colors flex items-center gap-1">
                     <span>Shop</span>
                     <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
@@ -299,15 +326,15 @@ export default function Navbar({ onOpenSearch }) {
                           
                           <div className="space-y-2 text-xs font-mono">
                             {parentCat.subcategories && parentCat.subcategories.length > 0 ? (
-                              parentCat.subcategories.map((sub, sIdx) => (
-                                <Link
-                                  key={sub.slug || sIdx}
-                                  to={`/category/${sub.slug}`}
-                                  className="block text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors py-0.5"
-                                >
-                                  {sub.name}
-                                </Link>
-                              ))
+                               parentCat.subcategories.map((sub, sIdx) => (
+                                 <Link
+                                   key={sub.slug || sIdx}
+                                   to={`/category/${sub.slug}`}
+                                   className="block text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors py-0.5"
+                                 >
+                                   {sub.name}
+                                 </Link>
+                               ))
                             ) : (
                               <Link
                                 to={`/category/${parentCat.slug}`}
@@ -325,7 +352,9 @@ export default function Navbar({ onOpenSearch }) {
 
                 {/* 8. SALE */}
                 <Link to="/category/sale"
-                  className="py-3.5 hover:text-orange-500 transition-colors text-orange-500 font-black flex items-center gap-1"
+                  className={`hover:text-orange-500 transition-all duration-300 text-orange-500 font-black flex items-center gap-1 ${
+                    isScrolled ? 'py-1.5' : 'py-3.5'
+                  }`}
                 >
                   <span>Sale</span>
                   <span className="px-1.5 py-0.5 bg-orange-500 text-white text-[9px] rounded-full font-mono uppercase">
@@ -334,7 +363,9 @@ export default function Navbar({ onOpenSearch }) {
                 </Link>
 
                 {/* 9. ABOUT */}
-                <div className="group py-3.5 relative cursor-pointer">
+                <div className={`group relative cursor-pointer transition-all duration-300 ${
+                  isScrolled ? 'py-1.5' : 'py-3.5'
+                }`}>
                   <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
                     About
                     <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
