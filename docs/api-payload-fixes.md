@@ -6,6 +6,15 @@
 
 ## Comment Logs
 
+### [E21] 2026-08-18: Hid Shop Megamenu from Navbar Link List
+- **সমস্যা:** ন্যাভবার মেনু থেকে "Shop" লিংক এবং এর মেগামেনু ড্রপডাউনটি হাইড/রিমুভ করতে হবে।
+- **Fix:**
+  - `Navbar.jsx` এর ডেস্কটপ বটম টিয়ার লে-আউট থেকে "Shop" এর মেগামেনু ট্র্রিগার কন্টেইনার এবং এর ভেতরের সকল ক্যাটাগরি ম্যাপিং মডিউল রিমুভ করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/Navbar.jsx`](file:///f:/Engulfic/src/components/Navbar.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E20] 2026-08-18: Cleaned Product Card: Kept Size Only, Removed Prices & Limited Run Badge, Centered View Piece Link
 - **সমস্যা:** প্রোডাক্ট কার্ডের সাইজ বাটন থেকে প্রাইস সরিয়ে শুধু সাইজ দেখাতে হবে, "Limited Run" ব্যাজটি মুছে ফেলতে হবে এবং "View Piece/View Details" বাটনটি সেন্টারে এলাইন করতে হবে।
 - **Fix:**
