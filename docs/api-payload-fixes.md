@@ -6,6 +6,17 @@
 
 ## Comment Logs
 
+### [E15] 2026-08-18: Fixed Mobile Carousel Product Card Clippings
+- **সমস্যা:** মোবাইলে ক্যারোসেলে কার্ড রেন্ডার করার সময় কার্ডের ডান দিক ও নিচের বর্ডারের কিছু অংশ কেটে আসছিল (clipping)। তাছাড়া কার্ডে হোভার ট্রানজিশন (`hover:-translate-y-1.5`) এর কারণে স্ক্রল এরিয়াতে লে-আউট শিফট হচ্ছিল।
+- **Fix:**
+  - `NewArrivalsSection.jsx`-এ কার্ডের প্যাডিং অফসেট `p-2` থেকে `pr-4` এ শিফট করা হয়েছে এবং মোবাইল উইডথ `w-[70%]` করা হয়েছে যাতে কার্ডের সাইড বা শ্যাডো কেটে না যায়।
+  - `ProductCard.jsx` থেকে হোভার ট্রানজিশন `hover:-translate-y-1.5` রিমুভ করা হয়েছে যাতে স্ক্রল কন্টেইনারে কার্ডের পজিশন স্ট্যাটিক থাকে এবং কাটিং না ঘটে।
+- **ফাইলসমূহ:**
+  - [`src/components/NewArrivalsSection.jsx`](file:///f:/Engulfic/src/components/NewArrivalsSection.jsx)
+  - [`src/components/ProductCard.jsx`](file:///f:/Engulfic/src/components/ProductCard.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E14] 2026-08-17: Unified All API Calls from a Single Entrypoint (src/lib/api.js)
 - **সমস্যা:** ওয়েবসাইটটিতে এপিআই রিকোয়েস্ট দুটি ভিন্ন ফাইলে ভাগ করা ছিল (`src/lib/api.js` এবং `src/core/lib/api.js`), যার ফলে ইমপোর্টগুলো ফ্র্যাগমেন্টেড হয়ে পড়ছিল।
 - **Fix:**

@@ -37,7 +37,7 @@ export default function ProductCard({ product, onShowToast }) {
   return (
     <Link
       to={`/shop/${product.slug || product.id}`}
-      className="group bg-slate-100/80 dark:bg-white/5 backdrop-blur-md rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-orange-500/50 hover:bg-slate-200/60 dark:hover:bg-white/10 transition-all duration-500 ease-out flex flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 dark:hover:shadow-orange-500/15 hover:-translate-y-1.5 text-left block"
+      className="group bg-slate-100/80 dark:bg-white/5 backdrop-blur-md rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-orange-500/50 hover:bg-slate-200/60 dark:hover:bg-white/10 transition-all duration-500 ease-out flex flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 dark:hover:shadow-orange-500/15 text-left block"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -97,8 +97,8 @@ export default function ProductCard({ product, onShowToast }) {
       {/* Product Details Section */}
       <div className="p-3 sm:p-5 flex flex-col flex-1 justify-between gap-2 sm:gap-4">
         <div>
-          <div className="flex items-center justify-between text-[11px] sm:text-xs text-slate-500 dark:text-white/50 font-mono mb-1">
-            <span>{typeof product.category === 'object' ? (product.category?.name || '') : product.category} • {product.gender}</span>
+          <div className="flex items-center justify-between text-[10px] sm:text-xs text-slate-500 dark:text-white/50 font-mono mb-1">
+            <span className="truncate pr-2">{typeof product.category === 'object' ? (product.category?.name || '') : product.category}</span>
             {product.rating > 0 && (
               <div className="hidden sm:flex items-center gap-1 text-orange-500">
                 <Star className="w-3.5 h-3.5 fill-orange-500" />
@@ -108,12 +108,12 @@ export default function ProductCard({ product, onShowToast }) {
           </div>
 
           <div className="block">
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight hover:text-orange-500 transition line-clamp-1">
+            <h3 className="text-xs sm:text-base font-bold text-slate-900 dark:text-white tracking-tight hover:text-orange-500 transition line-clamp-1 leading-tight">
               {product.name}
             </h3>
           </div>
 
-          <p className="text-[11px] sm:text-xs text-slate-500 dark:text-white/50 line-clamp-1 mt-0.5 sm:mt-1 font-light">
+          <p className="hidden sm:block text-xs text-slate-500 dark:text-white/50 line-clamp-1 mt-1 font-light">
             {product.tagline}
           </p>
         </div>
@@ -199,12 +199,12 @@ export default function ProductCard({ product, onShowToast }) {
           </div>
 
           {/* Card Action Link (No Price Display as Requested) */}
-          <div className="flex items-center justify-between pt-1 sm:pt-2">
-            <span className="text-[11px] sm:text-xs font-mono font-bold text-orange-500 uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <div className="flex items-center justify-between pt-1 sm:pt-2 border-t sm:border-none border-slate-200/50 dark:border-white/5 mt-1 sm:mt-0">
+            <span className="text-[10px] sm:text-xs font-mono font-bold text-orange-500 uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>View Piece</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </span>
-            <span className="text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase">
+            <span className="hidden sm:block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase">
               {product.stockCount <= 10 ? 'Limited Run' : 'In Stock'}
             </span>
           </div>

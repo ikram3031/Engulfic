@@ -139,18 +139,18 @@ export default function NewArrivalsSection({ onShowToast }) {
 
         <div
           ref={carouselRef}
-          className="flex overflow-x-auto pb-4 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth snap-x snap-mandatory"
+          className="flex overflow-x-auto w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth snap-x snap-mandatory pb-6"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => ( // Show 4 skeleton cards for loading
-                <div key={i} className="flex-none w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/4 p-2 snap-center">
+                <div key={i} className="flex-none w-[70%] sm:w-1/3 lg:w-1/4 xl:w-1/4 pr-4 snap-center">
                   <div className="animate-pulse bg-slate-200 dark:bg-white/10 rounded-3xl aspect-[3/4]" />
                 </div>
               ))
             : newArrivals.map((product) => (
-                <div key={product.id} className="flex-none w-1/2 sm:w-1/3 lg:w-1/4 xl:w-1/4 p-2 snap-center">
+                <div key={product.id} className="flex-none w-[70%] sm:w-1/3 lg:w-1/4 xl:w-1/4 pr-4 snap-center">
                   <ProductCard
                     product={product}
                     onShowToast={onShowToast}
