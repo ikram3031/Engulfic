@@ -6,6 +6,17 @@
 
 ## Comment Logs
 
+### [E20] 2026-08-18: Cleaned Product Card: Kept Size Only, Removed Prices & Limited Run Badge, Centered View Piece Link
+- **সমস্যা:** প্রোডাক্ট কার্ডের সাইজ বাটন থেকে প্রাইস সরিয়ে শুধু সাইজ দেখাতে হবে, "Limited Run" ব্যাজটি মুছে ফেলতে হবে এবং "View Piece/View Details" বাটনটি সেন্টারে এলাইন করতে হবে।
+- **Fix:**
+  - `ProductCard.jsx`-এ সাইজ ব্যাজ রেন্ডারিং থেকে `— {formatPrice(v.price)}` বাদ দেওয়া হয়েছে যাতে শুধুমাত্র সাইজের নাম (`S`, `M`, `L`, `XL` ইত্যাদি) প্রদর্শিত হয়।
+  - কার্ডের অ্যাকশন এরিয়া থেকে "Limited Run" / "In Stock" লেখাটি পুরোপুরি বাদ দেওয়া হয়েছে।
+  - "View Piece" অ্যাকশন লিংকটিকে জাস্টিফাই-বিটুইন এর পরিবর্তে সেন্টারে প্লেস করতে `justify-center` ক্লাস ব্যবহার করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/ProductCard.jsx`](file:///f:/Engulfic/src/components/ProductCard.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E19] 2026-08-18: Switched Mode Toggle Theme Color to Brand Orange
 - **সমস্যা:** ডার্ক/লাইট মোড টগল সুইচের আইকন ও বর্ডারের কালার স্কিমটি অ্যাপ্লিকেশনের ব্র্যান্ড থিমের সাথে সামঞ্জস্যপূর্ণ ছিল না (হলুদ/amber ছিল)।
 - **Fix:**
