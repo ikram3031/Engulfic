@@ -154,6 +154,7 @@ export default function NewArrivalsSection({ onShowToast }) {
                   <ProductCard
                     product={product}
                     onShowToast={onShowToast}
+                    hideDetails={true}
                   />
                 </div>
               ))}

@@ -6,6 +6,18 @@
 
 ## Comment Logs
 
+### [E22] 2026-08-18: Rendered Only Category & Name in New Arrivals Carousel Cards
+- **সমস্যা:** হোম পেজের "New Arrivals" সেকশনের প্রোডাক্ট কার্ডগুলোতে সাইজ সিলেক্টর, কালার সোয়াচ এবং ভিউ বাটনগুলো হাইড করে শুধু প্রোডাক্টের ক্যাটাগরি এবং নাম দেখাতে হবে।
+- **Fix:**
+  - `ProductCard.jsx` কম্পোনেন্টে একটি নতুন `hideDetails` প্রোপ পাস করা হয়েছে যা বাই ডিফল্ট `false` থাকে।
+  - যদি `hideDetails` এর ভ্যালু `true` হয়, তবে ট্যাগলাইন, সাইজ ও কালার সিলেক্টর এবং "View Piece" বাটন কন্টেইনারটি কার্ডে রেন্ডার হবে না।
+  - `NewArrivalsSection.jsx`-এ রেন্ডার হওয়া প্রোডাক্ট কার্ডগুলোতে `hideDetails={true}` পাস করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/NewArrivalsSection.jsx`](file:///f:/Engulfic/src/components/NewArrivalsSection.jsx)
+  - [`src/components/ProductCard.jsx`](file:///f:/Engulfic/src/components/ProductCard.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E21] 2026-08-18: Hid Shop Megamenu from Navbar Link List
 - **সমস্যা:** ন্যাভবার মেনু থেকে "Shop" লিংক এবং এর মেগামেনু ড্রপডাউনটি হাইড/রিমুভ করতে হবে।
 - **Fix:**

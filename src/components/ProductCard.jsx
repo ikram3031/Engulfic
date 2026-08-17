@@ -7,7 +7,7 @@ import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
 import { Heart, Star, ArrowRight } from 'lucide-react';
 
-export default function ProductCard({ product, onShowToast }) {
+export default function ProductCard({ product, onShowToast, hideDetails = false }) {
   const [hovered, setHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || product.variants?.[0]?.size || '');
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || '');
@@ -113,99 +113,105 @@ export default function ProductCard({ product, onShowToast }) {
             </h3>
           </div>
 
-          <p className="hidden sm:block text-xs text-slate-500 dark:text-white/50 line-clamp-1 mt-1 font-light">
-            {product.tagline}
-          </p>
+          {!hideDetails && (
+            <p className="hidden sm:block text-xs text-slate-500 dark:text-white/50 line-clamp-1 mt-1 font-light">
+              {product.tagline}
+            </p>
+          )}
         </div>
 
-        {/* Color Swatches & Size Picker (Hidden on Mobile) */}
-        <div className="pt-2 border-t border-slate-200 dark:border-white/10">
-          <div className="hidden sm:flex sm:flex-col justify-center min-h-[44px] space-y-2 pb-2">
-            {product.variants?.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {product.variants.map((v, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSelectedSize(v.size);
-                    }}
-                    className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all ${
-                      selectedSize === v.size
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    {v.size}
-                  </button>
-                ))}
+        {!hideDetails && (
+          <>
+            {/* Color Swatches & Size Picker (Hidden on Mobile) */}
+            <div className="pt-2 border-t border-slate-200 dark:border-white/10">
+              <div className="hidden sm:flex sm:flex-col justify-center min-h-[44px] space-y-2 pb-2">
+                {product.variants?.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {product.variants.map((v, idx) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSelectedSize(v.size);
+                        }}
+                        className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all ${
+                          selectedSize === v.size
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        {v.size}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    {/* Colors */}
+                    {product.colors?.length > 0 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400 dark:text-white/40 font-mono text-[11px]">COLOR</span>
+                        <div className="flex items-center gap-1.5">
+                          {product.colors.map((c, idx) => (
+                            <button
+                              key={idx}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSelectedColor(c.name);
+                              }}
+                              className={`w-3.5 h-3.5 rounded-full border transition-all ${
+                                selectedColor === c.name
+                                  ? 'ring-2 ring-orange-500 scale-110 border-slate-900 dark:border-white'
+                                  : 'border-slate-300 dark:border-white/20 opacity-70 hover:opacity-100'
+                              }`}
+                              style={{ backgroundColor: c.hex }}
+                              title={c.name}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Sizes */}
+                    {product.sizes?.length > 0 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400 dark:text-white/40 font-mono text-[11px]">SIZE</span>
+                        <div className="flex items-center gap-1">
+                          {product.sizes.map((s) => (
+                            <button
+                              key={s}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSelectedSize(s);
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                                selectedSize === s
+                                  ? 'bg-orange-500 text-white'
+                                  : 'bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
+                              }`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-            ) : (
-              <>
-                {/* Colors */}
-                {product.colors?.length > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 dark:text-white/40 font-mono text-[11px]">COLOR</span>
-                    <div className="flex items-center gap-1.5">
-                      {product.colors.map((c, idx) => (
-                        <button
-                          key={idx}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setSelectedColor(c.name);
-                          }}
-                          className={`w-3.5 h-3.5 rounded-full border transition-all ${
-                            selectedColor === c.name
-                              ? 'ring-2 ring-orange-500 scale-110 border-slate-900 dark:border-white'
-                              : 'border-slate-300 dark:border-white/20 opacity-70 hover:opacity-100'
-                          }`}
-                          style={{ backgroundColor: c.hex }}
-                          title={c.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
 
-                {/* Sizes */}
-                {product.sizes?.length > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 dark:text-white/40 font-mono text-[11px]">SIZE</span>
-                    <div className="flex items-center gap-1">
-                      {product.sizes.map((s) => (
-                        <button
-                          key={s}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setSelectedSize(s);
-                          }}
-                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
-                            selectedSize === s
-                              ? 'bg-orange-500 text-white'
-                              : 'bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/60 hover:text-slate-900 dark:hover:text-white'
-                          }`}
-                        >
-                          {s}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Card Action Link (Centered, No Limited Run) */}
-          <div className="flex items-center justify-center pt-2 mt-1 sm:mt-0">
-            <span className="text-[10px] sm:text-xs font-mono font-bold text-orange-500 uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-all">
-              <span>View Piece</span>
-              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            </span>
-          </div>
-        </div>
+              {/* Card Action Link (Centered, No Limited Run) */}
+              <div className="flex items-center justify-center pt-2 mt-1 sm:mt-0">
+                <span className="text-[10px] sm:text-xs font-mono font-bold text-orange-500 uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-all">
+                  <span>View Piece</span>
+                  <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                </span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </Link>
   );
