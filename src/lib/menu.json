@@ -54,23 +54,5 @@
         "slug": "baggy-graphic-sweatpants"
       }
     ]
-  },
-  {
-    "name": "Jerseys",
-    "slug": "jerseys",
-    "subcategories": [
-      {
-        "name": "Player Edition",
-        "slug": "player-edition"
-      },
-      {
-        "name": "Fan Edition",
-        "slug": "fan-edition"
-      },
-      {
-        "name": "Retro Edition",
-        "slug": "retro-edition"
-      }
-    ]
   }
 ]

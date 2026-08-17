@@ -18,8 +18,7 @@ export default function BestSellingProducts({ onShowToast }) {
     { name: 'T-Shirt', slug: 'drop-shoulder-t-shirts' },
     { name: 'Shirts', slug: 'shirts' },
     { name: 'Sweatshirts', slug: 'sweatshirts' },
-    { name: 'Pants', slug: 'baggy-pants' },
-    { name: 'Jerseys', slug: 'jerseys' }
+    { name: 'Pants', slug: 'baggy-pants' }
   ];
 
   // Determine active categories slugs based on fetched products

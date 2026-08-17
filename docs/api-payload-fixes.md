@@ -6,6 +6,17 @@
 
 ## Comment Logs
 
+### [E16] 2026-08-18: Hid Jerseys and subcategories from Navbar Menu & Bestsellers
+- **সমস্যা:** নেভিগেশন মেনু (Navbar dropdowns/drawers) এবং বেস্ট সেলিং ফিল্টার ট্যাব থেকে "Jerseys" ক্যাটাগরি এবং এর সাব-ক্যাটাগরিগুলো হাইড করার প্রয়োজন ছিল।
+- **Fix:**
+  - `menu.json` কনফিগারেশন থেকে "Jerseys" ব্লক এবং এর সকল সাব-ক্যাটাগরি অবজেক্ট রিমুভ করা হয়েছে।
+  - `BestSellingProducts.jsx` এর ট্যাব এরে থেকে "Jerseys" ক্যাটাগরি বাদ দেওয়া হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/lib/menu.json`](file:///f:/Engulfic/src/lib/menu.json)
+  - [`src/components/BestSellingProducts.jsx`](file:///f:/Engulfic/src/components/BestSellingProducts.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E15] 2026-08-18: Fixed Mobile Carousel Product Card Clippings
 - **সমস্যা:** মোবাইলে ক্যারোসেলে কার্ড রেন্ডার করার সময় কার্ডের ডান দিক ও নিচের বর্ডারের কিছু অংশ কেটে আসছিল (clipping)। তাছাড়া কার্ডে হোভার ট্রানজিশন (`hover:-translate-y-1.5`) এর কারণে স্ক্রল এরিয়াতে লে-আউট শিফট হচ্ছিল।
 - **Fix:**
