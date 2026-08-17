@@ -105,25 +105,7 @@ export default function CatalogPage() {
             </div>
           </div>
 
-          {/* Primary Category Selector Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {categoriesList.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setSelectedCategory(cat);
-                  setPage(1);
-                }}
-                className={`px-4 py-2 rounded-2xl text-xs font-mono font-bold uppercase transition border shrink-0 ${
-                  selectedCategory === cat
-                    ? 'bg-orange-500 text-white border-orange-400 shadow-lg shadow-orange-500/20'
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white/70 border-slate-200 dark:border-white/10 hover:border-orange-500'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+          {/* Categories moved to the controls bar as a dropdown */}
 
           {/* Secondary Controls Bar (Search, Sort) */}
           <div className="p-4 sm:p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4 shadow-sm">
@@ -141,6 +123,22 @@ export default function CatalogPage() {
                   }}
                   className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
                 />
+              </div>
+
+              {/* Category Dropdown (moved from top) */}
+              <div>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full px-4 py-2.5 bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
+                >
+                  {categoriesList.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="hidden lg:block lg:col-span-2"></div>
