@@ -233,16 +233,16 @@ export default function Navbar({ onOpenSearch }) {
                 onClick={toggleTheme}
                 className={`rounded-full border transition-all duration-300 flex items-center justify-center ${
                   theme === 'light'
-                    ? 'bg-slate-900 text-white border-slate-900 hover:bg-slate-800'
-                    : 'bg-zinc-900 text-amber-400 border-zinc-800 hover:bg-zinc-800'
+                    ? 'bg-slate-900 text-white border-slate-900 hover:bg-orange-500 hover:border-orange-500'
+                    : 'bg-zinc-900 text-orange-500 border-zinc-800 hover:bg-zinc-800 hover:border-orange-500/50'
                 } ${isScrolled ? 'p-2' : 'p-3'}`}
                 title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
                 aria-label="Toggle Theme"
               >
                 {theme === 'light' ? (
-                  <Moon className={`text-amber-300 fill-amber-300 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
+                  <Moon className={`text-orange-400 fill-orange-400 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                 ) : (
-                  <Sun className={`text-amber-400 fill-amber-400 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
+                  <Sun className={`text-orange-500 fill-orange-500 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
                 )}
               </button>
             </div>

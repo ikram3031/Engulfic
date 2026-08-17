@@ -6,6 +6,16 @@
 
 ## Comment Logs
 
+### [E19] 2026-08-18: Switched Mode Toggle Theme Color to Brand Orange
+- **সমস্যা:** ডার্ক/লাইট মোড টগল সুইচের আইকন ও বর্ডারের কালার স্কিমটি অ্যাপ্লিকেশনের ব্র্যান্ড থিমের সাথে সামঞ্জস্যপূর্ণ ছিল না (হলুদ/amber ছিল)।
+- **Fix:**
+  - `Navbar.jsx` এ মোড টগল বাটনের কালার টেমপ্লেট পরিবর্তন করা হয়েছে।
+  - লাইট মোডে টগল বাটনে হোভার স্টেট এবং ডার্ক মোডে একটিভ ও হোভার স্টেটের আইকন ফিল কালার হলুদ (`amber-400`/`amber-300`) থেকে পরিবর্তন করে ব্র্যান্ডের কমলা রঙে (`orange-500`/`orange-400`) রূপান্তর করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/Navbar.jsx`](file:///f:/Engulfic/src/components/Navbar.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E18] 2026-08-18: Made Sticky Navbar Header More Compact on Scroll
 - **সমস্যা:** ডেস্কটপে স্ক্রল করার পর যখন ন্যাভবারটি স্টিকি পজিশনে থাকে, তখন এটির হাইট ও আইকন সাইজ কমিয়ে আরো বেশি কমপ্যাক্ট এবং মিনিমালিস্ট করার প্রয়োজন ছিল।
 - **Fix:**
