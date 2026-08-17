@@ -126,8 +126,24 @@ export function transformProduct(p) {
     categoryName = p.categoryName;
     categorySlug = p.categorySlug || '';
   } else if (typeof p.category === 'string') {
-    categoryName = p.category;
-    categorySlug = p.categorySlug || '';
+    // Try to resolve the Category MongoID to human-readable name from local storage cached names
+    const cachedCats = localStorage.getItem("luxury_categories");
+    let resolved = false;
+    if (cachedCats) {
+      try {
+        const parsed = JSON.parse(cachedCats);
+        const match = parsed.find(c => c._id === p.category || c.id === p.category);
+        if (match) {
+          categoryName = match.name || match.title || p.category;
+          categorySlug = match.slug || '';
+          resolved = true;
+        }
+      } catch (_) {}
+    }
+    if (!resolved) {
+      categoryName = p.category;
+      categorySlug = p.categorySlug || '';
+    }
   } else if (Array.isArray(p.categories) && p.categories.length > 0 && typeof p.categories[0] === 'string') {
     categoryName = p.categories[0];
     categorySlug = p.categories[0];

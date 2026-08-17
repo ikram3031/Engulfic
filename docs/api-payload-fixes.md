@@ -6,6 +6,15 @@
 
 ## Comment Logs
 
+### [E17] 2026-08-18: Resolved Category ID Strings to Cached Display Names
+- **সমস্যা:** প্রোডাক্ট ভিউ পেজ এবং রিলেটেড সেকশনের হেডারে ক্যাটাগরি নামের পরিবর্তে র (Raw) ক্যাটাগরি আইডি (যেমন: `6a7f16256cb27019830ecb99`) প্রদর্শিত হচ্ছিল।
+- **Fix:**
+  - `transformProduct.js`-এ ক্যাটাগরি স্ট্রিং রেজোলিউশন মডিফাই করা হয়েছে। এখন ক্যাটাগরি ভ্যালু যদি র আইডি স্ট্রিং হয়, তবে সেটি `localStorage` এ ক্যাশ করা ক্যাটাগরি লিস্ট (`luxury_categories`) থেকে মানুষের পাঠযোগ্য সঠিক ডিসপ্লে নাম এবং স্ল্যাগ রেজলভ করবে।
+- **ফাইলসমূহ:**
+  - [`src/lib/transformProduct.js`](file:///f:/Engulfic/src/lib/transformProduct.js)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E16] 2026-08-18: Hid Jerseys and subcategories from Navbar Menu & Bestsellers
 - **সমস্যা:** নেভিগেশন মেনু (Navbar dropdowns/drawers) এবং বেস্ট সেলিং ফিল্টার ট্যাব থেকে "Jerseys" ক্যাটাগরি এবং এর সাব-ক্যাটাগরিগুলো হাইড করার প্রয়োজন ছিল।
 - **Fix:**
