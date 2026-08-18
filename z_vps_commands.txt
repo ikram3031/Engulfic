@@ -1,0 +1,50 @@
+# ============================================================
+#  VPS COMMANDS — 144.79.218.8 | /engulf/dev
+# ============================================================
+
+# ── LOGIN ────────────────────────────────────────────────────
+ssh -i "C:\Users\mdikr\.ssh\engulfic" root@144.79.218.8
+
+
+# ── FIRST TIME SETUP (run once on VPS) ──────────────────────
+# mkdir -p /engulf/dev
+# cd /engulf/dev
+# git clone <repo-url> .
+# git checkout live
+# cp .env.example .env   ← then edit secrets
+
+
+# ── DEPLOY (on VPS inside /engulf/dev) ──────────────────────
+# git pull origin live
+# make rebuild            ← full rebuild + restart
+# make up                 ← start without rebuilding
+# make down               ← stop all containers
+
+
+# ── INDIVIDUAL SERVICE BUILD ──────────────────────────────────
+# make build-fg           ← frontend build
+
+
+# ── MONITORING ───────────────────────────────────────────────
+# make status             ← container status
+# make logs               ← all logs (live)
+# make logs-fg            ← frontend logs
+
+
+# ── NGINX (on VPS host) ──────────────────────────────────────
+# cp nginx.conf /etc/nginx/sites-available/engulfic
+# ln -s /etc/nginx/sites-available/engulfic /etc/nginx/sites-enabled/
+# nginx -t
+# systemctl reload nginx
+
+
+# ── SSL — CERTBOT (run once after DNS is pointed) ────────────
+# apt install certbot python3-certbot-nginx -y
+# certbot --nginx \
+#   -d engulfic.com -d www.engulfic.com
+
+
+# ── USEFUL DOCKER COMMANDS ────────────────────────────────────
+# docker ps
+# docker compose logs -f
+# docker compose exec frontend sh
