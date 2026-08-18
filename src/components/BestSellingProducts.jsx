@@ -54,9 +54,9 @@ export default function BestSellingProducts({ onShowToast }) {
   });
 
   return (
-    <section id="bestsellers-section" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="bestsellers-section" className="py-8 sm:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Section Header */}
-      <div className="text-center mb-8 space-y-3">
+      <div className="text-center mb-6 space-y-3">
         <div className="inline-flex items-center gap-2 text-xs font-mono text-orange-500 uppercase tracking-widest justify-center">
           <TrendingUp className="w-3.5 h-3.5" />
           <span>MOST COVETED GARMENTS</span>
@@ -66,13 +66,13 @@ export default function BestSellingProducts({ onShowToast }) {
         </h2>
       </div>
 
-      {/* Tabs Menu (Vertical Stack on Mobile, Horizontal Row on Desktop) */}
-      <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-2 sm:gap-3 mb-10 w-full max-w-3xl mx-auto px-4">
+      {/* Tabs Menu (Horizontal Scroll on Mobile, Centered on Desktop) */}
+      <div className="flex sm:flex-wrap items-center justify-start sm:justify-center gap-2 sm:gap-3 mb-8 w-full max-w-3xl mx-auto overflow-x-auto no-scrollbar py-1">
         {availableTabs.map((tab) => (
           <button
             key={tab.name}
             onClick={() => setActiveTab(tab.name)}
-            className={`w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all duration-300 border ${
+            className={`flex-shrink-0 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider transition-all duration-300 border ${
               activeTab === tab.name
                 ? 'bg-orange-500 text-white border-orange-400 shadow-[0_0_12px_rgba(249,115,22,0.4)] scale-105'
                 : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10'
@@ -83,7 +83,7 @@ export default function BestSellingProducts({ onShowToast }) {
         ))}
       </div>
 
-      {/* Grid: Mobile = 2 products per row (grid-cols-2), Desktop = 4 products per row (lg:grid-cols-4) */}
+      {/* Grid: 2 columns on mobile, 4 columns on desktop */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => (

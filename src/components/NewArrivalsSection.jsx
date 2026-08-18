@@ -103,9 +103,9 @@ export default function NewArrivalsSection({ onShowToast }) {
   }, [newArrivals.length]);
 
   return (
-    <section id="new-arrivals-section" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="new-arrivals-section" className="py-8 sm:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-6">
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-mono text-orange-500 mb-2 uppercase tracking-widest">
             <Sparkles className="w-3.5 h-3.5 animate-pulse" />
@@ -139,22 +139,22 @@ export default function NewArrivalsSection({ onShowToast }) {
 
         <div
           ref={carouselRef}
-          className="flex overflow-x-auto w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth snap-x snap-mandatory pb-6"
+          className="flex overflow-x-auto w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth snap-x snap-mandatory pb-6 gap-3 sm:gap-5"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => ( // Show 4 skeleton cards for loading
-                <div key={i} className="flex-none w-[70%] sm:w-1/3 lg:w-1/4 xl:w-1/4 pr-4 snap-center">
-                  <div className="animate-pulse bg-slate-200 dark:bg-white/10 rounded-3xl aspect-[3/4]" />
+                <div key={i} className="flex-none w-[calc(50%-6px)] sm:w-[calc(33.333%-14px)] lg:w-[calc(25%-15px)] snap-start">
+                  <div className="animate-pulse bg-slate-200 dark:bg-white/10 rounded-2xl aspect-[3/4]" />
                 </div>
               ))
             : newArrivals.map((product) => (
-                <div key={product.id} className="flex-none w-[70%] sm:w-1/3 lg:w-1/4 xl:w-1/4 pr-4 snap-center">
+                <div key={product.id} className="flex-none w-[calc(50%-6px)] sm:w-[calc(33.333%-14px)] lg:w-[calc(25%-15px)] snap-start">
                   <ProductCard
                     product={product}
                     onShowToast={onShowToast}
-                    hideDetails={true}
+                    hideDetails={false}
                   />
                 </div>
               ))}

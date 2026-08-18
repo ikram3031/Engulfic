@@ -118,6 +118,18 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
               {product.tagline}
             </p>
           )}
+
+          {/* Price display */}
+          <div className="flex items-baseline gap-2 mt-1.5">
+            <span className="text-sm sm:text-base font-black text-orange-500 font-mono">
+              {formatPrice(product.price)}
+            </span>
+            {hasDiscount && (
+              <span className="text-xs text-slate-400 dark:text-white/40 line-through font-mono">
+                {formatPrice(product.originalPrice)}
+              </span>
+            )}
+          </div>
         </div>
 
         {!hideDetails && (
