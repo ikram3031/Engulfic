@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProducts } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
@@ -10,97 +10,53 @@ import { Link } from 'react-router-dom';
 export default function NewArrivalsSection({ onShowToast }) {
   const { data: newArrivals = [], isLoading } = useQuery({
     queryKey: ['newArrivals'],
-    queryFn: () => fetchProducts({ sortBy: 'newest', limit: 12 }) // Fetch newest products
+    queryFn: () => fetchProducts({ sortBy: 'newest', limit: 12 })
   });
 
-  const carouselRef = useRef(null);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const scrollCarousel = useCallback((index) => {
-    if (carouselRef.current && newArrivals.length > 0) {
-      const itemWidth = carouselRef.current.children[0]?.offsetWidth;
-      if (itemWidth) {
-        carouselRef.current.scrollTo({
-          left: index * itemWidth,
-          behavior: 'smooth'
-        });
-        setCurrentSlideIndex(index);
-      }
-    }
-  }, [newArrivals.length]);
-
-  const scrollNext = useCallback(() => {
-    if (carouselRef.current && newArrivals.length > 0) {
-      const { scrollWidth, scrollLeft, clientWidth } = carouselRef.current;
-      const itemWidth = carouselRef.current.children[0]?.offsetWidth;
-
-      if (!itemWidth) return;
-
-      let nextScrollLeft = scrollLeft + itemWidth;
-      let nextIndex = currentSlideIndex + 1;
-
-      // If we're at or near the end, loop back to the beginning
-      // A small buffer (e.g., itemWidth / 2) is used to account for potential sub-pixel rendering or gaps
-      if (scrollLeft + clientWidth >= scrollWidth - itemWidth / 2) {
-        nextScrollLeft = 0;
-        nextIndex = 0;
-      }
-
-      carouselRef.current.scrollTo({
-        left: nextScrollLeft,
-        behavior: 'smooth'
-      });
-      // The actual currentSlideIndex will be updated by the scroll event listener
-    }
-  }, [currentSlideIndex, newArrivals.length]);
-
-  const scrollPrev = useCallback(() => {
-    if (carouselRef.current && newArrivals.length > 0) {
-      const { scrollLeft } = carouselRef.current;
-      const itemWidth = carouselRef.current.children[0]?.offsetWidth;
-
-      if (!itemWidth) return;
-
-      let prevScrollLeft = scrollLeft - itemWidth;
-      if (scrollLeft <= itemWidth / 2) {
-        prevScrollLeft = (newArrivals.length - 1) * itemWidth;
-      }
-
-      carouselRef.current.scrollTo({
-        left: prevScrollLeft,
-        behavior: 'smooth'
-      });
-    }
-  }, [newArrivals.length]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(4);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (isLoading || newArrivals.length === 0 || isHovered) return;
-
-    const interval = setInterval(() => {
-      scrollNext();
-    }, 4000); // Auto-scroll every 4 seconds
-
-    return () => clearInterval(interval);
-  }, [isLoading, newArrivals, isHovered, scrollNext]);
-
-  useEffect(() => {
-    const carouselElement = carouselRef.current;
-    if (!carouselElement) return;
-
-    const handleScroll = () => {
-      const scrollLeft = carouselElement.scrollLeft;
-      const itemWidth = carouselElement.children[0]?.offsetWidth;
-      if (itemWidth && newArrivals.length > 0) {
-        // Calculate the index of the first fully visible item
-        const newIndex = Math.round(scrollLeft / itemWidth);
-        setCurrentSlideIndex(Math.min(newIndex, newArrivals.length - 1)); // Ensure index doesn't exceed bounds
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setVisibleCount(2);
+      } else if (window.innerWidth < 1024) {
+        setVisibleCount(3);
+      } else {
+        setVisibleCount(4);
       }
     };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-    carouselElement.addEventListener('scroll', handleScroll);
-    return () => carouselElement.removeEventListener('scroll', handleScroll);
-  }, [newArrivals.length]);
+  const items = newArrivals;
+  const maxIndex = Math.max(0, items.length - visibleCount);
+  const safeCurrentIndex = Math.min(currentIndex, maxIndex);
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % (maxIndex + 1));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + maxIndex + 1) % (maxIndex + 1));
+  };
+
+  useEffect(() => {
+    if (isPaused || maxIndex <= 0) return;
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [isPaused, maxIndex]);
+
+  useEffect(() => {
+    if (currentIndex > maxIndex) {
+      setCurrentIndex(maxIndex);
+    }
+  }, [maxIndex, currentIndex]);
 
   return (
     <section id="new-arrivals-section" className="py-8 sm:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -116,7 +72,7 @@ export default function NewArrivalsSection({ onShowToast }) {
           </h2>
         </div>
         <Link
-          to="/catalog?sortBy=newest" // Link to catalog with newest filter
+          to="/catalog?sortBy=newest"
           className="inline-flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold uppercase tracking-wider text-xs rounded-full hover:bg-orange-500 hover:text-white transition shadow-md"
         >
           <span>View All New</span>
@@ -124,33 +80,45 @@ export default function NewArrivalsSection({ onShowToast }) {
         </Link>
       </div>
 
-      {/* Product Carousel (Horizontal Scroll) */}
-      <div className="relative group/carousel">
-        {/* Left Arrow Button (visible on desktop) */}
-        {!isLoading && newArrivals.length > 0 && (
-          <button
-            onClick={scrollPrev}
-            className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-11 h-11 rounded-full bg-black/60 hover:bg-orange-500 text-white transition-all shadow-lg border border-white/10 hover:scale-105"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-        )}
+      {isLoading ? (
+        <div className="overflow-hidden w-full px-1">
+          <div className="flex transition-transform duration-1000 ease-out">
+            {Array.from({ length: visibleCount }).map((_, i) => (
+              <div key={i} className="flex-shrink-0 px-1.5 sm:px-2.5" style={{ width: `${100 / visibleCount}%` }}>
+                <div className="animate-pulse bg-slate-200 dark:bg-white/10 rounded-2xl aspect-[3/4]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : items.length > 0 ? (
+        <div className="relative group/carousel">
+          {maxIndex > 0 && (
+            <button
+              onClick={prevSlide}
+              className="absolute -left-2 sm:-left-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-11 h-11 rounded-full bg-black/60 hover:bg-orange-500 text-white transition-all shadow-lg border border-white/10 hover:scale-105"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
 
-        <div
-          ref={carouselRef}
-          className="flex overflow-x-auto w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth snap-x snap-mandatory pb-6 gap-3 sm:gap-5"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, i) => ( // Show 4 skeleton cards for loading
-                <div key={i} className="flex-none w-[calc(50%-6px)] sm:w-[calc(33.333%-14px)] lg:w-[calc(25%-15px)] snap-start">
-                  <div className="animate-pulse bg-slate-200 dark:bg-white/10 rounded-2xl aspect-[3/4]" />
-                </div>
-              ))
-            : newArrivals.map((product) => (
-                <div key={product.id} className="flex-none w-[calc(50%-6px)] sm:w-[calc(33.333%-14px)] lg:w-[calc(25%-15px)] snap-start">
+          <div
+            className="overflow-hidden w-full px-1"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            <div
+              className="flex transition-transform duration-1000 ease-out"
+              style={{
+                transform: `translateX(-${safeCurrentIndex * (100 / visibleCount)}%)`,
+              }}
+            >
+              {items.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex-shrink-0 px-1.5 sm:px-2.5"
+                  style={{ width: `${100 / visibleCount}%` }}
+                >
                   <ProductCard
                     product={product}
                     onShowToast={onShowToast}
@@ -158,37 +126,38 @@ export default function NewArrivalsSection({ onShowToast }) {
                   />
                 </div>
               ))}
-        </div>
+            </div>
+          </div>
 
-        {/* Right Arrow Button (visible on desktop) */}
-        {!isLoading && newArrivals.length > 0 && (
-          <button
-            onClick={scrollNext}
-            className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-11 h-11 rounded-full bg-black/60 hover:bg-orange-500 text-white transition-all shadow-lg border border-white/10 hover:scale-105"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        )}
-      </div>
-
-      {/* Carousel Dots */}
-      {!isLoading && newArrivals.length > 0 && (
-        <div className="flex justify-center mt-6 gap-2">
-          {newArrivals.map((_, index) => (
+          {maxIndex > 0 && (
             <button
-              key={index}
-              onClick={() => scrollCarousel(index)}
-              className={`h-2.5 rounded-full transition-all duration-300 ${
-                index === currentSlideIndex
-                  ? 'w-8 bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)]'
-                  : 'w-2.5 bg-slate-300 dark:bg-white/20 hover:bg-orange-300 dark:hover:bg-orange-500/50'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+              onClick={nextSlide}
+              className="absolute -right-2 sm:-right-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-11 h-11 rounded-full bg-black/60 hover:bg-orange-500 text-white transition-all shadow-lg border border-white/10 hover:scale-105"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Carousel Dots */}
+          {maxIndex > 0 && (
+            <div className="flex justify-center mt-6 gap-2">
+              {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                    index === safeCurrentIndex
+                      ? 'w-8 bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)]'
+                      : 'w-2.5 bg-slate-300 dark:bg-white/20 hover:bg-orange-300 dark:hover:bg-orange-500/50'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      ) : null}
     </section>
   );
 }
