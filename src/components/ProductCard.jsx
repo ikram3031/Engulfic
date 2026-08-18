@@ -37,7 +37,7 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
   return (
     <Link
       to={`/shop/${product.slug || product.id}`}
-      className="group bg-slate-100/80 dark:bg-white/5 backdrop-blur-md rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-orange-500/50 hover:bg-slate-200/60 dark:hover:bg-white/10 transition-all duration-500 ease-out flex flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 dark:hover:shadow-orange-500/15 text-left block"
+      className="group bg-slate-100/80 dark:bg-white/5 backdrop-blur-md rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-orange-500/50 hover:bg-slate-200/60 dark:hover:bg-white/10 transition-all duration-500 ease-out flex flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 dark:hover:shadow-orange-500/15 text-left block h-full"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
