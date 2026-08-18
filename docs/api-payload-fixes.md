@@ -6,6 +6,35 @@
 
 ## Comment Logs
 
+### [E24] 2026-08-18: Integrated Smooth Transform-Based Carousel Slider in New Arrivals Section (Decantre Pattern)
+- **সমস্যা:** `NewArrivalsSection.jsx`-এর পূর্ববর্তী ক্যারোসেলটি নেটিভ স্ক্রল/ওভারফ্লো বিহেভিয়ার ব্যবহার করছিল, যা মোবাইল এবং ট্যাবলেটে স্মুথ মনে হচ্ছিল না এবং ট্রানজিশন ঠিকমতো স্লাইড হচ্ছিল না।
+- **Fix:**
+  - নেটিভ স্ক্রল লজিক পরিবর্তন করে Decantre এর মতো CSS transform-based স্লাইডিং (`transform: translateX(-${safeCurrentIndex * (100 / visibleCount)}%)`) প্রয়োগ করা হয়েছে।
+  - রেসপন্সিভ স্ক্রিন সাইজ অনুযায়ী `visibleCount` হিসাব করা হয়েছে (মোবাইলে ২টি, ট্যাবলেটে ৩টি, ডেস্কটপে ৪টি)।
+  - ৬ সেকেন্ড পর পর অটো-স্লাইড (অটো-প্লে) টাইমার যুক্ত করা হয়েছে এবং হোভার করলে পজ হওয়ার সুবিধা দেওয়া হয়েছে।
+  - মোট আইটেম ও দৃশ্যমান আইটেমের উপর ভিত্তি করে ডট পেজিনেশন এবং অ্যারো বাটনগুলো ক্যালকুলেট করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/NewArrivalsSection.jsx`](file:///f:/Engulfic/src/components/NewArrivalsSection.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
+---
+
+### [E23] 2026-08-18: Updated Home Categories Grid and Compact Mobile Product Cards
+- **সমস্যা:** ক্যাটাগরি সেকশনে চাইল্ড ক্যাটাগরি প্রদর্শিত হচ্ছিল এবং মোবাইল ডিভাইসে প্রোডাক্ট কার্ডগুলো অনেক বড় লাগছিল ও হার্ডকোডেড জেন্ডার ট্যাগ দেখাচ্ছিল।
+- **Fix:**
+  - `CategoryGrid.jsx`-এ শুধুমাত্র `lib/menu.json` এর প্যারেন্ট ক্যাটাগরিগুলো ডিসপ্লে করার ব্যবস্থা করা হয়েছে।
+  - `ProductCard.jsx` থেকে হার্ডকোডেড gender/unisex ট্যাগ বাদ দেওয়া হয়েছে।
+  - মোবাইল ভিউতে প্রোডাক্ট কার্ডের ফন্ট সাইজ ছোট করে এবং অপ্রয়োজনীয় ডেসক্রিপশন/স্টক টেক্সট হাইড করে শুধুমাত্র "View Piece" অ্যাকশন বাটন ফোকাসড রাখা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/components/CategoryGrid.jsx`](file:///f:/Engulfic/src/components/CategoryGrid.jsx)
+  - [`src/components/ProductCard.jsx`](file:///f:/Engulfic/src/components/ProductCard.jsx)
+  - [`src/components/Navbar.jsx`](file:///f:/Engulfic/src/components/Navbar.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
+---
+
 ### [E22] 2026-08-18: Rendered Only Category & Name in New Arrivals Carousel Cards
 - **সমস্যা:** হোম পেজের "New Arrivals" সেকশনের প্রোডাক্ট কার্ডগুলোতে সাইজ সিলেক্টর, কালার সোয়াচ এবং ভিউ বাটনগুলো হাইড করে শুধু প্রোডাক্টের ক্যাটাগরি এবং নাম দেখাতে হবে।
 - **Fix:**
