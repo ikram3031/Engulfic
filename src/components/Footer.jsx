@@ -2,16 +2,31 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Check, Instagram, Twitter, Globe } from 'lucide-react';
+import { Sparkles, Check, Loader2, AlertCircle, Instagram, Twitter, Globe } from 'lucide-react';
+import { subscribeNewsletter } from '@/lib/api';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
-    if (email) {
-      setSubscribed(true);
+    if (!email || !email.trim()) return;
+
+    setIsLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      const res = await subscribeNewsletter(email.trim());
+      setSuccessMessage(res.message || 'Subscribed! Check your inbox for code VIP50');
+      setEmail('');
+    } catch (err) {
+      setErrorMessage(err.message || 'Failed to subscribe. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -33,28 +48,45 @@ export default function Footer() {
             </p>
           </div>
 
-          <div className="w-full md:w-auto min-w-[300px]">
-            {subscribed ? (
-              <div className="flex items-center gap-2 p-4 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl text-emerald-400 text-xs font-mono font-bold">
-                <Check className="w-5 h-5" />
-                <span>Subscribed! Check your inbox for code VIP50</span>
+          <div className="w-full md:w-auto min-w-[320px]">
+            {successMessage ? (
+              <div className="flex items-center gap-2.5 p-4 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl text-emerald-400 text-xs font-mono font-bold">
+                <Check className="w-5 h-5 shrink-0 text-emerald-400" />
+                <span>{successMessage}</span>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email address..."
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full bg-slate-900/80 dark:bg-black/40 border border-slate-700 dark:border-white/10 rounded-2xl px-4 py-3.5 text-xs text-white placeholder-slate-400 dark:placeholder-white/30 focus:outline-none focus:border-orange-500 font-sans"
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-3.5 bg-orange-500 text-white font-black uppercase tracking-wider text-xs rounded-2xl hover:bg-orange-600 transition shrink-0 border border-orange-400/30 shadow-lg"
-                >
-                  Join
-                </button>
+              <form onSubmit={handleSubscribe} className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    placeholder="Enter your email address..."
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (errorMessage) setErrorMessage('');
+                    }}
+                    required
+                    disabled={isLoading}
+                    className="w-full bg-slate-900/80 dark:bg-black/40 border border-slate-700 dark:border-white/10 rounded-2xl px-4 py-3.5 text-xs text-white placeholder-slate-400 dark:placeholder-white/30 focus:outline-none focus:border-orange-500 font-sans disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="px-6 py-3.5 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 text-white font-black uppercase tracking-wider text-xs rounded-2xl transition shrink-0 border border-orange-400/30 shadow-lg flex items-center justify-center min-w-[80px] cursor-pointer"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      'Join'
+                    )}
+                  </button>
+                </div>
+                {errorMessage && (
+                  <div className="flex items-center gap-1.5 text-red-400 text-[11px] font-mono px-2">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
               </form>
             )}
           </div>

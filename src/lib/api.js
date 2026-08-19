@@ -177,6 +177,28 @@ export async function fetchCategories() {
   }));
 }
 
+/**
+ * Subscribe email to newsletter / Runway Club
+ */
+export async function subscribeNewsletter(email) {
+  const url = `${BASE_URL}/api/v1/subscribers`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({ email: String(email).trim() }),
+  });
+
+  const json = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(json.message || 'Failed to subscribe. Please try again.');
+  }
+
+  return json;
+}
+
 // Alias for search and details to align core API consumers
 export const fetchProductDetails = fetchProductById;
 
