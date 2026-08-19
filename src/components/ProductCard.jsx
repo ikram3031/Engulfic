@@ -31,7 +31,8 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  const categoryName = typeof product.category === 'object' ? (product.category?.name || '') : (product.category || '');
+  const rawCat = typeof product.category === 'object' ? (product.category?.name || '') : (product.category || '');
+  const categoryName = typeof rawCat === 'string' && /^[0-9a-fA-F]{24}$/.test(rawCat) ? '' : rawCat;
 
   return (
     <Link
@@ -67,21 +68,13 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
         )}
 
         {/* Badges */}
-        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
-          {hasDiscount ? (
+        {hasDiscount && (
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
             <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-red-600 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-wider rounded-md shadow-md">
               -{discountPercent}% OFF
             </span>
-          ) : product.isNew ? (
-            <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-orange-500 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-wider rounded-md shadow-md">
-              NEW
-            </span>
-          ) : product.stockCount <= 10 && product.stockCount > 0 ? (
-            <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-black/75 text-orange-300 backdrop-blur-md text-[9px] sm:text-[10px] font-mono border border-orange-500/30 rounded-md">
-              {product.stockCount} LEFT
-            </span>
-          ) : null}
-        </div>
+          </div>
+        )}
 
         {/* Wishlist Button */}
         <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">

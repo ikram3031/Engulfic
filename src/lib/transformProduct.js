@@ -1,23 +1,5 @@
 /**
  * transformProduct — Maps backend product response to frontend expected shape.
- *
- * Backend fields → Frontend fields:
- *   id            → id
- *   name          → name
- *   slug          → slug
- *   description   → description, tagline (first 120 chars)
- *   price         → originalPrice (when offerPrice exists)
- *   offerPrice    → price (current selling price)
- *   imageUrl      → image
- *   images[0].url → secondaryImage
- *   stockStatus   → inStock
- *   stockQuantity → stockCount
- *   variants      → variants, sizes (extracted)
- *   categories    → categories (kept as-is for filtering)
- *   tags          → tags
- *   notes         → notes
- *   type          → type
- *   createdAt     → createdAt, isNew (< 30 days)
  */
 
 const API_BASE = (
@@ -37,13 +19,78 @@ function formatImageUrl(url) {
   return `${API_BASE}${clean}`;
 }
 
+const DB_CATEGORY_MAP = {
+  '6a7f12afe92cea5ce35c2ce4': { name: 'Sweatshirts', slug: 'sweatshirts' },
+  '6a7f12e0e92cea5ce35c2ceb': { name: 'Oversized Sweatshirt', slug: 'oversized-sweatshirt' },
+  '6a7f133fe92cea5ce35c2cf3': { name: 'Oversized Graphic Sweatshirt', slug: 'oversized-graphic-sweatshirt' },
+  '6a7f15766cb27019830ecb70': { name: 'Baggy Pants', slug: 'baggy-pants' },
+  '6a7f15806cb27019830ecb78': { name: 'Baggy Sweatpants', slug: 'baggy-sweatpants' },
+  '6a7f15976cb27019830ecb80': { name: 'Baggy Graphic Sweatpants', slug: 'baggy-graphic-sweatpants' },
+  '6a7f160c6cb27019830ecb89': { name: 'Shirts', slug: 'shirts' },
+  '6a7f16156cb27019830ecb91': { name: 'Oversized Shirt', slug: 'oversized-shirt' },
+  '6a7f16256cb27019830ecb99': { name: 'Casual Shirt', slug: 'casual-shirt' },
+  '6a7f16466cb27019830ecba5': { name: 'Drop Shoulder T-Shirts', slug: 'drop-shoulder-t-shirts' },
+  '6a7f164f6cb27019830ecbad': { name: 'Drop Shoulder Tee', slug: 'drop-shoulder-tee' },
+  '6a7f16586cb27019830ecbb5': { name: 'Graphic Drop Shoulder Tee', slug: 'graphic-drop-shoulder-tee' },
+  '6a7f16626cb27019830ecbbc': { name: 'Jerseys', slug: 'jerseys' },
+  '6a7f16736cb27019830ecbc4': { name: 'Player Edition', slug: 'player-edition' },
+  '6a7f16896cb27019830ecbcc': { name: 'Fan Edition', slug: 'fan-edition' },
+  '6a7f169f6cb27019830ecbd4': { name: 'Retro Edition', slug: 'retro-edition' },
+};
+
+function isMongoObjectId(val) {
+  return typeof val === 'string' && /^[0-9a-fA-F]{24}$/.test(val);
+}
+
+function resolveFromTitle(name = '') {
+  const lower = name.toLowerCase();
+  if (lower.includes('sweatpant') || lower.includes('baggy') || lower.includes('pant') || lower.includes('trouser')) {
+    return { name: 'Baggy Pants', slug: 'baggy-pants' };
+  }
+  if (lower.includes('t-shirt') || lower.includes('tee')) {
+    return { name: 'Drop Shoulder T-Shirts', slug: 'drop-shoulder-t-shirts' };
+  }
+  if (lower.includes('sweatshirt') || lower.includes('hoodie')) {
+    return { name: 'Sweatshirts', slug: 'sweatshirts' };
+  }
+  if (lower.includes('shirt')) {
+    return { name: 'Shirts', slug: 'shirts' };
+  }
+  if (lower.includes('jersey')) {
+    return { name: 'Jerseys', slug: 'jerseys' };
+  }
+  return { name: 'Apparel', slug: 'shop' };
+}
+
+function resolveCategory(cat, productName = '') {
+  if (!cat) return resolveFromTitle(productName);
+
+  if (typeof cat === 'object') {
+    const name = cat.name || cat.title || '';
+    const slug = cat.slug || '';
+    if (name && !isMongoObjectId(name)) {
+      return { name, slug: slug || name.toLowerCase().replace(/\s+/g, '-') };
+    }
+    if (cat._id && DB_CATEGORY_MAP[cat._id]) return DB_CATEGORY_MAP[cat._id];
+    if (cat.id && DB_CATEGORY_MAP[cat.id]) return DB_CATEGORY_MAP[cat.id];
+  }
+
+  if (typeof cat === 'string') {
+    if (DB_CATEGORY_MAP[cat]) return DB_CATEGORY_MAP[cat];
+    if (!isMongoObjectId(cat)) {
+      return { name: cat, slug: cat.toLowerCase().replace(/\s+/g, '-') };
+    }
+  }
+
+  return resolveFromTitle(productName);
+}
+
 export function transformProduct(p) {
   if (!p) return null;
 
   // --- Price logic ---
   let price, originalPrice;
   if (p.type === 'variant' && p.variants?.length > 0) {
-    // Sort by sortOrder, use first variant's prices
     const sorted = [...p.variants].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
     const first = sorted[0];
     if (first.offerPrice && first.offerPrice < first.price) {
@@ -54,7 +101,6 @@ export function transformProduct(p) {
       originalPrice = null;
     }
   } else {
-    // Simple product
     if (p.offerPrice && p.offerPrice < p.price) {
       price = p.offerPrice;
       originalPrice = p.price;
@@ -107,47 +153,19 @@ export function transformProduct(p) {
       : cleanDescription
     : '';
 
-  // --- Category: resolve to display name if populated ---
-  // Backend may populate categories as objects or return as IDs
-  let categoryName = '';
-  let categorySlug = '';
+  // --- Category: resolve to display name & slug ---
+  let rawCat = null;
   if (p._populatedCategories && p._populatedCategories.length > 0) {
-    const firstPop = p._populatedCategories[0];
-    categoryName = typeof firstPop === 'object' ? (firstPop.name || firstPop.title || '') : String(firstPop || '');
-    categorySlug = typeof firstPop === 'object' ? (firstPop.slug || '') : '';
-  } else if (p.category && typeof p.category === 'object') {
-    categoryName = p.category.name || p.category.title || '';
-    categorySlug = p.category.slug || '';
-  } else if (Array.isArray(p.categories) && p.categories.length > 0 && typeof p.categories[0] === 'object') {
-    categoryName = p.categories[0].name || p.categories[0].title || '';
-    categorySlug = p.categories[0].slug || '';
+    rawCat = p._populatedCategories[0];
+  } else if (p.category) {
+    rawCat = p.category;
+  } else if (Array.isArray(p.categories) && p.categories.length > 0) {
+    rawCat = p.categories[0];
   } else if (p.categoryName) {
-    // If the API enriches category name
-    categoryName = p.categoryName;
-    categorySlug = p.categorySlug || '';
-  } else if (typeof p.category === 'string') {
-    // Try to resolve the Category MongoID to human-readable name from local storage cached names
-    const cachedCats = localStorage.getItem("luxury_categories");
-    let resolved = false;
-    if (cachedCats) {
-      try {
-        const parsed = JSON.parse(cachedCats);
-        const match = parsed.find(c => c._id === p.category || c.id === p.category);
-        if (match) {
-          categoryName = match.name || match.title || p.category;
-          categorySlug = match.slug || '';
-          resolved = true;
-        }
-      } catch (_) {}
-    }
-    if (!resolved) {
-      categoryName = p.category;
-      categorySlug = p.categorySlug || '';
-    }
-  } else if (Array.isArray(p.categories) && p.categories.length > 0 && typeof p.categories[0] === 'string') {
-    categoryName = p.categories[0];
-    categorySlug = p.categories[0];
+    rawCat = p.categoryName;
   }
+
+  const { name: categoryName, slug: categorySlug } = resolveCategory(rawCat, p.name);
 
   return {
     // Core identity
@@ -166,10 +184,10 @@ export function transformProduct(p) {
     originalPrice,
     type: p.type || 'simple',
 
-    // Variants (for chip display)
+    // Variants
     variants,
     sizes,
-    colors: [], // Backend has no colors — hide color swatches
+    colors: [],
 
     // Stock
     inStock,
@@ -193,12 +211,12 @@ export function transformProduct(p) {
 
     // Flags
     isNew,
-    isBestSeller: false, // No backend field
-    rating: 0,           // No backend field
-    reviewsCount: 0,     // No backend field
-    gender: 'Unisex',    // No backend field
+    isBestSeller: false,
+    rating: 0,
+    reviewsCount: 0,
+    gender: 'Unisex',
 
-    // Detail fields (may be empty)
+    // Detail fields
     fabric: '',
     care: '',
     fit: '',

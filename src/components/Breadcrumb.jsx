@@ -3,32 +3,37 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 
+const isMongoId = (val) => typeof val === 'string' && /^[0-9a-fA-F]{24}$/.test(val);
+
 export default function Breadcrumb({ items = [] }) {
+  const filteredItems = items.filter((item) => item && item.label && !isMongoId(item.label));
+
   return (
-    <nav aria-label="Breadcrumb" className="py-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <ol className="flex items-center flex-wrap gap-2 text-xs font-mono text-slate-500 dark:text-white/50">
-        <li>
-          <Link to="/"
-            className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white transition-colors py-1"
+    <nav aria-label="Breadcrumb" className="py-3.5 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <ol className="flex items-center flex-wrap gap-1.5 sm:gap-2 text-xs font-sans text-slate-500 dark:text-white/60">
+        <li className="inline-flex items-center">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 hover:text-orange-500 dark:hover:text-orange-400 transition-colors py-0.5"
           >
             <Home className="w-3.5 h-3.5 text-orange-500" />
             <span>Home</span>
           </Link>
         </li>
 
-        {items.map((item, index) => {
-          const isLast = index === items.length - 1;
+        {filteredItems.map((item, index) => {
+          const isLast = index === filteredItems.length - 1;
           return (
-            <li key={index} className="flex items-center gap-2">
+            <li key={index} className="inline-flex items-center gap-1.5 sm:gap-2">
               <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-white/30 shrink-0" />
               {isLast || !item.href ? (
-                <span className="font-bold text-slate-900 dark:text-white truncate max-w-[200px] sm:max-w-xs">
+                <span className="font-semibold text-slate-900 dark:text-white truncate max-w-[220px] sm:max-w-md">
                   {item.label}
                 </span>
               ) : (
                 <Link
                   to={item.href}
-                  className="hover:text-slate-900 dark:hover:text-white transition-colors py-1"
+                  className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors py-0.5 truncate max-w-[150px] sm:max-w-xs"
                 >
                   {item.label}
                 </Link>

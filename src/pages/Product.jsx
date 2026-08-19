@@ -230,8 +230,8 @@ export default function ProductDetailPage() {
             <Breadcrumb
               items={[
                 { 
-                  label: (typeof product.category === 'object' ? (product.category?.name || '') : product.category) || 'Catalog', 
-                  href: `/category/${product.categorySlug || (typeof product.category === 'object' ? (product.category?.slug || '') : (product.category || 'all')).toLowerCase().replace(/\s+/g, '-')}` 
+                  label: product.category || 'Catalog', 
+                  href: `/category/${product.categorySlug || 'all'}` 
                 },
                 { label: product.name }
               ]}
@@ -254,12 +254,6 @@ export default function ProductDetailPage() {
                     {discountPercent > 0 && (
                       <span className="absolute top-4 left-4 px-3 py-1 bg-red-600 text-white font-black text-xs uppercase tracking-wider rounded-lg shadow-lg border border-red-500/30 z-10">
                         -{discountPercent}% OFF
-                      </span>
-                    )}
-
-                    {product.isNew && (
-                      <span className="absolute top-4 left-24 px-3 py-1 bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-lg shadow-lg border border-orange-400/30 z-10">
-                        NEW RUNWAY
                       </span>
                     )}
 
@@ -315,16 +309,17 @@ export default function ProductDetailPage() {
                 {/* Right Product Options & Purchase */}
                 <div className="lg:col-span-5 space-y-6">
                   
-                  {/* Schema Badges: Category */}
-                  <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
-                    <Link
-                      to={`/category/${product.categorySlug || (typeof product.category === 'object' ? (product.category?.slug || '') : (product.category || 'all')).toLowerCase().replace(/\s+/g, '-')}`}
-                      className="flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-full font-bold hover:bg-orange-500 hover:text-white transition duration-300 shadow-sm"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                      {typeof product.category === 'object' ? (product.category?.name || '') : (product.category || 'LUXURY')}
-                    </Link>
-                  </div>
+                  {/* Category Badge */}
+                  {product.category && (
+                    <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+                      <Link
+                        to={`/category/${product.categorySlug || product.category.toLowerCase().replace(/\s+/g, '-')}`}
+                        className="px-3 py-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-full font-bold hover:bg-orange-500 hover:text-white transition duration-300 shadow-sm uppercase tracking-wider text-[11px]"
+                      >
+                        {product.category}
+                      </Link>
+                    </div>
+                  )}
 
                   {/* Product Title & Identifiers (SKU) */}
                   <div className="space-y-2">
@@ -474,26 +469,6 @@ export default function ProductDetailPage() {
                       />
                     </div>
                   </div>
-
-                  {/* Notes Schema Section (Fragrance / Key Notes) */}
-                  {product.notes && product.notes.length > 0 && (
-                    <div className="p-5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3 font-mono">
-                      <span className="text-xs font-bold text-orange-500 uppercase tracking-wider block">
-                        FRAGRANCE / SPECIFICATION NOTES
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {product.notes.map((note, idx) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-1.5 bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-white/90 rounded-xl text-xs flex items-center gap-1.5 border border-slate-300 dark:border-white/10"
-                          >
-                            <Sparkles className="w-3 h-3 text-orange-500" />
-                            <span>{note}</span>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
                   {/* Tags Schema Section */}
                   {product.tags && product.tags.length > 0 && (
