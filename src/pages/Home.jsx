@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {  useNavigate  } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import HeroBanner from '@/components/HeroBanner';
 import CategoryGrid from '@/components/CategoryGrid';
@@ -55,10 +55,10 @@ export default function Home() {
       {/* Hero Section */}
       <HeroBanner onExploreClick={handleScrollToCategories} />
 
-      {/* New Arrivals Section */}
+      {/* New Arrivals Embla Carousel (2 cards per view on mobile) */}
       <NewArrivalsSection onShowToast={showToast} />
 
-      {/* Category Cards Section (1 per row mobile, 2 per row desktop) */}
+      {/* Category Cards Section (2 per row mobile, 4 per row desktop) */}
       <CategoryGrid />
 
       {/* Best Selling Products Section */}
