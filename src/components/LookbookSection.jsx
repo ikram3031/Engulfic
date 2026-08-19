@@ -56,10 +56,10 @@ export default function LookbookSection({ onQuickView }) {
 
               <div className="absolute left-12 top-0 hidden group-hover:flex flex-col bg-black/80 border border-white/20 p-3.5 rounded-2xl w-52 backdrop-blur-xl shadow-2xl z-30">
                 <p className="text-xs font-bold text-white line-clamp-1">{trench.name}</p>
-                <p className="text-[10px] text-orange-400 font-mono mt-0.5">${trench.price} USD</p>
+                <p className="text-[10px] text-orange-400 font-mono mt-0.5">৳{trench.price}</p>
                 <button
                   onClick={() => onQuickView(trench)}
-                  className="mt-2 py-1.5 px-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-[10px] uppercase rounded-lg transition-colors"
+                  className="mt-2 py-1.5 px-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-[10px] uppercase rounded-lg transition-colors cursor-pointer"
                 >
                   Quick View
                 </button>
@@ -81,10 +81,10 @@ export default function LookbookSection({ onQuickView }) {
 
               <div className="absolute right-12 top-0 hidden group-hover:flex flex-col bg-black/80 border border-white/20 p-3.5 rounded-2xl w-52 backdrop-blur-xl shadow-2xl z-30">
                 <p className="text-xs font-bold text-white line-clamp-1">{bag.name}</p>
-                <p className="text-[10px] text-orange-400 font-mono mt-0.5">${bag.price} USD</p>
+                <p className="text-[10px] text-orange-400 font-mono mt-0.5">৳{bag.price}</p>
                 <button
                   onClick={() => onQuickView(bag)}
-                  className="mt-2 py-1.5 px-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-[10px] uppercase rounded-lg transition-colors"
+                  className="mt-2 py-1.5 px-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-[10px] uppercase rounded-lg transition-colors cursor-pointer"
                 >
                   Quick View
                 </button>
@@ -106,10 +106,10 @@ export default function LookbookSection({ onQuickView }) {
 
               <div className="absolute left-12 top-0 hidden group-hover:flex flex-col bg-black/80 border border-white/20 p-3.5 rounded-2xl w-52 backdrop-blur-xl shadow-2xl z-30">
                 <p className="text-xs font-bold text-white line-clamp-1">{boots.name}</p>
-                <p className="text-[10px] text-orange-400 font-mono mt-0.5">${boots.price} USD</p>
+                <p className="text-[10px] text-orange-400 font-mono mt-0.5">৳{boots.price}</p>
                 <button
                   onClick={() => onQuickView(boots)}
-                  className="mt-2 py-1.5 px-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-[10px] uppercase rounded-lg transition-colors"
+                  className="mt-2 py-1.5 px-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-[10px] uppercase rounded-lg transition-colors cursor-pointer"
                 >
                   Quick View
                 </button>

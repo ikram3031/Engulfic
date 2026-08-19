@@ -13,24 +13,24 @@ export default function FAQPage() {
 
   const faqs = [
     {
-      q: 'What shipping options do you offer for domestic and global orders?',
-      a: 'Engulfic partners exclusively with DHL Express for fully insured air courier shipping. We offer complimentary global express shipping on all orders over $250 USD.'
+      q: 'What shipping options do you offer for orders across Bangladesh?',
+      a: 'We offer nationwide doorstep delivery across all districts of Bangladesh via trusted express couriers with live tracking updates.'
     },
     {
-      q: 'How do your baggy trousers and oversized shirts fit?',
-      a: 'Our silhouettes are engineered with precise architectural drape. Oversized shirts and baggy trousers are designed to fit true to size for a relaxed runway silhouette. If you prefer a traditional tailored fit, we recommend downsizing by one size.'
+      q: 'How do your baggy trousers and drop-shoulder shirts fit?',
+      a: 'Our silhouettes are engineered with precise architectural drape and relaxed fits. They are designed to fit true to size for a modern oversized streetwear look.'
     },
     {
-      q: 'How should I care for Japanese selvedge denim and raw indigo garments?',
-      a: 'Raw selvedge denim should be worn as long as possible before the first wash to develop organic whiskering. When washing, wash cold inside out with mild detergent and hang dry.'
+      q: 'How should I care for premium heavy cotton and denim garments?',
+      a: 'Wash cold inside out with mild detergent and hang dry in shade to preserve fabric texture, density, and rich color depth.'
     },
     {
       q: 'What is your return and exchange policy?',
-      a: 'We offer a 30-day return window worldwide. Items must be unworn and in original condition with security tags attached. Pre-paid DHL return labels are available through our portal.'
+      a: 'We offer an easy 7-day return and exchange policy. Items must be unworn, unwashed, and in original condition with all tags intact.'
     },
     {
-      q: 'Which promo codes are available for new orders?',
-      a: 'You can use code ENGULF20 at checkout for 20% off your order, or VIP50 for exclusive 50% VIP tier savings.'
+      q: 'Are there discounts or coupon codes available?',
+      a: 'Keep an eye on our homepage and newsletter announcements for active seasonal discounts and special promotions.'
     }
   ];
 

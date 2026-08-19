@@ -25,7 +25,7 @@ export default function RefundPolicyPage() {
             </div>
             <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">RETURN & REFUND POLICY</h1>
             <p className="text-xs font-mono text-slate-500 dark:text-white/60">
-              30-DAY COMPLIMENTARY RETURN WINDOW WORLDWIDE
+              7-DAY HASSLE-FREE RETURN & EXCHANGE POLICY
             </p>
           </div>
 
@@ -33,20 +33,20 @@ export default function RefundPolicyPage() {
             <section className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white uppercase font-mono flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-orange-500" />
-                30-Day Unconditional Return Policy
+                7-Day Easy Return & Exchange
               </h2>
               <p>
-                If you are not completely satisfied with your garment size or fit, you may initiate a return within 30 days of receiving your package. Garments must remain unworn, unwashed, with all original Engulfic security tags attached.
+                If you are not completely satisfied with your garment size or fit, you may initiate a return or size exchange within 7 days of receiving your order. Garments must remain unworn, unwashed, with all original Engulfic tags and packaging attached.
               </p>
             </section>
 
             <section className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white uppercase font-mono flex items-center gap-2">
                 <Truck className="w-4 h-4 text-orange-500" />
-                Pre-Paid DHL Return Label
+                Doorstep Exchange & Support
               </h2>
               <p>
-                We provide a pre-paid DHL express return label for all domestic and international orders over $250. Simply generate your return portal slip at returns.engulfic.com or contact concierge@engulfic.com.
+                For any exchange or return inquiry, reach out to our customer care team at support@engulfic.com. We will arrange a hassle-free exchange through our courier partners.
               </p>
             </section>
           </div>

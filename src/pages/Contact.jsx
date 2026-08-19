@@ -115,34 +115,26 @@ export default function ContactPage() {
                 <div className="space-y-3 text-xs font-mono">
                   <div className="flex items-center gap-3">
                     <Mail className="w-4 h-4 text-orange-500" />
-                    <span>concierge@engulfic.com</span>
+                    <span>support@engulfic.com</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Phone className="w-4 h-4 text-orange-500" />
-                    <span>+1 (800) 948-ENGULF</span>
+                    <span>Available Sat – Thu: 10:00 AM – 8:00 PM</span>
                   </div>
                 </div>
               </div>
 
               <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4">
                 <h3 className="text-base font-bold uppercase font-mono border-b border-slate-200 dark:border-white/10 pb-3">
-                  FLAGSHIP ATELIERS
+                  HEADQUARTERS & STUDIO
                 </h3>
 
                 <div className="space-y-4 text-xs font-mono text-slate-700 dark:text-white/80">
                   <div className="flex items-start gap-3">
                     <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-slate-900 dark:text-white block">PARIS FLAGSHIP</strong>
-                      <span>28 Rue du Faubourg Saint-Honoré, 75008 Paris</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-slate-900 dark:text-white block">TOKYO ATELIER</strong>
-                      <span>5-7-21 Minamiaoyama, Minato-ku, Tokyo 107-0062</span>
+                      <strong className="text-slate-900 dark:text-white block">ENGULFIC STUDIO</strong>
+                      <span>Dhaka, Bangladesh</span>
                     </div>
                   </div>
                 </div>

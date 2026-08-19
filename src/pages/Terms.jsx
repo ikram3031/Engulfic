@@ -36,7 +36,7 @@ export default function TermsPage() {
                 1. General Provisions & Pricing
               </h2>
               <p>
-                By accessing Engulfic, you agree to adhere to these terms. All prices are listed in USD. Engulfic reserves the right to modify pricing, garment availability, or promotions without prior notice.
+                By accessing Engulfic, you agree to adhere to these terms. All prices are listed in Bangladeshi Taka (BDT ৳). Engulfic reserves the right to modify pricing, garment availability, or promotions without prior notice.
               </p>
             </section>
 
@@ -46,7 +46,7 @@ export default function TermsPage() {
                 2. Intellectual Property
               </h2>
               <p>
-                All garment designs, logos, runway imagery, text, and architectural branding are the exclusive intellectual property of Engulfic S.A. Reproduction or distribution without explicit written consent is strictly prohibited.
+                All garment designs, logos, imagery, and branding assets are the exclusive intellectual property of ENGULFIC. Reproduction or distribution without explicit written consent is strictly prohibited.
               </p>
             </section>
           </div>

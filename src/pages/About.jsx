@@ -28,7 +28,7 @@ export default function AboutPage() {
               REDEFINING MODERN LUXURY
             </h1>
             <p className="text-xs font-mono text-slate-500 dark:text-white/60 leading-relaxed">
-              PARIS • TOKYO • NEW YORK • SARTORIAL CRAFTSMANSHIP
+              DHAKA • BANGLADESH • PREMIUM STREETWEAR
             </p>
           </div>
 
@@ -42,8 +42,8 @@ export default function AboutPage() {
             />
             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
             <div className="absolute bottom-8 left-8 right-8 text-white space-y-1">
-              <span className="text-xs font-mono text-orange-400">ENGULFIC ATELIER N°01</span>
-              <p className="text-xl sm:text-2xl font-black uppercase">Sculptural silhouettes & raw Japanese selvedge denim</p>
+              <span className="text-xs font-mono text-orange-400">ENGULFIC ATELIER</span>
+              <p className="text-xl sm:text-2xl font-black uppercase">Sculptural silhouettes & premium heavy cotton garments</p>
             </div>
           </div>
 
@@ -51,9 +51,9 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
               <Compass className="w-6 h-6 text-orange-500" />
-              <h3 className="text-base font-bold uppercase font-sans">Artisanal Sourcing</h3>
+              <h3 className="text-base font-bold uppercase font-sans">Premium Fabrics</h3>
               <p className="text-xs font-mono text-slate-600 dark:text-white/70 leading-relaxed">
-                Every fabric is hand-selected from heritage European mills in Biella, Italy and vintage shuttle looms in Kurashiki, Japan.
+                Every fabric is hand-selected for high density, rich hand-feel, and enduring structural durability.
               </p>
             </div>
 
@@ -61,15 +61,15 @@ export default function AboutPage() {
               <Layers className="w-6 h-6 text-orange-500" />
               <h3 className="text-base font-bold uppercase font-sans">Architectural Proportions</h3>
               <p className="text-xs font-mono text-slate-600 dark:text-white/70 leading-relaxed">
-                From 500GSM organic terry hoodies to double-pleated baggy trousers, our patterns emphasize drape and longevity.
+                From heavyweight drop shoulder tees to wide-leg trousers, our silhouettes prioritize clean drape and everyday comfort.
               </p>
             </div>
 
             <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
               <Globe className="w-6 h-6 text-orange-500" />
-              <h3 className="text-base font-bold uppercase font-sans">Global Dispatch</h3>
+              <h3 className="text-base font-bold uppercase font-sans">Nationwide Delivery</h3>
               <p className="text-xs font-mono text-slate-600 dark:text-white/70 leading-relaxed">
-                Operating flagship hubs in Tokyo, Paris, and New York with express global fulfillment to over 120 countries.
+                Fast, fully tracked doorstep delivery across all 64 districts of Bangladesh with secure packaging.
               </p>
             </div>
           </div>

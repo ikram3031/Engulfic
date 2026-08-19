@@ -38,13 +38,13 @@ export default function Footer() {
           <div className="max-w-md space-y-2 text-center md:text-left">
             <div className="inline-flex items-center gap-2 text-xs font-mono text-orange-400">
               <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
-              <span>THE ENGULFIC ATELIER INSIDER</span>
+              <span>THE ENGULFIC INSIDER</span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
-              JOIN THE RUNWAY CLUB
+              JOIN THE ENGULFIC CLUB
             </h3>
             <p className="text-xs text-slate-300 dark:text-white/60">
-              Subscribe to receive private runway invites, early capsule drops, and a $50 voucher on your first order over $300.
+              Subscribe to receive updates on new arrivals, seasonal collections, and exclusive member offers.
             </p>
           </div>
 
@@ -97,7 +97,7 @@ export default function Footer() {
           <div className="space-y-3">
             <h4 className="font-bold text-white uppercase tracking-wider font-mono">ENGULFIC ATELIER</h4>
             <p className="text-slate-400 dark:text-white/60 leading-relaxed font-light">
-              Pioneering architectural silhouettes, Japanese selvedge denim, and organic cotton foundations. Designed in Paris & Tokyo.
+              Contemporary architectural streetwear, premium heavy cotton foundations, and signature silhouettes. Designed and crafted with precision.
             </p>
             <div className="flex items-center gap-3 text-slate-400 dark:text-white/50 pt-2">
               <Instagram className="w-4 h-4 hover:text-orange-400 cursor-pointer transition-colors" />
@@ -131,11 +131,12 @@ export default function Footer() {
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-bold text-white uppercase tracking-wider font-mono">FLAGSHIP STORES</h4>
+            <h4 className="font-bold text-white uppercase tracking-wider font-mono">CUSTOMER CARE</h4>
             <ul className="space-y-2 text-slate-400 dark:text-white/60 font-light">
-              <li>Paris: 28 Rue du Faubourg Saint-Honoré</li>
-              <li>Tokyo: 5-7-21 Minamiaoyama, Minato-ku</li>
-              <li>New York: 452 West Broadway, SoHo</li>
+              <li>Dhaka, Bangladesh</li>
+              <li>support@engulfic.com</li>
+              <li>Available: 10:00 AM – 8:00 PM</li>
+              <li>Nationwide Express Delivery</li>
             </ul>
           </div>
         </div>
