@@ -43,7 +43,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-slate-900 dark:bg-[#050505]/80 backdrop-blur-xl text-white border-t border-slate-800 dark:border-white/10 pt-16 pb-12 relative z-10 transition-colors duration-300">
+    <footer className="bg-slate-900 dark:bg-[#050505]/80 backdrop-blur-xl text-white border-t border-slate-800 dark:border-white/10 pt-16 pb-28 lg:pb-12 relative z-10 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Top Newsletter Section */}
         <div className="bg-slate-800/80 dark:bg-white/5 p-8 sm:p-12 rounded-3xl border border-slate-700 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 backdrop-blur-md shadow-2xl">

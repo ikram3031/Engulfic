@@ -26,7 +26,7 @@ function App() {
       <BrowserRouter>
         <ScrollToTopOnRouteChange />
         <div className="flex flex-col min-h-screen">
-          <main className="flex-grow pb-16 lg:pb-0">
+          <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
