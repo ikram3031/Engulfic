@@ -21,6 +21,7 @@ import {
   LogOut,
   UserCheck,
   Sparkles,
+  Home,
 } from 'lucide-react';
 import ProfileModal from '@/components/ProfileModal';
 import Toast from '@/components/Toast';
@@ -549,61 +550,79 @@ export default function Navbar({ onOpenSearch }) {
       )}
 
       {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 shadow-[0_-4px_16px_rgba(0,0,0,0.1)] px-4 py-2 flex items-center justify-between pb-safe">
-        {/* Left: Menu & Shop (Categories) */}
-        <div className="flex items-center gap-6">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex flex-col items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition gap-0.5 active:scale-95"
-            aria-label="Toggle Mobile Menu"
-          >
-            <Menu className="w-5 h-5" />
-            <span className="text-[9px] font-mono font-bold uppercase tracking-wider">Menu</span>
-          </button>
-          
-          <Link
-            to="/catalog"
-            className="flex flex-col items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition gap-0.5"
-          >
-            <Sparkles className="w-5 h-5 text-orange-500" />
-            <span className="text-[9px] font-mono font-bold uppercase tracking-wider">Shop</span>
-          </Link>
-        </div>
-
-        {/* Center: Home Floating Button */}
-        <div className="absolute left-1/2 -translate-x-1/2 -top-4">
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-slate-950/95 dark:bg-black/95 backdrop-blur-xl border-t border-slate-800 dark:border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.4)] px-3 py-2.5 pb-safe">
+        <div className="grid grid-cols-5 items-center justify-items-center">
+          {/* 1. Home */}
           <Link
             to="/"
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg shadow-orange-500/30 border-2 border-white dark:border-zinc-950 hover:scale-105 active:scale-95 transition-all"
-            title="Home"
+            className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 active:scale-90 ${
+              pathname === '/'
+                ? 'text-orange-500 font-bold'
+                : 'text-slate-400 dark:text-zinc-400 hover:text-white'
+            }`}
           >
-            <span className="font-black text-xs font-mono uppercase tracking-tighter">EG</span>
+            <Home className="w-5 h-5" />
+            <span className="text-[10px] font-mono tracking-tight">Home</span>
           </Link>
-        </div>
 
-        {/* Right: Search & Cart */}
-        <div className="flex items-center gap-6">
+          {/* 2. Shop / Catalog */}
+          <Link
+            to="/catalog"
+            className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 active:scale-90 ${
+              pathname.startsWith('/catalog') || pathname.startsWith('/category')
+                ? 'text-orange-500 font-bold'
+                : 'text-slate-400 dark:text-zinc-400 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-5 h-5" />
+            <span className="text-[10px] font-mono tracking-tight">Shop</span>
+          </Link>
+
+          {/* 3. Search */}
           <button
             onClick={onOpenSearch}
-            className="flex flex-col items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition gap-0.5 active:scale-95"
-            aria-label="Search Catalog"
+            className="flex flex-col items-center justify-center gap-1 text-slate-400 dark:text-zinc-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer"
+            aria-label="Search"
           >
             <Search className="w-5 h-5" />
-            <span className="text-[9px] font-mono font-bold uppercase tracking-wider">Search</span>
+            <span className="text-[10px] font-mono tracking-tight">Search</span>
           </button>
 
+          {/* 4. Wishlist */}
+          <Link
+            to="/wishlist"
+            className={`flex flex-col items-center justify-center gap-1 relative transition-all duration-200 active:scale-90 ${
+              pathname === '/wishlist'
+                ? 'text-orange-500 font-bold'
+                : 'text-slate-400 dark:text-zinc-400 hover:text-white'
+            }`}
+          >
+            <div className="relative">
+              <Heart className="w-5 h-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-orange-500 text-[8px] font-black text-white font-mono shadow-[0_0_8px_rgba(249,115,22,0.6)]">
+                  {wishlistCount}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-mono tracking-tight">Wishlist</span>
+          </Link>
+
+          {/* 5. Cart */}
           <button
             onClick={toggleCart}
-            className="flex flex-col items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 transition gap-0.5 relative active:scale-95"
-            aria-label="Toggle Cart"
+            className="flex flex-col items-center justify-center gap-1 relative text-slate-400 dark:text-zinc-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer"
+            aria-label="Cart"
           >
-            <ShoppingCart className="w-5 h-5" />
-            {totalCartCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-black text-white font-mono shadow-[0_0_8px_rgba(249,115,22,0.6)]">
-                {totalCartCount}
-              </span>
-            )}
-            <span className="text-[9px] font-mono font-bold uppercase tracking-wider">Cart</span>
+            <div className="relative">
+              <ShoppingCart className="w-5 h-5" />
+              {totalCartCount > 0 && (
+                <span className="absolute -top-1 -right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-orange-500 text-[8px] font-black text-white font-mono shadow-[0_0_8px_rgba(249,115,22,0.6)]">
+                  {totalCartCount}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-mono tracking-tight">Cart</span>
           </button>
         </div>
       </div>

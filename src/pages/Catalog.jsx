@@ -9,7 +9,7 @@ import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
 import { useAppStore } from '@/core/store/useAppStore';
-import { Sparkles, Search, Loader2 } from 'lucide-react';
+import { Sparkles, Search, Loader2, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 export default function CatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,7 +72,13 @@ export default function CatalogPage() {
     loadProducts();
   }, [page, selectedCategory, searchQuery, sortBy, fetchProducts]);
 
-  const categoriesList = ['All', ...categories.map(c => c.name || c.title)];
+  const mainCategories = [
+    { name: 'All', slug: 'All' },
+    { name: 'Shirts', slug: 'shirts' },
+    { name: 'T-Shirts', slug: 'drop-shoulder-t-shirts' },
+    { name: 'Sweatshirts', slug: 'sweatshirts' },
+    { name: 'Pants', slug: 'baggy-pants' },
+  ];
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white flex flex-col justify-between transition-colors duration-300">
@@ -105,61 +111,69 @@ export default function CatalogPage() {
             </div>
           </div>
 
-          {/* Categories moved to the controls bar as a dropdown */}
+          {/* Category Filters (Left) & Sort Dropdown (Right) */}
+          <div className="flex items-center justify-between gap-3 py-1">
+            {/* Desktop Left: Category Filter Pills */}
+            <div className="hidden md:flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+              {mainCategories.map((cat) => {
+                const isActive =
+                  selectedCategory.toLowerCase() === cat.slug.toLowerCase() ||
+                  (cat.slug === 'All' && (selectedCategory === 'All' || !selectedCategory));
+                return (
+                  <button
+                    key={cat.slug}
+                    onClick={() => {
+                      setSelectedCategory(cat.slug);
+                      setPage(1);
+                    }}
+                    className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all duration-300 shrink-0 border cursor-pointer ${
+                      isActive
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.35)] scale-105'
+                        : 'bg-white dark:bg-white/5 text-slate-700 dark:text-white/70 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* Secondary Controls Bar (Search, Sort) */}
-          <div className="p-4 sm:p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4 shadow-sm">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Live Search Input */}
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 dark:text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search catalog..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
-                />
-              </div>
+            {/* Mobile Left: Category Dropdown */}
+            <div className="md:hidden relative flex-1 max-w-[180px]">
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full appearance-none pl-3.5 pr-8 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-full text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
+              >
+                {mainCategories.map((cat) => (
+                  <option key={cat.slug} value={cat.slug} className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">
+                    {cat.name === 'All' ? 'All Categories' : cat.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-white/40 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
 
-              {/* Category Dropdown (moved from top) */}
-              <div>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => {
-                    setSelectedCategory(e.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full px-4 py-2.5 bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
-                >
-                  {categoriesList.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="hidden lg:block lg:col-span-2"></div>
-              
-              {/* Sort By Dropdown */}
-              <div>
-                <select
-                  value={sortBy}
-                  onChange={(e) => {
-                    setSortBy(e.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full px-4 py-2.5 bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
-                >
-                  <option value="featured">Sort: Featured</option>
-                  <option value="newest">Sort: Newest First</option>
-                  <option value="price-asc">Sort: Price Low to High</option>
-                  <option value="price-desc">Sort: Price High to Low</option>
-                  <option value="name-asc">Sort: Name (A-Z)</option>
-                </select>
-              </div>
+            {/* Right: Sort Dropdown (Mobile & Desktop) */}
+            <div className="relative shrink-0">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setPage(1);
+                }}
+                className="appearance-none pl-3.5 sm:pl-4 pr-8 sm:pr-9 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-full text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
+              >
+                <option value="featured" className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">Sort: Featured</option>
+                <option value="newest" className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">Sort: Newest First</option>
+                <option value="price-asc" className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">Price: Low to High</option>
+                <option value="price-desc" className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">Price: High to Low</option>
+                <option value="name-asc" className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">Name: A to Z</option>
+              </select>
+              <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400 dark:text-white/40 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
