@@ -2,7 +2,19 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Check, Loader2, AlertCircle, Instagram, Twitter, Globe } from 'lucide-react';
+import {
+  Sparkles,
+  Check,
+  Loader2,
+  AlertCircle,
+  Instagram,
+  Twitter,
+  Globe,
+  MapPin,
+  Mail,
+  Clock,
+  Truck,
+} from 'lucide-react';
 import { subscribeNewsletter } from '@/lib/api';
 
 export default function Footer() {
@@ -21,7 +33,7 @@ export default function Footer() {
 
     try {
       const res = await subscribeNewsletter(email.trim());
-      setSuccessMessage(res.message || 'Subscribed! Check your inbox for code VIP50');
+      setSuccessMessage(res.message || 'Subscribed! Welcome to Engulfic.');
       setEmail('');
     } catch (err) {
       setErrorMessage(err.message || 'Failed to subscribe. Please try again.');
@@ -93,11 +105,14 @@ export default function Footer() {
         </div>
 
         {/* Brand Grid Links */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-xs">
+          {/* Col 1: ENGULFIC Heading & Description */}
           <div className="space-y-3">
-            <h4 className="font-bold text-white uppercase tracking-wider font-mono">ENGULFIC ATELIER</h4>
-            <p className="text-slate-400 dark:text-white/60 leading-relaxed font-light">
-              Contemporary architectural streetwear, premium heavy cotton foundations, and signature silhouettes. Designed and crafted with precision.
+            <h2 className="text-2xl sm:text-3xl font-black text-orange-500 tracking-tight font-sans uppercase">
+              ENGULFIC
+            </h2>
+            <p className="text-slate-400 dark:text-white/60 leading-relaxed font-light text-xs">
+              Explore Engulfic's contemporary collection of premium apparel including shirts, jeans, sweatshirts, baggy pants, and essential unisex streetwear tailored for effortless modern styling.
             </p>
             <div className="flex items-center gap-3 text-slate-400 dark:text-white/50 pt-2">
               <Instagram className="w-4 h-4 hover:text-orange-400 cursor-pointer transition-colors" />
@@ -106,20 +121,20 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Col 2: CATEGORIES */}
           <div className="space-y-2">
             <h4 className="font-bold text-white uppercase tracking-wider font-mono">CATEGORIES</h4>
             <ul className="space-y-2 text-slate-400 dark:text-white/60 font-light">
-              <li><Link to="/category/shirts" className="hover:text-orange-400 transition">Shirts Collection</Link></li>
-              <li><Link to="/category/jeans" className="hover:text-orange-400 transition">Jeans & Selvedge</Link></li>
-              <li><Link to="/category/denim" className="hover:text-orange-400 transition">Denim Jackets & Vests</Link></li>
-              <li><Link to="/category/baggy" className="hover:text-orange-400 transition">Baggy Trousers</Link></li>
-              <li><Link to="/category/long-sleeve-t-shirt" className="hover:text-orange-400 transition">Long Sleeve Tees</Link></li>
-              <li><Link to="/category/short-sleeve-t-shirt" className="hover:text-orange-400 transition">Short Sleeve Tees</Link></li>
+              <li><Link to="/category/drop-shoulder-t-shirts" className="hover:text-orange-400 transition">T-Shirts</Link></li>
+              <li><Link to="/category/shirts" className="hover:text-orange-400 transition">Shirts</Link></li>
+              <li><Link to="/category/sweatshirts" className="hover:text-orange-400 transition">Sweatshirts</Link></li>
+              <li><Link to="/category/baggy-pants" className="hover:text-orange-400 transition">Pants</Link></li>
             </ul>
           </div>
 
+          {/* Col 3: QUICK LINKS */}
           <div className="space-y-2">
-            <h4 className="font-bold text-white uppercase tracking-wider font-mono">COMPANY & POLICIES</h4>
+            <h4 className="font-bold text-white uppercase tracking-wider font-mono">QUICK LINKS</h4>
             <ul className="space-y-2 text-slate-400 dark:text-white/60 font-light">
               <li><Link to="/about" className="hover:text-orange-400 transition">About Us</Link></li>
               <li><Link to="/contact" className="hover:text-orange-400 transition">Contact Us</Link></li>
@@ -130,29 +145,46 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Col 4: CONTACT INFO */}
           <div className="space-y-2">
-            <h4 className="font-bold text-white uppercase tracking-wider font-mono">CUSTOMER CARE</h4>
-            <ul className="space-y-2 text-slate-400 dark:text-white/60 font-light">
-              <li>Dhaka, Bangladesh</li>
-              <li>support@engulfic.com</li>
-              <li>Available: 10:00 AM – 8:00 PM</li>
-              <li>Nationwide Express Delivery</li>
+            <h4 className="font-bold text-white uppercase tracking-wider font-mono">CONTACT INFO</h4>
+            <ul className="space-y-3 text-slate-400 dark:text-white/60 font-light">
+              <li className="flex items-center gap-2.5">
+                <MapPin className="w-4 h-4 text-orange-500 shrink-0" />
+                <span>Mugda, Dhaka, Bangladesh</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Mail className="w-4 h-4 text-orange-500 shrink-0" />
+                <a href="mailto:contact@engulfic.com" className="hover:text-orange-400 transition">
+                  contact@engulfic.com
+                </a>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Clock className="w-4 h-4 text-orange-500 shrink-0" />
+                <span>Available: 10:00 AM – 8:00 PM</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Truck className="w-4 h-4 text-orange-500 shrink-0" />
+                <span>Nationwide Express Delivery</span>
+              </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom Copyright */}
+        {/* Bottom Copyright & Developed by */}
         <div className="pt-8 border-t border-slate-800 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400 dark:text-white/40 font-mono">
-          <p>© {new Date().getFullYear()} ENGULFIC INC. ALL RIGHTS RESERVED.</p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
-            <span>•</span>
-            <Link to="/terms" className="hover:text-white">Terms & Conditions</Link>
-            <span>•</span>
-            <Link to="/refund-policy" className="hover:text-white">Refund Policy</Link>
-            <span>•</span>
-            <Link to="/faq" className="hover:text-white">FAQ</Link>
-          </div>
+          <p>© 2026 ENGULFIC. All rights reserved.</p>
+          <p>
+            Developed by{' '}
+            <a
+              href="https://wa.me/8801784220265"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-500 hover:text-orange-400 font-bold underline transition-colors"
+            >
+              Plexivia
+            </a>
+          </p>
         </div>
       </div>
     </footer>

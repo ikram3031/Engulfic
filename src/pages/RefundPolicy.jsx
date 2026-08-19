@@ -46,7 +46,7 @@ export default function RefundPolicyPage() {
                 Doorstep Exchange & Support
               </h2>
               <p>
-                For any exchange or return inquiry, reach out to our customer care team at support@engulfic.com. We will arrange a hassle-free exchange through our courier partners.
+                For any exchange or return inquiry, reach out to our customer care team at contact@engulfic.com. We will arrange a hassle-free exchange through our courier partners.
               </p>
             </section>
           </div>

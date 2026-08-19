@@ -115,7 +115,7 @@ export default function ContactPage() {
                 <div className="space-y-3 text-xs font-mono">
                   <div className="flex items-center gap-3">
                     <Mail className="w-4 h-4 text-orange-500" />
-                    <span>support@engulfic.com</span>
+                    <span>contact@engulfic.com</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Phone className="w-4 h-4 text-orange-500" />
@@ -134,7 +134,7 @@ export default function ContactPage() {
                     <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                     <div>
                       <strong className="text-slate-900 dark:text-white block">ENGULFIC STUDIO</strong>
-                      <span>Dhaka, Bangladesh</span>
+                      <span>Mugda, Dhaka, Bangladesh</span>
                     </div>
                   </div>
                 </div>

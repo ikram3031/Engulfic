@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
                 3. Your Rights & Cookies
               </h2>
               <p>
-                You may request complete deletion of your personal account data or export a copy at any time by emailing privacy@engulfic.com. Essential cookies are utilized to preserve cart contents and preference settings across visits.
+                You may request complete deletion of your personal account data or export a copy at any time by emailing contact@engulfic.com. Essential cookies are utilized to preserve cart contents and preference settings across visits.
               </p>
             </section>
           </div>
