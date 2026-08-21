@@ -21,25 +21,85 @@ export const normalizeProductImage = (url) => {
   return `${API_BASE}${cleanPath}`;
 };
 
-export const resolveCategoryName = (categoryId) => {
-  if (!categoryId) return "";
-  if (typeof categoryId === 'object') {
-    return categoryId.name || categoryId.title || categoryId.slug || "";
+const DB_CATEGORY_MAP = {
+  '6a7f12afe92cea5ce35c2ce4': { name: 'Sweatshirts', slug: 'sweatshirts' },
+  '6a7f12e0e92cea5ce35c2ceb': { name: 'Oversized Sweatshirt', slug: 'oversized-sweatshirt' },
+  '6a7f133fe92cea5ce35c2cf3': { name: 'Oversized Graphic Sweatshirt', slug: 'oversized-graphic-sweatshirt' },
+  '6a7f15766cb27019830ecb70': { name: 'Baggy Pants', slug: 'baggy-pants' },
+  '6a7f15806cb27019830ecb78': { name: 'Baggy Sweatpants', slug: 'baggy-sweatpants' },
+  '6a7f15976cb27019830ecb80': { name: 'Baggy Graphic Sweatpants', slug: 'baggy-graphic-sweatpants' },
+  '6a7f160c6cb27019830ecb89': { name: 'Shirts', slug: 'shirts' },
+  '6a7f16156cb27019830ecb91': { name: 'Oversized Shirt', slug: 'oversized-shirt' },
+  '6a7f16256cb27019830ecb99': { name: 'Casual Shirt', slug: 'casual-shirt' },
+  '6a7f16466cb27019830ecba5': { name: 'Drop Shoulder T-Shirts', slug: 'drop-shoulder-t-shirts' },
+  '6a7f164f6cb27019830ecbad': { name: 'Drop Shoulder Tee', slug: 'drop-shoulder-tee' },
+  '6a7f16586cb27019830ecbb5': { name: 'Graphic Drop Shoulder Tee', slug: 'graphic-drop-shoulder-tee' },
+  '6a7f16626cb27019830ecbbc': { name: 'Jerseys', slug: 'jerseys' },
+  '6a7f16736cb27019830ecbc4': { name: 'Player Edition', slug: 'player-edition' },
+  '6a7f16896cb27019830ecbcc': { name: 'Fan Edition', slug: 'fan-edition' },
+  '6a7f169f6cb27019830ecbd4': { name: 'Retro Edition', slug: 'retro-edition' },
+};
+
+function resolveFromTitle(name = '') {
+  const lower = (name || '').toLowerCase();
+  if (lower.includes('sweatpant') || lower.includes('baggy') || lower.includes('pant') || lower.includes('trouser')) {
+    return { name: 'Baggy Pants', slug: 'baggy-pants' };
   }
-  if (typeof categoryId === 'string' && !categoryId.match(/^[0-9a-fA-F]{24}$/)) return categoryId;
-  
-  try {
-    const cached = localStorage.getItem("luxury_categories");
-    if (cached) {
-      const categories = JSON.parse(cached);
-      const found = categories.find(c => c._id === categoryId || c.id === categoryId);
-      if (found) return found.name || found.title || categoryId;
-    }
-  } catch (err) {
-    // Ignore cache parse errors
+  if (lower.includes('t-shirt') || lower.includes('tee')) {
+    return { name: 'Drop Shoulder T-Shirts', slug: 'drop-shoulder-t-shirts' };
   }
-  return typeof categoryId === 'string' ? categoryId : "";
+  if (lower.includes('sweatshirt') || lower.includes('hoodie')) {
+    return { name: 'Sweatshirts', slug: 'sweatshirts' };
+  }
+  if (lower.includes('shirt')) {
+    return { name: 'Shirts', slug: 'shirts' };
+  }
+  if (lower.includes('jersey')) {
+    return { name: 'Jerseys', slug: 'jerseys' };
+  }
+  return { name: 'Apparel', slug: 'shop' };
 }
+
+export const resolveCategoryInfo = (categoryId, productName = '') => {
+  if (!categoryId) return resolveFromTitle(productName);
+  
+  if (typeof categoryId === 'object') {
+    const name = categoryId.name || categoryId.title || '';
+    const slug = categoryId.slug || '';
+    if (name && !/^[0-9a-fA-F]{24}$/.test(name)) {
+      return { name, slug: slug || name.toLowerCase().replace(/\s+/g, '-') };
+    }
+    if (categoryId._id && DB_CATEGORY_MAP[categoryId._id]) return DB_CATEGORY_MAP[categoryId._id];
+    if (categoryId.id && DB_CATEGORY_MAP[categoryId.id]) return DB_CATEGORY_MAP[categoryId.id];
+  }
+
+  if (typeof categoryId === 'string') {
+    if (DB_CATEGORY_MAP[categoryId]) return DB_CATEGORY_MAP[categoryId];
+    
+    // Check localStorage cache
+    try {
+      const cached = localStorage.getItem("luxury_categories");
+      if (cached) {
+        const categories = JSON.parse(cached);
+        const found = categories.find(c => c._id === categoryId || c.id === categoryId);
+        if (found && found.name) {
+          return { name: found.name, slug: found.slug || found.name.toLowerCase().replace(/\s+/g, '-') };
+        }
+      }
+    } catch (_) {}
+
+    // If it's not a 24-char hex ID, it's already a category name or slug
+    if (!/^[0-9a-fA-F]{24}$/.test(categoryId)) {
+      return { name: categoryId, slug: categoryId.toLowerCase().replace(/\s+/g, '-') };
+    }
+  }
+
+  return resolveFromTitle(productName);
+};
+
+export const resolveCategoryName = (categoryId, productName = '') => {
+  return resolveCategoryInfo(categoryId, productName).name;
+};
 
 export const mapRemoteProduct = (product = {}) => {
   let rawImage = product.imageUrl || product.image || "";
@@ -104,7 +164,8 @@ export const mapRemoteProduct = (product = {}) => {
 
   const origPrice = hasMainOffer ? rawPrice : null;
 
-  const catVal = product.category || (Array.isArray(product.categories) && product.categories.length > 0 ? product.categories[0] : "");
+  const catVal = product._populatedCategories?.[0] || product.category || (Array.isArray(product.categories) && product.categories.length > 0 ? product.categories[0] : "");
+  const catInfo = resolveCategoryInfo(catVal, product.name || product.title);
 
   return {
     id: product.id || product._id || product.slug || String(Math.random()),
@@ -114,7 +175,8 @@ export const mapRemoteProduct = (product = {}) => {
     type: product.type || (variations.length > 1 ? "variant" : "simple"),
     description: product.description || "",
     longDescription: product.longDescription || "",
-    category: resolveCategoryName(catVal),
+    category: catInfo.name,
+    categorySlug: catInfo.slug,
     price: activePrice,
     originalPrice: origPrice,
     regularPrice: rawPrice,
