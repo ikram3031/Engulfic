@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {  useNavigate  } from 'react-router-dom';
 import { useCartStore } from '@/store/useCartStore';
 import { formatPrice } from '@/lib/utils';
-import { X, ShoppingCart, Trash2, Tag, ArrowRight, ShieldCheck, Truck, Sparkles, Eye } from 'lucide-react';
+import { X, ShoppingCart, Trash2, ArrowRight, Eye } from 'lucide-react';
 
 export default function CartDrawer({ onCheckout }) {
   const navigate = useNavigate();
@@ -78,19 +78,7 @@ export default function CartDrawer({ onCheckout }) {
             </button>
           </div>
 
-          {/* Shipping Indicator */}
-          <div className="bg-slate-100/80 dark:bg-white/5 px-6 py-3 border-b border-slate-200 dark:border-white/10 text-xs backdrop-blur-md">
-            {subtotal >= 2000 ? (
-              <p className="text-emerald-600 dark:text-emerald-400 font-mono font-bold flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> You unlocked FREE Express Shipping nationwide!
-              </p>
-            ) : (
-              <p className="text-slate-700 dark:text-white/80 font-mono flex items-center gap-1.5">
-                <Truck className="w-3.5 h-3.5 text-orange-500" />
-                Free shipping on orders over <strong className="text-orange-500">{formatPrice(2000)}</strong>
-              </p>
-            )}
-          </div>
+
 
           {/* Cart Items List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -186,61 +174,8 @@ export default function CartDrawer({ onCheckout }) {
           {/* Drawer Footer Calculations & Checkout */}
           {cart.length > 0 && (
             <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50/95 dark:bg-black/80 backdrop-blur-xl space-y-4">
-              {/* Promo Code Form */}
-              <div>
-                {promoCode ? (
-                  <div className="flex items-center justify-between p-2.5 bg-orange-500/10 border border-orange-500/30 rounded-xl text-xs text-orange-600 dark:text-orange-300">
-                    <div className="flex items-center gap-2 font-mono">
-                      <Tag className="w-3.5 h-3.5" />
-                      <span>Code <strong>{promoCode}</strong> Applied</span>
-                    </div>
-                    <button
-                      onClick={removePromoCode}
-                      className="text-orange-600 dark:text-orange-400 hover:underline text-[11px] font-bold"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleApplyPromo} className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Promo Code (ENGULF20)"
-                      value={inputCode}
-                      onChange={(e) => setInputCode(e.target.value)}
-                      className="flex-1 bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white uppercase placeholder-slate-400 dark:placeholder-white/30 focus:outline-none focus:border-orange-500 font-mono"
-                    />
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-slate-200 dark:bg-white/10 hover:bg-orange-500 hover:text-white border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-xs font-bold uppercase rounded-xl transition"
-                    >
-                      Apply
-                    </button>
-                  </form>
-                )}
-                {promoMessage && (
-                  <p className={`text-[11px] mt-1 font-mono ${promoMessage.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>
-                    {promoMessage.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Subtotal & Totals Breakdown */}
-              <div className="space-y-1.5 text-xs font-mono text-slate-600 dark:text-white/60 border-t border-slate-200 dark:border-white/10 pt-3">
-                <div className="flex justify-between text-slate-900 dark:text-white font-semibold">
-                  <span>Subtotal</span>
-                  <span className="text-slate-900 dark:text-white font-mono font-bold">{formatPrice(subtotal)}</span>
-                </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
-                    <span>Discount ({promoCode})</span>
-                    <span>-{formatPrice(discount)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span className="text-slate-900 dark:text-white font-semibold">{shipping === 0 ? 'FREE' : formatPrice(shipping)}</span>
-                </div>
+              {/* Totals Breakdown */}
+              <div className="space-y-1.5 text-xs font-mono text-slate-600 dark:text-white/60 pt-1">
                 <div className="flex justify-between text-base font-black text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-white/10">
                   <span>Total</span>
                   <span className="text-orange-600 dark:text-orange-400 font-mono">{formatPrice(total)}</span>
@@ -273,10 +208,6 @@ export default function CartDrawer({ onCheckout }) {
                 </button>
               </div>
 
-              <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500 dark:text-white/40 font-mono pt-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span>256-Bit Encrypted SSL Checkout</span>
-              </div>
             </div>
           )}
         </div>
