@@ -11,7 +11,7 @@ import SearchModal from '@/components/SearchModal';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatPrice } from '@/lib/utils';
-import { createOrder } from '@/lib/api';
+import { createOrder, loginMember, registerMember } from '@/lib/api';
 import {
   ShoppingCart,
   ShieldCheck,
@@ -28,7 +28,9 @@ import {
   Download,
   Printer,
   FileText,
-  Building2
+  Building2,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 const BANGLADESH_DISTRICTS = [
@@ -55,6 +57,7 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1); // 1: Checkout Form, 2: Order Complete / Invoice
   const [orderId, setOrderId] = useState('');
   const [orderSummary, setOrderSummary] = useState(null);
+  const [isCustomerAccountOpen, setIsCustomerAccountOpen] = useState(false);
 
   // Auth toggle tab
   const [authTab, setAuthTab] = useState('signin'); // 'signin' or 'signup'
@@ -130,30 +133,47 @@ export default function CheckoutPage() {
   };
 
   // Auth Submit handlers
-  const handleSignInSubmit = (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    if (!authEmail) {
-      setToastMessage('Email is required');
+    if (!authEmail || !authPassword) {
+      setToastMessage('Email and Password are required');
       return;
     }
-    const loggedInUser = login(authEmail);
-    setToastMessage(`Signed in as ${loggedInUser.name}`);
+    try {
+      const res = await loginMember({ email: authEmail, password: authPassword });
+      login(res.member || res.user, { accessToken: res.accessToken, refreshToken: res.refreshToken });
+      setToastMessage(`Signed in successfully!`);
+    } catch (err) {
+      setToastMessage(err.message || 'Failed to sign in. Check your credentials.');
+    }
   };
 
-  const handleSignUpSubmit = (e) => {
+  const handleSignUpSubmit = async (e) => {
     e.preventDefault();
     if (!authEmail || !authFirstName || !authLastName || !authPhone) {
       setToastMessage('Please fill all required sign up fields');
       return;
     }
-    const loggedInUser = login(authEmail);
     const fullName = `${authFirstName} ${authLastName}`;
-    updateProfile({
-      name: fullName,
-      phone: authPhone,
-      email: authEmail
-    });
-    setToastMessage(`Account created successfully! Signed in as ${fullName}`);
+    try {
+      const res = await registerMember({
+        firstName: authFirstName,
+        lastName: authLastName,
+        email: authEmail,
+        phone: authPhone,
+        password: authPassword || '12345678', // fallback if they didn't have password field
+      });
+      // Optionally login after register
+      if (res.accessToken) {
+        login(res.member || res.user, { accessToken: res.accessToken, refreshToken: res.refreshToken });
+        setToastMessage(`Account created! Welcome ${fullName}`);
+      } else {
+        setToastMessage(`Account created successfully! Please sign in.`);
+        setAuthTab('signin');
+      }
+    } catch (err) {
+      setToastMessage(err.message || 'Failed to create account.');
+    }
   };
 
   // Shipping calculation
@@ -321,15 +341,32 @@ export default function CheckoutPage() {
                 {/* Left Side: Forms */}
                 <div className="lg:col-span-7 space-y-8">
                   {/* Step 1: User Authentication check */}
-                  <div className="p-6 bg-slate-100/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-orange-500/10 rounded-full text-orange-500 border border-orange-500/20">
-                        <User className="w-5 h-5" />
+                  <div className="bg-slate-100/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden transition-all duration-300">
+                    <button
+                      type="button"
+                      onClick={() => setIsCustomerAccountOpen(!isCustomerAccountOpen)}
+                      className="w-full p-6 flex items-center justify-between text-left hover:bg-slate-200/50 dark:hover:bg-white/10 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-orange-500/10 rounded-full text-orange-500 border border-orange-500/20">
+                          <User className="w-5 h-5 shrink-0" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-black uppercase tracking-wide">1. Customer Account</h3>
+                          {!isLoggedIn && (
+                            <p className="text-xs text-slate-500 dark:text-white/60 mt-1 font-mono">
+                              Existing member? <span className="text-orange-500 font-bold hover:underline">Sign in</span> or create a new member account.
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <h3 className="text-lg font-black uppercase tracking-wide">1. Customer Account</h3>
-                    </div>
+                      <div className="text-slate-400">
+                        {isCustomerAccountOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                      </div>
+                    </button>
 
-                    {isLoggedIn && user ? (
+                    <div className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${isCustomerAccountOpen || (isLoggedIn && user) ? 'max-h-[1000px] pb-6 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}>
+                      {isLoggedIn && user ? (
                       <div className="p-4 bg-emerald-500/15 border border-emerald-500/20 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs font-mono">
                         <div>
                           <p className="font-bold text-emerald-600 dark:text-emerald-400">REGISTERED CUSTOMER SIGNED IN</p>
@@ -431,6 +468,17 @@ export default function CheckoutPage() {
                                 placeholder="name@example.com"
                                 value={authEmail}
                                 onChange={(e) => setAuthEmail(e.target.value)}
+                                className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">Password *</label>
+                              <input
+                                type="password"
+                                required
+                                placeholder="••••••••"
+                                value={authPassword}
+                                onChange={(e) => setAuthPassword(e.target.value)}
                                 className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
                               />
                             </div>
