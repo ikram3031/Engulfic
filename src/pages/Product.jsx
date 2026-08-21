@@ -37,8 +37,102 @@ import {
   FileText,
   Check,
   Info,
-  BadgeAlert
+  BadgeAlert,
+  Ruler
 } from 'lucide-react';
+
+const SIZE_TABLE_DATA = {
+  sweatshirts: {
+    title: 'Sweatshirts & Oversized Crews Size Chart',
+    unit: 'Inches (Chest / Length / Shoulder)',
+    rows: [
+      { size: 'XS', chest: '44"', length: '27"', shoulder: '21.5"' },
+      { size: 'S', chest: '46"', length: '28"', shoulder: '22.5"' },
+      { size: 'M', chest: '48"', length: '29"', shoulder: '23.5"' },
+      { size: 'L', chest: '50"', length: '30"', shoulder: '24.5"' },
+      { size: 'XL', chest: '52"', length: '31"', shoulder: '25.5"' },
+    ]
+  },
+  pants: {
+    title: 'Baggy Pants & Sweatpants Size Chart',
+    unit: 'Inches (Waist / Inseam / Leg Opening)',
+    rows: [
+      { size: 'XS', waist: '28 - 30"', inseam: '30"', leg: '9.5"' },
+      { size: 'S', waist: '30 - 32"', inseam: '31"', leg: '10.0"' },
+      { size: 'M', waist: '32 - 34"', inseam: '31.5"', leg: '10.5"' },
+      { size: 'L', waist: '34 - 36"', inseam: '32"', leg: '11.0"' },
+      { size: 'XL', waist: '36 - 38"', inseam: '32.5"', leg: '11.5"' },
+    ]
+  },
+  shirts: {
+    title: 'Oversized & Casual Shirts Size Chart',
+    unit: 'Inches (Chest / Length / Sleeve)',
+    rows: [
+      { size: 'XS', chest: '42"', length: '28"', sleeve: '23.5"' },
+      { size: 'S', chest: '44"', length: '29"', sleeve: '24.0"' },
+      { size: 'M', chest: '46"', length: '30"', sleeve: '24.5"' },
+      { size: 'L', chest: '48"', length: '31"', sleeve: '25.0"' },
+      { size: 'XL', chest: '50"', length: '32"', sleeve: '25.5"' },
+    ]
+  },
+  tees: {
+    title: 'Drop Shoulder T-Shirts Size Chart',
+    unit: 'Inches (Chest / Length / Drop Sleeve)',
+    rows: [
+      { size: 'XS', chest: '44"', length: '27.5"', sleeve: '9.0"' },
+      { size: 'S', chest: '46"', length: '28.5"', sleeve: '9.5"' },
+      { size: 'M', chest: '48"', length: '29.5"', sleeve: '10.0"' },
+      { size: 'L', chest: '50"', length: '30.5"', sleeve: '10.5"' },
+      { size: 'XL', chest: '52"', length: '31.5"', sleeve: '11.0"' },
+    ]
+  },
+  jerseys: {
+    title: 'Player & Fan Edition Jerseys Size Chart',
+    unit: 'Inches (Chest / Length)',
+    rows: [
+      { size: 'S', chest: '42"', length: '28.5"' },
+      { size: 'M', chest: '44"', length: '29.5"' },
+      { size: 'L', chest: '46"', length: '30.5"' },
+      { size: 'XL', chest: '48"', length: '31.5"' },
+    ]
+  }
+};
+
+function getCategorySizeKey(product) {
+  const catSlug = (product?.categorySlug || product?.category || '').toLowerCase();
+  const name = (product?.name || '').toLowerCase();
+  const rawCat = typeof product?.raw?.category === 'object' 
+    ? (product?.raw?.category?.slug || product?.raw?.category?.name || '') 
+    : String(product?.raw?.category || '');
+  const combined = `${catSlug} ${name} ${rawCat}`.toLowerCase();
+
+  // 1. Pants & Sweatpants (baggy-pants, baggy-sweatpants, baggy-graphic-sweatpants)
+  if (combined.includes('pant') || combined.includes('sweatpant') || combined.includes('baggy') || combined.includes('trouser')) {
+    return 'pants';
+  }
+
+  // 2. Sweatshirts & Crews (sweatshirts, oversized-sweatshirt, oversized-graphic-sweatshirt)
+  if (combined.includes('sweatshirt') || combined.includes('hoodie') || combined.includes('crew')) {
+    return 'sweatshirts';
+  }
+
+  // 3. Jerseys (jerseys, player-edition, fan-edition, retro-edition)
+  if (combined.includes('jersey') || combined.includes('player-edition') || combined.includes('fan-edition') || combined.includes('retro-edition')) {
+    return 'jerseys';
+  }
+
+  // 4. Drop Shoulder T-Shirts (drop-shoulder-t-shirts, drop-shoulder-tee, graphic-drop-shoulder-tee)
+  if (combined.includes('t-shirt') || combined.includes('tee') || combined.includes('drop-shoulder')) {
+    return 'tees';
+  }
+
+  // 5. Shirts (shirts, oversized-shirt, casual-shirt)
+  if (combined.includes('shirt')) {
+    return 'shirts';
+  }
+
+  return 'pants';
+}
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -121,10 +215,26 @@ export default function ProductDetailPage() {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [isAutoPlayPaused, setIsAutoPlayPaused] = useState(false);
+
+  // Compute all unique gallery & main images available for this product
+  const allImages = product
+    ? Array.from(
+        new Set(
+          [
+            product.image,
+            ...(Array.isArray(product.galleryImages) ? product.galleryImages : []),
+            ...(Array.isArray(product.images) ? product.images : []),
+            ...(Array.isArray(product.variants) ? product.variants.map((v) => v.imageUrl) : [])
+          ].filter((img) => typeof img === 'string' && img.trim() !== '')
+        )
+      )
+    : [];
   
   useEffect(() => {
     if (product) {
-      setActiveImage(product.image);
+      const defaultImg = product.image || (product.images && product.images[0]) || '';
+      setActiveImage(defaultImg);
       setActiveIndex(0);
       const defaultVar = product.variants?.[0] || null;
       setSelectedVariant(defaultVar);
@@ -133,27 +243,44 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
+  // Auto carousel slide effect
+  useEffect(() => {
+    if (allImages.length <= 1 || isAutoPlayPaused) return;
+
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => {
+        const next = (prev + 1) % allImages.length;
+        setActiveImage(allImages[next]);
+        return next;
+      });
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [allImages, isAutoPlayPaused]);
+
   const handleSelectVariant = (v) => {
     setSelectedVariant(v);
     setSelectedSize(v.size);
     if (v.imageUrl) {
       setActiveImage(v.imageUrl);
+      const matchIdx = allImages.indexOf(v.imageUrl);
+      if (matchIdx !== -1) setActiveIndex(matchIdx);
     }
   };
 
   const handlePrevImage = () => {
-    if (product?.images && product.images.length > 0) {
-      const newIndex = (activeIndex - 1 + product.images.length) % product.images.length;
+    if (allImages.length > 1) {
+      const newIndex = (activeIndex - 1 + allImages.length) % allImages.length;
       setActiveIndex(newIndex);
-      setActiveImage(product.images[newIndex]);
+      setActiveImage(allImages[newIndex]);
     }
   };
 
   const handleNextImage = () => {
-    if (product?.images && product.images.length > 0) {
-      const newIndex = (activeIndex + 1) % product.images.length;
+    if (allImages.length > 1) {
+      const newIndex = (activeIndex + 1) % allImages.length;
       setActiveIndex(newIndex);
-      setActiveImage(product.images[newIndex]);
+      setActiveImage(allImages[newIndex]);
     }
   };
 
@@ -219,7 +346,7 @@ export default function ProductDetailPage() {
     <main className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white flex flex-col justify-between transition-colors duration-300">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
 
-      <div className="flex-1">
+      <div className="flex-1 pb-16 md:pb-24">
         {isLoading || !product ? (
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
@@ -242,12 +369,17 @@ export default function ProductDetailPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 
                 {/* Left Image Gallery / Carousel */}
-                <div className="lg:col-span-7 space-y-4">
-                  <div className="relative aspect-[3/4] w-full rounded-3xl overflow-hidden bg-slate-200 dark:bg-black/40 border border-slate-200 dark:border-white/10 shadow-2xl group">
+                <div className="lg:col-span-6 space-y-4">
+                  <div
+                    onMouseEnter={() => setIsAutoPlayPaused(true)}
+                    onMouseLeave={() => setIsAutoPlayPaused(false)}
+                    className="relative aspect-[3/4] w-full rounded-3xl overflow-hidden bg-slate-200 dark:bg-black/40 border border-slate-200 dark:border-white/10 shadow-2xl group select-none"
+                  >
                     <img
-                      src={activeImage}
+                      key={activeImage || activeIndex}
+                      src={activeImage || product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover object-center transition-all duration-300 ease-in-out"
+                      className="w-full h-full object-cover object-center transition-all duration-500 ease-in-out"
                       referrerPolicy="no-referrer"
                     />
 
@@ -258,56 +390,80 @@ export default function ProductDetailPage() {
                     )}
 
                     {/* Carousel Controls */}
-                    {product.images && product.images.length > 1 && (
+                    {allImages.length > 1 && (
                       <>
                         <button
                           onClick={handlePrevImage}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 dark:bg-black/60 text-slate-800 dark:text-white hover:bg-white dark:hover:bg-black transition shadow-lg opacity-0 group-hover:opacity-100 z-10"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/80 dark:bg-black/60 text-slate-800 dark:text-white hover:bg-white dark:hover:bg-black hover:scale-110 transition duration-300 shadow-xl opacity-80 group-hover:opacity-100 z-10"
                           aria-label="Previous image"
                         >
                           <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
                           onClick={handleNextImage}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/80 dark:bg-black/60 text-slate-800 dark:text-white hover:bg-white dark:hover:bg-black transition shadow-lg opacity-0 group-hover:opacity-100 z-10"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/80 dark:bg-black/60 text-slate-800 dark:text-white hover:bg-white dark:hover:bg-black hover:scale-110 transition duration-300 shadow-xl opacity-80 group-hover:opacity-100 z-10"
                           aria-label="Next image"
                         >
                           <ChevronRight className="w-5 h-5" />
                         </button>
+
+                        {/* Dot / Slide Indicators */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10 z-10">
+                          {allImages.map((_, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                setActiveIndex(idx);
+                                setActiveImage(allImages[idx]);
+                              }}
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                activeIndex === idx
+                                  ? 'w-6 bg-orange-500'
+                                  : 'w-2 bg-white/50 hover:bg-white'
+                              }`}
+                              aria-label={`Go to slide ${idx + 1}`}
+                            />
+                          ))}
+                        </div>
                       </>
                     )}
                   </div>
 
-                  {/* Thumbnails */}
-                  {product.images && product.images.length > 1 && (
-                    <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-white/10">
-                      {product.images.map((imgUrl, index) => (
-                        <button
-                          key={index}
-                          onClick={() => {
-                            setActiveImage(imgUrl);
-                            setActiveIndex(index);
-                          }}
-                          className={`w-20 h-24 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0 ${
-                            activeImage === imgUrl
-                              ? 'border-orange-500 scale-105 shadow-md opacity-100'
-                              : 'border-slate-300 dark:border-white/10 opacity-60 hover:opacity-90'
-                          }`}
-                        >
-                          <img
-                            src={imgUrl}
-                            alt={`Gallery view ${index + 1}`}
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
-                          />
-                        </button>
-                      ))}
+                  {/* Thumbnails spanning 100% full width below main image */}
+                  {allImages.length > 0 && (
+                    <div className="w-full">
+                      <div className="flex items-center gap-3 w-full overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-white/10">
+                        {allImages.map((imgUrl, index) => {
+                          const isActive = activeImage === imgUrl || activeIndex === index;
+                          return (
+                            <button
+                              key={index}
+                              onClick={() => {
+                                setActiveImage(imgUrl);
+                                setActiveIndex(index);
+                              }}
+                              className={`relative flex-1 min-w-[65px] aspect-[3/4] rounded-2xl overflow-hidden border-2 transition-all duration-300 cursor-pointer ${
+                                isActive
+                                  ? 'border-orange-500 ring-2 ring-orange-500/30 scale-[1.02] shadow-lg opacity-100 z-10'
+                                  : 'border-slate-300 dark:border-white/10 opacity-60 hover:opacity-100 hover:border-orange-400'
+                              }`}
+                            >
+                              <img
+                                src={imgUrl}
+                                alt={`Gallery thumbnail ${index + 1}`}
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
 
                 {/* Right Product Options & Purchase */}
-                <div className="lg:col-span-5 space-y-6">
+                <div className="lg:col-span-6 space-y-6">
                   
                   {/* Category Badge */}
                   {product.category && (
@@ -486,21 +642,111 @@ export default function ProductDetailPage() {
                     </div>
                   )}
 
-                  {/* Guarantees */}
-                  <div className="grid grid-cols-3 gap-3 text-center text-[10px] font-mono text-slate-500 dark:text-white/60">
-                    <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-1">
-                      <Truck className="w-4 h-4 text-orange-500 mx-auto" />
-                      <span>Nationwide Delivery</span>
-                    </div>
-                    <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-1">
-                      <ShieldCheck className="w-4 h-4 text-orange-500 mx-auto" />
-                      <span>Pure & Authentic Product</span>
-                    </div>
-                    <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-1">
-                      <Sparkles className="w-4 h-4 text-orange-500 mx-auto" />
-                      <span>Best Customer Service</span>
-                    </div>
-                  </div>
+                  {/* Category Wise Size Chart Table */}
+                  {(() => {
+                    const sizeKey = getCategorySizeKey(product);
+                    const tableData = SIZE_TABLE_DATA[sizeKey];
+                    if (!tableData) return null;
+
+                    return (
+                      <div className="p-5 bg-slate-100/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-white/10">
+                          <div className="flex items-center gap-2">
+                            <Ruler className="w-4 h-4 text-orange-500" />
+                            <h3 className="text-xs font-bold font-mono uppercase text-slate-900 dark:text-white">
+                              {tableData.title}
+                            </h3>
+                          </div>
+                          <span className="text-[10px] font-mono text-orange-500 font-bold">{tableData.unit}</span>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left font-mono text-[11px]">
+                            <thead>
+                              <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/50 uppercase">
+                                <th className="py-2 px-2">Size</th>
+                                {sizeKey === 'sweatshirts' && (
+                                  <>
+                                    <th className="py-2 px-2">Chest</th>
+                                    <th className="py-2 px-2">Length</th>
+                                    <th className="py-2 px-2">Shoulder</th>
+                                  </>
+                                )}
+                                {sizeKey === 'pants' && (
+                                  <>
+                                    <th className="py-2 px-2">Waist</th>
+                                    <th className="py-2 px-2">Inseam</th>
+                                    <th className="py-2 px-2">Leg Opening</th>
+                                  </>
+                                )}
+                                {sizeKey === 'shirts' && (
+                                  <>
+                                    <th className="py-2 px-2">Chest</th>
+                                    <th className="py-2 px-2">Length</th>
+                                    <th className="py-2 px-2">Sleeve</th>
+                                  </>
+                                )}
+                                {sizeKey === 'tees' && (
+                                  <>
+                                    <th className="py-2 px-2">Chest</th>
+                                    <th className="py-2 px-2">Length</th>
+                                    <th className="py-2 px-2">Drop Sleeve</th>
+                                  </>
+                                )}
+                                {sizeKey === 'jerseys' && (
+                                  <>
+                                    <th className="py-2 px-2">Chest</th>
+                                    <th className="py-2 px-2">Length</th>
+                                  </>
+                                )}
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-200 dark:divide-white/5">
+                              {tableData.rows.map((row, i) => (
+                                <tr key={i} className="hover:bg-orange-500/5 transition">
+                                  <td className="py-2 px-2 font-bold text-orange-500">{row.size}</td>
+                                  {sizeKey === 'sweatshirts' && (
+                                    <>
+                                      <td className="py-2 px-2">{row.chest}</td>
+                                      <td className="py-2 px-2">{row.length}</td>
+                                      <td className="py-2 px-2">{row.shoulder}</td>
+                                    </>
+                                  )}
+                                  {sizeKey === 'pants' && (
+                                    <>
+                                      <td className="py-2 px-2">{row.waist}</td>
+                                      <td className="py-2 px-2">{row.inseam}</td>
+                                      <td className="py-2 px-2">{row.leg}</td>
+                                    </>
+                                  )}
+                                  {sizeKey === 'shirts' && (
+                                    <>
+                                      <td className="py-2 px-2">{row.chest}</td>
+                                      <td className="py-2 px-2">{row.length}</td>
+                                      <td className="py-2 px-2">{row.sleeve}</td>
+                                    </>
+                                  )}
+                                  {sizeKey === 'tees' && (
+                                    <>
+                                      <td className="py-2 px-2">{row.chest}</td>
+                                      <td className="py-2 px-2">{row.length}</td>
+                                      <td className="py-2 px-2">{row.sleeve}</td>
+                                    </>
+                                  )}
+                                  {sizeKey === 'jerseys' && (
+                                    <>
+                                      <td className="py-2 px-2">{row.chest}</td>
+                                      <td className="py-2 px-2">{row.length}</td>
+                                    </>
+                                  )}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                 </div>
               </div>
