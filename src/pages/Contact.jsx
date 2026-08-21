@@ -66,7 +66,6 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
-                      placeholder="e.g. Julian Vane"
                     />
                   </div>
                   <div>
@@ -77,7 +76,6 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
-                      placeholder="julian@example.com"
                     />
                   </div>
                 </div>
@@ -90,7 +88,6 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
-                    placeholder="Order Inquiry / Custom Sizing"
                   />
                 </div>
 
@@ -102,7 +99,6 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
-                    placeholder="How can our concierge assist you?"
                   />
                 </div>
 
@@ -129,33 +125,27 @@ export default function ContactPage() {
             {/* Flagship Locations Info */}
             <div className="lg:col-span-5 space-y-6">
               <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4">
-                <h3 className="text-base font-bold uppercase font-mono border-b border-slate-200 dark:border-white/10 pb-3">
-                  CLIENT CARE CONTACTS
+                <h3 className="text-base font-bold font-mono border-b border-slate-200 dark:border-white/10 pb-3">
+                  contact@engulfic.com
                 </h3>
-
-                <div className="space-y-3 text-xs font-mono">
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-4 h-4 text-orange-500" />
-                    <span>contact@engulfic.com</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-4 h-4 text-orange-500" />
-                    <span>Available Sat – Thu: 10:00 AM – 8:00 PM</span>
-                  </div>
-                </div>
               </div>
 
               <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4">
                 <h3 className="text-base font-bold uppercase font-mono border-b border-slate-200 dark:border-white/10 pb-3">
-                  HEADQUARTERS & OFFICE
+                  ENGULFIC OFFICE
                 </h3>
 
                 <div className="space-y-4 text-xs font-mono text-slate-700 dark:text-white/80">
                   <div className="flex items-start gap-3">
                     <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-slate-900 dark:text-white block">ENGULFIC OFFICE</strong>
                       <span>Mugda, Dhaka, Bangladesh</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Phone className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                    <div>
+                      <span>Available Sat – Thu: 10:00 AM – 8:00 PM</span>
                     </div>
                   </div>
                 </div>
