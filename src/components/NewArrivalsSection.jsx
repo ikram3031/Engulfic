@@ -23,6 +23,7 @@ export default function NewArrivalsSection({ onShowToast }) {
   const [api, setApi] = React.useState(null);
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
+  const [isPaused, setIsPaused] = React.useState(false);
 
   React.useEffect(() => {
     if (!api) return;
@@ -42,6 +43,21 @@ export default function NewArrivalsSection({ onShowToast }) {
       api.off('reInit', onSelect);
     };
   }, [api]);
+
+  // Fast auto-rotate effect (2500ms interval) with hover pause
+  React.useEffect(() => {
+    if (!api || isPaused) return;
+
+    const interval = setInterval(() => {
+      if (api.canScrollNext()) {
+        api.scrollNext();
+      } else {
+        api.scrollTo(0);
+      }
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [api, isPaused]);
 
   return (
     <section id="new-arrivals-section" className="py-6 sm:py-14 w-full max-w-full sm:max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 overflow-hidden">
@@ -73,7 +89,11 @@ export default function NewArrivalsSection({ onShowToast }) {
           ))}
         </div>
       ) : newArrivals.length > 0 ? (
-        <div className="relative w-full max-w-full px-0">
+        <div 
+          className="relative w-full max-w-full px-0"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           <Carousel
             setApi={setApi}
             opts={{

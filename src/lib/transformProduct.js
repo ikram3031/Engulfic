@@ -19,31 +19,12 @@ function formatImageUrl(url) {
   return `${API_BASE}${clean}`;
 }
 
-const DB_CATEGORY_MAP = {
-  '6a7f12afe92cea5ce35c2ce4': { name: 'Sweatshirts', slug: 'sweatshirts' },
-  '6a7f12e0e92cea5ce35c2ceb': { name: 'Oversized Sweatshirt', slug: 'oversized-sweatshirt' },
-  '6a7f133fe92cea5ce35c2cf3': { name: 'Oversized Graphic Sweatshirt', slug: 'oversized-graphic-sweatshirt' },
-  '6a7f15766cb27019830ecb70': { name: 'Baggy Pants', slug: 'baggy-pants' },
-  '6a7f15806cb27019830ecb78': { name: 'Baggy Sweatpants', slug: 'baggy-sweatpants' },
-  '6a7f15976cb27019830ecb80': { name: 'Baggy Graphic Sweatpants', slug: 'baggy-graphic-sweatpants' },
-  '6a7f160c6cb27019830ecb89': { name: 'Shirts', slug: 'shirts' },
-  '6a7f16156cb27019830ecb91': { name: 'Oversized Shirt', slug: 'oversized-shirt' },
-  '6a7f16256cb27019830ecb99': { name: 'Casual Shirt', slug: 'casual-shirt' },
-  '6a7f16466cb27019830ecba5': { name: 'Drop Shoulder T-Shirts', slug: 'drop-shoulder-t-shirts' },
-  '6a7f164f6cb27019830ecbad': { name: 'Drop Shoulder Tee', slug: 'drop-shoulder-tee' },
-  '6a7f16586cb27019830ecbb5': { name: 'Graphic Drop Shoulder Tee', slug: 'graphic-drop-shoulder-tee' },
-  '6a7f16626cb27019830ecbbc': { name: 'Jerseys', slug: 'jerseys' },
-  '6a7f16736cb27019830ecbc4': { name: 'Player Edition', slug: 'player-edition' },
-  '6a7f16896cb27019830ecbcc': { name: 'Fan Edition', slug: 'fan-edition' },
-  '6a7f169f6cb27019830ecbd4': { name: 'Retro Edition', slug: 'retro-edition' },
-};
-
 function isMongoObjectId(val) {
   return typeof val === 'string' && /^[0-9a-fA-F]{24}$/.test(val);
 }
 
 function resolveFromTitle(name = '') {
-  const lower = name.toLowerCase();
+  const lower = (name || '').toLowerCase();
   if (lower.includes('sweatpant') || lower.includes('baggy') || lower.includes('pant') || lower.includes('trouser')) {
     return { name: 'Baggy Pants', slug: 'baggy-pants' };
   }
@@ -71,12 +52,22 @@ function resolveCategory(cat, productName = '') {
     if (name && !isMongoObjectId(name)) {
       return { name, slug: slug || name.toLowerCase().replace(/\s+/g, '-') };
     }
-    if (cat._id && DB_CATEGORY_MAP[cat._id]) return DB_CATEGORY_MAP[cat._id];
-    if (cat.id && DB_CATEGORY_MAP[cat.id]) return DB_CATEGORY_MAP[cat.id];
   }
 
+  // Try checking localStorage cache if populated
+  try {
+    const cached = localStorage.getItem("luxury_categories");
+    if (cached) {
+      const pool = JSON.parse(cached);
+      const targetId = typeof cat === 'object' ? (cat._id || cat.id || cat.slug) : cat;
+      const found = pool.find(c => String(c._id || c.id) === String(targetId) || String(c.slug) === String(targetId));
+      if (found && found.name && !isMongoObjectId(found.name)) {
+        return { name: found.name, slug: found.slug || found.name.toLowerCase().replace(/\s+/g, '-') };
+      }
+    }
+  } catch (_) {}
+
   if (typeof cat === 'string') {
-    if (DB_CATEGORY_MAP[cat]) return DB_CATEGORY_MAP[cat];
     if (!isMongoObjectId(cat)) {
       return { name: cat, slug: cat.toLowerCase().replace(/\s+/g, '-') };
     }
@@ -111,11 +102,12 @@ export function transformProduct(p) {
   }
 
   // --- Image logic ---
-  const rawImage = p.imageUrl || p.image_url || '';
+  const rawImage = p.imageUrl || p.image_url || p.image || '';
   const image = formatImageUrl(rawImage);
-  const galleryImages = (p.images || [])
-    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-    .map((img) => formatImageUrl(img?.url || img))
+  const rawImagesList = Array.isArray(p.images) ? p.images : (Array.isArray(p.galleryImages) ? p.galleryImages : []);
+  const galleryImages = rawImagesList
+    .sort((a, b) => ((typeof a === 'object' ? a.sortOrder : 0) || 0) - ((typeof b === 'object' ? b.sortOrder : 0) || 0))
+    .map((img) => formatImageUrl(typeof img === 'object' ? (img?.url || img?.imageUrl || img?.image || '') : img))
     .filter(Boolean);
   const secondaryImage = galleryImages.length > 0 ? galleryImages[0] : image;
 

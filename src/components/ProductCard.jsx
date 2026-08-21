@@ -3,12 +3,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlistStore } from '@/store/useWishlistStore';
-import { Heart, Star, ArrowRight } from 'lucide-react';
+import { useCartStore } from '@/store/useCartStore';
+import { formatPrice } from '@/lib/utils';
+import { Heart, Star, ShoppingCart } from 'lucide-react';
 
 export default function ProductCard({ product, onShowToast, hideDetails = false }) {
   const [hovered, setHovered] = useState(false);
 
   const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const addToCart = useCartStore((state) => state.addToCart);
+  const openCart = useCartStore((state) => state.openCart);
+
   const isWishlisted = isInWishlist(product?.slug || product?.id);
 
   if (!product) return null;
@@ -24,6 +29,18 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
           : `Saved "${product.name}" to Wishlist`
       );
     }
+  };
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const defaultSize = product.sizes?.[0] || 'Standard';
+    const defaultColor = product.colors?.[0] || 'Default';
+    addToCart(product, defaultSize, defaultColor, 1);
+    if (onShowToast) {
+      onShowToast(`Added "${product.name}" to cart`);
+    }
+    openCart();
   };
 
   const hasDiscount = product.originalPrice && product.originalPrice > product.price;
@@ -90,7 +107,7 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
         </div>
       </div>
 
-      {/* Product Details Section - Clean with no variation and no price */}
+      {/* Product Details Section */}
       <div className="p-2.5 sm:p-4 flex flex-col flex-1 justify-between gap-1.5 sm:gap-2">
         <div>
           {/* Category & Rating */}
@@ -110,12 +127,28 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
           </h3>
         </div>
 
-        {/* Action Link */}
-        <div className="flex items-center justify-center pt-1.5 sm:pt-2 border-t border-slate-200 dark:border-white/10 mt-auto">
-          <span className="text-[10px] sm:text-xs font-mono font-bold text-orange-500 uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-all">
-            <span>View Piece</span>
-            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-          </span>
+        {/* Bottom Bar: Left Price & Right Add to Cart Icon */}
+        <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/10 mt-auto">
+          <div className="flex items-baseline gap-1.5 font-mono">
+            <span className="text-xs sm:text-sm md:text-base font-black text-slate-900 dark:text-white">
+              {formatPrice(product.price)}
+            </span>
+            {hasDiscount && (
+              <span className="text-[10px] sm:text-xs text-slate-400 dark:text-white/40 line-through">
+                {formatPrice(product.originalPrice)}
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            className="p-1.5 sm:p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg sm:rounded-xl transition shadow-md flex items-center justify-center cursor-pointer border border-orange-400/30"
+            title="Add to Cart"
+            aria-label="Add to Cart"
+          >
+            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
         </div>
       </div>
     </Link>
