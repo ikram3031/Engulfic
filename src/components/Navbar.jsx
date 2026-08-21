@@ -6,7 +6,8 @@ import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import menuData from '@/lib/menu.json';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCategories } from '@/lib/api';
 import {
   ShoppingCart,
   Heart,
@@ -26,6 +27,85 @@ import {
 import ProfileModal from '@/components/ProfileModal';
 import Toast from '@/components/Toast';
 
+function buildGroupedCategories(rawCategories) {
+  const defaultStructure = [
+    {
+      name: 'T-Shirt',
+      slug: 'drop-shoulder-t-shirts',
+      subcategories: [
+        { name: 'Drop Shoulder Tee', slug: 'drop-shoulder-tee' },
+        { name: 'Graphic Drop Shoulder Tee', slug: 'graphic-drop-shoulder-tee' }
+      ]
+    },
+    {
+      name: 'Shirts',
+      slug: 'shirts',
+      subcategories: [
+        { name: 'Oversized Shirt', slug: 'oversized-shirt' },
+        { name: 'Casual Shirt', slug: 'casual-shirt' }
+      ]
+    },
+    {
+      name: 'Sweatshirts',
+      slug: 'sweatshirts',
+      subcategories: [
+        { name: 'Oversized Sweatshirt', slug: 'oversized-sweatshirt' },
+        { name: 'Oversized Graphic Sweatshirt', slug: 'oversized-graphic-sweatshirt' }
+      ]
+    },
+    {
+      name: 'Pants',
+      slug: 'baggy-pants',
+      subcategories: [
+        { name: 'Baggy Sweatpants', slug: 'baggy-sweatpants' },
+        { name: 'Baggy Graphic Sweatpants', slug: 'baggy-graphic-sweatpants' }
+      ]
+    },
+    {
+      name: 'Jerseys',
+      slug: 'jerseys',
+      subcategories: [
+        { name: 'Player Edition', slug: 'player-edition' },
+        { name: 'Fan Edition', slug: 'fan-edition' },
+        { name: 'Retro Edition', slug: 'retro-edition' }
+      ]
+    }
+  ];
+
+  if (!rawCategories || rawCategories.length === 0) {
+    return defaultStructure;
+  }
+
+  const parents = rawCategories.filter(c => !c.parent);
+  const children = rawCategories.filter(c => c.parent);
+
+  if (parents.length === 0) {
+    return rawCategories.map(c => ({
+      name: c.name,
+      slug: c.slug,
+      subcategories: []
+    }));
+  }
+
+  return parents.map(p => {
+    const pId = String(p.id || p._id || p.slug);
+    const pSlug = p.slug;
+    const subcats = children.filter(c => {
+      const cParentId = typeof c.parent === 'object' ? String(c.parent.id || c.parent._id || c.parent.slug) : String(c.parent);
+      return cParentId === pId || cParentId === pSlug;
+    }).map(c => ({
+      name: c.name,
+      slug: c.slug
+    }));
+
+    return {
+      name: p.name,
+      slug: p.slug,
+      subcategories: subcats
+    };
+  });
+}
+
 export default function Navbar({ onOpenSearch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -33,7 +113,15 @@ export default function Navbar({ onOpenSearch }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   const { pathname } = useLocation();
-  const groupedCategories = menuData;
+
+  // TanStack Query for dynamic category fetching & caching
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    staleTime: 1000 * 60 * 60, // 1 hour caching
+  });
+
+  const groupedCategories = buildGroupedCategories(categories);
 
   const totalCartCount = useCartStore((state) => state.getTotalItemsCount());
   const toggleCart = useCartStore((state) => state.toggleCart);
@@ -318,6 +406,15 @@ export default function Navbar({ onOpenSearch }) {
                 </Link>
 
                 {/* 9. ABOUT */}
+                <Link to="/about"
+                  className={`hover:text-orange-500 transition-all duration-300 ${
+                    isScrolled ? 'py-1.5' : 'py-3.5'
+                  }`}
+                >
+                  About
+                </Link>
+
+                {/* Submenu commented out for now
                 <div className={`group relative cursor-pointer transition-all duration-300 ${
                   isScrolled ? 'py-1.5' : 'py-3.5'
                 }`}>
@@ -341,6 +438,7 @@ export default function Navbar({ onOpenSearch }) {
                     </Link>
                   </div>
                 </div>
+                */}
 
                 {/* 10. CONTACT */}
                 <Link to="/contact"
