@@ -10,7 +10,7 @@ export default function Breadcrumb({ items = [] }) {
 
   return (
     <nav aria-label="Breadcrumb" className="py-3.5 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-      <ol className="flex items-center flex-wrap gap-1.5 sm:gap-2 text-xs font-sans text-slate-500 dark:text-white/60">
+      <ol className="flex items-center justify-center flex-wrap gap-1.5 sm:gap-2 text-xs font-sans text-slate-500 dark:text-white/60">
         <li className="inline-flex items-center">
           <Link
             to="/"
