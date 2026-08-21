@@ -8,12 +8,10 @@ import {
   Loader2,
   AlertCircle,
   Instagram,
-  Twitter,
-  Globe,
+  Facebook,
   MapPin,
   Mail,
   Clock,
-  Truck,
 } from 'lucide-react';
 import { subscribeNewsletter } from '@/lib/api';
 
@@ -114,10 +112,16 @@ export default function Footer() {
             <p className="text-slate-400 dark:text-white/60 leading-relaxed font-light text-xs">
               Explore Engulfic's contemporary collection of premium apparel including shirts, jeans, sweatshirts, baggy pants, and essential unisex streetwear tailored for effortless modern styling.
             </p>
-            <div className="flex items-center gap-3 text-slate-400 dark:text-white/50 pt-2">
-              <Instagram className="w-4 h-4 hover:text-orange-400 cursor-pointer transition-colors" />
-              <Twitter className="w-4 h-4 hover:text-orange-400 cursor-pointer transition-colors" />
-              <Globe className="w-4 h-4 hover:text-orange-400 cursor-pointer transition-colors" />
+            <div className="flex items-center gap-4 text-slate-400 dark:text-white/50 pt-2">
+              <a href="https://www.facebook.com/Engulfclothing" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors">
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a href="https://www.instagram.com/engul_fic/" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors">
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a href="mailto:contact@engulfic.com" className="hover:text-orange-400 transition-colors">
+                <Mail className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
@@ -162,10 +166,6 @@ export default function Footer() {
               <li className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-orange-500 shrink-0" />
                 <span>Available: 10:00 AM – 8:00 PM</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Truck className="w-4 h-4 text-orange-500 shrink-0" />
-                <span>Nationwide Express Delivery</span>
               </li>
             </ul>
           </div>
