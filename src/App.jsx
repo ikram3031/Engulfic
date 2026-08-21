@@ -19,6 +19,7 @@ import SizeGuide from './pages/SizeGuide';
 import Terms from './pages/Terms';
 import Wishlist from './pages/Wishlist';
 import ScrollToTopOnRouteChange from './components/ScrollToTopOnRouteChange';
+import CartDrawer from './components/CartDrawer';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
           </Routes>
         </main>
+        <CartDrawer />
       </div>
     </BrowserRouter>
     </AppProvider>

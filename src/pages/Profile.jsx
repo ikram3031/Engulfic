@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import {  useNavigate  } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import CartDrawer from '@/components/CartDrawer';
 import QuickViewModal from '@/components/QuickViewModal';
 import SearchModal from '@/components/SearchModal';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -589,7 +588,6 @@ export default function ProfilePage() {
         />
       )}
 
-      <CartDrawer />
       <Footer />
     </div>
   );

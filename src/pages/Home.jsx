@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import HeroBanner from '@/components/HeroBanner';
 import CategoryGrid from '@/components/CategoryGrid';
-import CartDrawer from '@/components/CartDrawer';
 import SearchModal from '@/components/SearchModal';
 import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
@@ -69,9 +68,6 @@ export default function Home() {
 
       {/* Footer with Policy & Info Links */}
       <Footer />
-
-      {/* Slide-over Cart Drawer */}
-      <CartDrawer onCheckout={() => navigate('/checkout')} />
 
       {/* Modals & Controls */}
       <SearchModal

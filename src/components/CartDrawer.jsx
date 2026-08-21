@@ -7,7 +7,7 @@ import { formatPrice } from '@/lib/utils';
 import { X, ShoppingCart, Trash2, Tag, ArrowRight, ShieldCheck, Truck, Sparkles, Eye } from 'lucide-react';
 
 export default function CartDrawer({ onCheckout }) {
-  const router = useNavigate();
+  const navigate = useNavigate();
   const {
     cart,
     isOpen,
