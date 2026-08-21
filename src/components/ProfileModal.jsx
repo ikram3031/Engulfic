@@ -219,12 +219,20 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-xl animate-fadeIn">
       <div
-        className="relative w-full max-w-md bg-white dark:bg-[#050505]/95 border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl text-slate-900 dark:text-white p-6 sm:p-8 backdrop-blur-2xl transition-colors duration-300"
+        className={`relative w-full max-w-md bg-white dark:bg-[#050505]/95 border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl text-slate-900 dark:text-white p-6 sm:p-8 backdrop-blur-2xl transition-colors duration-300 ${isLoading ? 'pointer-events-none select-none' : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Loading overlay — blocks all clicks during async operations */}
+        {isLoading && (
+          <div className="absolute inset-0 z-50 bg-white/60 dark:bg-black/60 backdrop-blur-sm rounded-3xl flex items-center justify-center">
+            <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+          </div>
+        )}
+
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white/70 hover:text-slate-900 dark:hover:text-white rounded-full border border-slate-200 dark:border-white/10 transition backdrop-blur-md"
+          onClick={isLoading ? undefined : onClose}
+          disabled={isLoading}
+          className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white/70 hover:text-slate-900 dark:hover:text-white rounded-full border border-slate-200 dark:border-white/10 transition backdrop-blur-md disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <X className="w-5 h-5" />
         </button>
