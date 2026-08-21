@@ -231,7 +231,7 @@ export {
  * Submit Contact Form
  */
 export async function submitContactForm(data) {
-  const url = ${BASE_URL}/api/v1/contact;
+  const url = `${BASE_URL}/api/v1/contact`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
