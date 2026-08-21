@@ -114,12 +114,12 @@ export default function ContactPage() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>TRANSMITTING...</span>
+                      <span>SENDING...</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>TRANSMIT MESSAGE</span>
+                      <span>SEND MESSAGE</span>
                     </>
                   )}
                 </button>
