@@ -276,7 +276,7 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
               <form onSubmit={handleLogin} className="space-y-5">
                 <div className="text-center space-y-2">
                   <h2 className="text-2xl font-black uppercase tracking-tight font-sans">Member Sign In</h2>
-                  <p className="text-xs text-slate-500 dark:text-white/60">Enter password for {email}</p>
+                  <p className="text-xs text-slate-500 dark:text-white/60">Enter password for <strong className="text-slate-900 dark:text-white">{email}</strong></p>
                 </div>
 
                 <div>
@@ -291,11 +291,11 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
                   />
                 </div>
 
-                <div className="flex justify-between items-center text-xs">
-                  <button type="button" onClick={() => setMode('check-email')} className="text-slate-500 hover:text-orange-500 font-mono">
+                <div className="flex justify-between items-center text-xs mt-1">
+                  <button type="button" onClick={() => setMode('check-email')} className="text-orange-500 hover:text-orange-600 font-bold underline underline-offset-4 decoration-orange-500/30 hover:decoration-orange-500 font-mono transition-colors">
                     Change Email
                   </button>
-                  <button type="button" onClick={handleForgotPassword} className="text-slate-500 hover:text-orange-500 font-mono">
+                  <button type="button" onClick={handleForgotPassword} className="text-orange-500 hover:text-orange-600 font-bold underline underline-offset-4 decoration-orange-500/30 hover:decoration-orange-500 font-mono transition-colors">
                     Forgot Password?
                   </button>
                 </div>
@@ -315,7 +315,7 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="text-center space-y-2">
                   <h2 className="text-2xl font-black uppercase tracking-tight font-sans">Create Account</h2>
-                  <p className="text-xs text-slate-500 dark:text-white/60">Complete the details to register {email}</p>
+                  <p className="text-xs text-slate-500 dark:text-white/60">Complete the details to register <strong className="text-slate-900 dark:text-white">{email}</strong></p>
                 </div>
 
                 <div className="space-y-3">
@@ -356,8 +356,8 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center text-xs">
-                  <button type="button" onClick={() => setMode('check-email')} className="text-slate-500 hover:text-orange-500 font-mono">
+                <div className="flex justify-between items-center text-xs mt-1">
+                  <button type="button" onClick={() => setMode('check-email')} className="text-orange-500 hover:text-orange-600 font-bold underline underline-offset-4 decoration-orange-500/30 hover:decoration-orange-500 font-mono transition-colors">
                     Change Email
                   </button>
                 </div>
