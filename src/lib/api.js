@@ -226,3 +226,25 @@ export {
   clearStoredMemberTokens,
   setStoredMemberTokens
 } from '@/core/lib/api';
+
+/**
+ * Submit Contact Form
+ */
+export async function submitContactForm(data) {
+  const url = ${BASE_URL}/api/v1/contact;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to submit contact form');
+  }
+
+  return response.json();
+}

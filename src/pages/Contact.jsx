@@ -6,18 +6,29 @@ import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 import SearchModal from '@/components/SearchModal';
 import Toast from '@/components/Toast';
-import { Mail, Phone, MapPin, Send, Sparkles } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Sparkles, Facebook, Instagram, Loader2 } from 'lucide-react';
+import { submitContactForm } from '@/lib/api';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setToastMessage('Thank you! Your message has been sent to Engulfic Concierge.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    setTimeout(() => setToastMessage(''), 4000);
+    setIsSubmitting(true);
+    try {
+      await submitContactForm(formData);
+      setToastMessage('Thank you! Your message has been sent to Engulfic Concierge.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      setToastMessage(error.message || 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setToastMessage(''), 4000);
+    }
   };
 
   return (
@@ -97,10 +108,20 @@ export default function ContactPage() {
 
                 <button
                   type="submit"
-                  className="w-full py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-orange-600 transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-orange-600 transition shadow-xl border border-orange-400/30 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>TRANSMIT MESSAGE</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>TRANSMITTING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>TRANSMIT MESSAGE</span>
+                    </>
+                  )}
                 </button>
               </form>
             </div>
@@ -126,17 +147,34 @@ export default function ContactPage() {
 
               <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4">
                 <h3 className="text-base font-bold uppercase font-mono border-b border-slate-200 dark:border-white/10 pb-3">
-                  HEADQUARTERS & STUDIO
+                  HEADQUARTERS & OFFICE
                 </h3>
 
                 <div className="space-y-4 text-xs font-mono text-slate-700 dark:text-white/80">
                   <div className="flex items-start gap-3">
                     <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-slate-900 dark:text-white block">ENGULFIC STUDIO</strong>
+                      <strong className="text-slate-900 dark:text-white block">ENGULFIC OFFICE</strong>
                       <span>Mugda, Dhaka, Bangladesh</span>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <div className="p-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4">
+                <h3 className="text-base font-bold uppercase font-mono border-b border-slate-200 dark:border-white/10 pb-3">
+                  SOCIAL MEDIA
+                </h3>
+
+                <div className="space-y-4 text-xs font-mono text-slate-700 dark:text-white/80">
+                  <a href="https://www.facebook.com/Engulfclothing" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-orange-500 transition-colors">
+                    <Facebook className="w-4 h-4 shrink-0" />
+                    <span>Facebook (@Engulfclothing)</span>
+                  </a>
+                  <a href="https://www.instagram.com/engul_fic/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-orange-500 transition-colors">
+                    <Instagram className="w-4 h-4 shrink-0" />
+                    <span>Instagram (@engul_fic)</span>
+                  </a>
                 </div>
               </div>
             </div>
