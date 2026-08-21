@@ -893,6 +893,38 @@ export default function CheckoutPage() {
                       <span>256-Bit Secure SSL Checkout</span>
                     </div>
                   </div>
+
+                  {/* Checkout Notes & Important Info */}
+                  <div className="p-6 bg-orange-500/5 dark:bg-orange-500/10 border border-orange-500/20 rounded-3xl space-y-4">
+                    <h4 className="text-sm font-black uppercase tracking-wide text-orange-600 dark:text-orange-400 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Important Information
+                    </h4>
+                    
+                    <ul className="space-y-3 text-xs font-mono text-slate-700 dark:text-white/80">
+                      <li className="flex items-start gap-2">
+                        <Truck className="w-3.5 h-3.5 text-orange-500 shrink-0 mt-0.5" />
+                        <span>Delivery takes <strong>24-48 hours</strong> inside Dhaka, and <strong>24-72 hours</strong> outside Dhaka.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Tag className="w-3.5 h-3.5 text-orange-500 shrink-0 mt-0.5" />
+                        <span>For orders above <strong>৳3,000</strong>, a partial advance payment is required.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Mail className="w-3.5 h-3.5 text-orange-500 shrink-0 mt-0.5" />
+                        <span>For any inquiries, connect with us on <a href="https://www.facebook.com/Engulfclothing" target="_blank" rel="noreferrer" className="text-orange-500 font-bold hover:underline">Facebook</a> / <a href="https://www.instagram.com/engul_fic/" target="_blank" rel="noreferrer" className="text-orange-500 font-bold hover:underline">Instagram</a> or use our <Link to="/contact" className="text-orange-500 font-bold hover:underline">Contact form</Link>.</span>
+                      </li>
+                    </ul>
+
+                    <div className="mt-4 p-4 bg-orange-500 text-white rounded-2xl shadow-xl border border-orange-400/50">
+                      <p className="text-xs font-mono leading-relaxed flex items-start gap-2">
+                        <User className="w-5 h-5 shrink-0" />
+                        <span>
+                          <strong>MEMBER BENEFIT:</strong> Create a registered account to unlock upcoming offers, exclusive drops, and special discounts!
+                        </span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )
