@@ -334,7 +334,9 @@ export default function ProfileModal({ isOpen, onClose, onShowToast }) {
                   <div>
                     <label className="block text-xs font-mono text-slate-500 dark:text-white/50 mb-1">Phone Number</label>
                     <input
-                      type="text"
+                      type="tel"
+                      name="phone"
+                      autoComplete="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+88017XXXXXXXX"

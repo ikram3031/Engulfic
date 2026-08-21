@@ -485,7 +485,9 @@ export default function CheckoutPage() {
                             <div>
                               <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">Phone Number *</label>
                               <input
-                                type="text"
+                                type="tel"
+                                name="phone"
+                                autoComplete="tel"
                                 required
                                 placeholder="e.g. +880 17XXXXXXXX"
                                 value={authPhone}
@@ -556,8 +558,9 @@ export default function CheckoutPage() {
                         <div>
                           <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Phone Number *</label>
                           <input
-                            type="text"
+                            type="tel"
                             name="phone"
+                            autoComplete="tel"
                             value={billingForm.phone}
                             onChange={handleBillingChange}
                             required
@@ -683,8 +686,9 @@ export default function CheckoutPage() {
                           <div>
                             <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Phone Number *</label>
                             <input
-                              type="text"
+                              type="tel"
                               name="phone"
+                              autoComplete="tel"
                               value={shippingForm.phone}
                               onChange={handleShippingChange}
                               required={shipToDifferent}
