@@ -505,6 +505,7 @@ export default function CheckoutPage() {
                         )}
                       </div>
                     )}
+                    </div>
                   </div>
 
                   {/* Step 2: Billing & Shipping Information */}
