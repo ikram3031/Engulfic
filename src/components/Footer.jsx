@@ -172,7 +172,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Copyright & Developed by */}
-        <div className="pt-8 border-t border-slate-800 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400 dark:text-white/40 font-mono">
+        <div className="hidden sm:flex pt-8 border-t border-slate-800 dark:border-white/10 flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400 dark:text-white/40 font-mono">
           <p>© 2026 ENGULFIC. All rights reserved.</p>
           <p>
             Developed by{' '}
