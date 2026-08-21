@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
-import Breadcrumb from '@/components/Breadcrumb';
+
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
@@ -57,10 +57,7 @@ export default function CategoryPage() {
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
 
       <div className="flex-1">
-        {/* Clickable Breadcrumbs */}
-        <Breadcrumb items={breadcrumbItems} />
-
-        {/* Hero Category Banner */}
+        {/* Hero Category Banner with breadcrumb inside */}
         <div className="relative h-[260px] sm:h-[320px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-4 rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10">
           <img
             src={categoryMeta.image || categoryMeta.imageUrl || 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=1200'}
@@ -81,6 +78,23 @@ export default function CategoryPage() {
             <p className="text-xs sm:text-sm text-white/80 font-mono line-clamp-2 leading-relaxed max-w-lg">
               {categoryMeta.description}
             </p>
+
+            {/* Breadcrumb inside banner */}
+            <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-1.5 text-[11px] font-mono text-white/60">
+              <Link to="/" className="hover:text-orange-400 transition-colors flex items-center gap-1">
+                Home
+              </Link>
+              {breadcrumbItems.map((item, i) => (
+                <span key={i} className="flex items-center gap-1.5">
+                  <span className="text-white/30">›</span>
+                  {i === breadcrumbItems.length - 1 || !item.href ? (
+                    <span className="text-white font-bold">{item.label}</span>
+                  ) : (
+                    <Link to={item.href} className="hover:text-orange-400 transition-colors">{item.label}</Link>
+                  )}
+                </span>
+              ))}
+            </nav>
           </div>
         </div>
 
