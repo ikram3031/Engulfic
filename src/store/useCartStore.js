@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { fetchCouponByCode } from '@/lib/api';
+import { trackAddToCart } from '@/lib/metaPixel';
 
 export const useCartStore = create((set, get) => ({
   cart: [],
@@ -52,7 +53,9 @@ export const useCartStore = create((set, get) => ({
       return { cart: updatedCart, isOpen: true };
     });
     get().showToast(`Added ${quantity > 1 ? `${quantity}x ` : ''}"${product.name}" (${size}, ${color}) to Cart!`);
+    trackAddToCart(product, quantity, size, color);
   },
+
 
   removeFromCart: (cartItemId) => {
     set((state) => ({

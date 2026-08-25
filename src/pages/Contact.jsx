@@ -8,8 +8,10 @@ import SearchModal from '@/components/SearchModal';
 import Toast from '@/components/Toast';
 import { Mail, Phone, MapPin, Send, Sparkles, Facebook, Instagram, Loader2 } from 'lucide-react';
 import { submitContactForm } from '@/lib/api';
+import { trackContact } from '@/lib/metaPixel';
 
-export default function ContactPage() {
+// Customer contact and concierge inquiry page with Meta Pixel Contact event tracking
+const ContactPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -21,6 +23,7 @@ export default function ContactPage() {
     setIsSubmitting(true);
     try {
       await submitContactForm(formData);
+      trackContact({ email: formData.email, firstName: formData.name });
       setToastMessage('Thank you! Your message has been sent to Engulfic Concierge.');
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
@@ -30,6 +33,7 @@ export default function ContactPage() {
       setTimeout(() => setToastMessage(''), 4000);
     }
   };
+
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white flex flex-col justify-between transition-colors duration-300">
@@ -177,4 +181,6 @@ export default function ContactPage() {
       <Toast message={toastMessage} onClose={() => setToastMessage('')} />
     </main>
   );
-}
+};
+
+export default ContactPage;

@@ -21,7 +21,8 @@ import Wishlist from './pages/Wishlist';
 import ScrollToTopOnRouteChange from './components/ScrollToTopOnRouteChange';
 import CartDrawer from './components/CartDrawer';
 
-function App() {
+// Main application root with global router, context provider, and routes
+const App = () => {
   return (
     <AppProvider>
       <BrowserRouter>

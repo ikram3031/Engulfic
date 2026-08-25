@@ -1,17 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
+import { trackViewContent } from '@/lib/metaPixel';
 import { X, Star, Heart, ShoppingCart, Truck, ShieldCheck, Check, Sparkles } from 'lucide-react';
 
-export default function QuickViewModal({ product, onClose, onShowToast }) {
+// Displays product quick view modal with variant selectors and Meta Pixel ViewContent tracking
+const QuickViewModal = ({ product, onClose, onShowToast }) => {
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || product?.variants?.[0]?.size || '');
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]?.name || '');
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('details'); // details, fabric, shipping
   const [activeImage, setActiveImage] = useState(product?.image || '');
+
+  useEffect(() => {
+    if (product) {
+      trackViewContent(product);
+    }
+  }, [product]);
+
 
   const addToCart = useCartStore((state) => state.addToCart);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
@@ -267,4 +276,6 @@ export default function QuickViewModal({ product, onClose, onShowToast }) {
       </div>
     </div>
   );
-}
+};
+
+export default QuickViewModal;

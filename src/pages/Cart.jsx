@@ -10,6 +10,7 @@ import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
 import { useCartStore } from '@/store/useCartStore';
 import { formatPrice } from '@/lib/utils';
+import { trackInitiateCheckout } from '@/lib/metaPixel';
 import {
   ShoppingCart,
   Trash2,
@@ -22,7 +23,8 @@ import {
   Sparkles
 } from 'lucide-react';
 
-export default function CartPage() {
+// Shopping cart page showing item list, promo discounts, and checkout proceed actions
+const CartPage = () => {
   const {
     cart,
     removeFromCart,
@@ -274,7 +276,9 @@ export default function CartPage() {
 
                   {/* Checkout & Continue Shopping CTAs */}
                   <div className="space-y-3">
-                    <Link to="/checkout"
+                    <Link
+                      to="/checkout"
+                      onClick={() => trackInitiateCheckout(cart, total)}
                       className="w-full py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-orange-600 transition shadow-2xl border border-orange-400/30 flex items-center justify-center gap-2"
                     >
                       <span>Proceed to Checkout</span>
@@ -306,4 +310,6 @@ export default function CartPage() {
       <Toast message={toastMessage} onClose={() => setToastMessage('')} />
     </main>
   );
-}
+};
+
+export default CartPage;

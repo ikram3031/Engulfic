@@ -4,9 +4,11 @@ import { useState } from 'react';
 import {  useNavigate  } from 'react-router-dom';
 import { useCartStore } from '@/store/useCartStore';
 import { formatPrice } from '@/lib/utils';
+import { trackInitiateCheckout } from '@/lib/metaPixel';
 import { X, ShoppingCart, Trash2, ArrowRight, Eye } from 'lucide-react';
 
-export default function CartDrawer({ onCheckout }) {
+// Slide-over cart drawer with realtime quantity management and checkout triggers
+const CartDrawer = ({ onCheckout }) => {
   const navigate = useNavigate();
   const {
     cart,
@@ -194,6 +196,7 @@ export default function CartDrawer({ onCheckout }) {
 
                 <button
                   onClick={() => {
+                    trackInitiateCheckout(cart, total, itemsCount);
                     closeCart();
                     if (onCheckout) {
                       onCheckout();
@@ -214,4 +217,6 @@ export default function CartDrawer({ onCheckout }) {
       </div>
     </div>
   );
-}
+};
+
+export default CartDrawer;

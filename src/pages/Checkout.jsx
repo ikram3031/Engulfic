@@ -13,6 +13,11 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { formatPrice } from '@/lib/utils';
 import { createOrder, loginMember, registerMember } from '@/lib/api';
 import {
+  trackInitiateCheckout,
+  trackAddPaymentInfo,
+  trackPurchase,
+} from '@/lib/metaPixel';
+import {
   ShoppingCart,
   ShieldCheck,
   Tag,
@@ -47,7 +52,8 @@ const BANGLADESH_DISTRICTS = [
   'Tangail', 'Thakurgaon'
 ];
 
-export default function CheckoutPage() {
+// Handles end-to-end checkout flow, address collection, order generation, and Meta Pixel Purchase tracking
+const CheckoutPage = () => {
   const router = useNavigate();
   const { cart, getSubtotal, getDiscountAmount, promoCode, applyPromoCode, removePromoCode, clearCart } = useCartStore();
   const { isLoggedIn, user, login, logout, updateProfile } = useAuthStore();
@@ -115,6 +121,14 @@ export default function CheckoutPage() {
       return () => clearTimeout(timer);
     }
   }, [isLoggedIn, user]);
+
+  // Track Meta Pixel InitiateCheckout on checkout terminal mount
+  useEffect(() => {
+    if (cart && cart.length > 0) {
+      trackInitiateCheckout(cart, grandTotal || getSubtotal());
+    }
+  }, []);
+
 
   const handleBillingChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -235,6 +249,9 @@ export default function CheckoutPage() {
     }
 
     try {
+      // Fire Meta Pixel AddPaymentInfo event
+      trackAddPaymentInfo(cart, grandTotal, 'cod');
+
       // Build billingInfo and shippingInfo matching API spec (06_orders-api.md)
       const buildAddressInfo = (form) => ({
         fullName: `${form.firstName} ${form.lastName}`.trim(),
@@ -266,6 +283,16 @@ export default function CheckoutPage() {
 
       const response = await createOrder(orderPayload);
       const generatedId = response.data?.orderNumber || response.orderNumber || `ENG-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      // Fire Meta Pixel Purchase event with transaction details and customer address data
+      trackPurchase({
+        orderId: generatedId,
+        total: grandTotal,
+        subtotal,
+        shippingCost,
+        items: cart,
+        customer: shipToDifferent ? shippingForm : billingForm,
+      });
 
       const now = new Date();
       const formattedDate = now.toLocaleDateString('en-US', {
@@ -1152,4 +1179,6 @@ export default function CheckoutPage() {
       <Toast message={toastMessage} onClose={() => setToastMessage('')} />
     </main>
   );
-}
+};
+
+export default CheckoutPage;

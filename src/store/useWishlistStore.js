@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { trackAddToWishlist } from '@/lib/metaPixel';
 
 export const useWishlistStore = create((set, get) => ({
   wishlist: [],
@@ -11,10 +12,12 @@ export const useWishlistStore = create((set, get) => ({
           wishlist: state.wishlist.filter((item) => item.id !== product.id),
         };
       } else {
+        trackAddToWishlist(product);
         return { wishlist: [...state.wishlist, product] };
       }
     });
   },
+
 
   isInWishlist: (productId) => {
     return get().wishlist.some((item) => item.id === productId);

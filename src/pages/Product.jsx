@@ -13,6 +13,7 @@ import { useAppStore } from '@/core/store/useAppStore';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
+import { trackViewContent } from '@/lib/metaPixel';
 import {
   ShoppingCart,
   Heart,
@@ -183,9 +184,10 @@ export default function ProductDetailPage() {
     }
   }, [id]);
 
-  // Dynamic SEO metadata update
+  // Dynamic SEO metadata update & Meta Pixel ViewContent tracking
   useEffect(() => {
     if (product) {
+      trackViewContent(product);
       document.title = product.metaData?.metaTitle || `${product.name} | Engulfic`;
       if (product.metaData?.metaDescription) {
         let metaDesc = document.querySelector("meta[name='description']");

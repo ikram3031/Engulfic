@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProducts } from '@/lib/api';
+import { trackSearch } from '@/lib/metaPixel';
 import { X, Search, ArrowRight, Loader2, PackageX } from 'lucide-react';
 
-export default function SearchModal({ isOpen, onClose }) {
+// Live search popup modal with debounced query execution and Meta Pixel Search tracking
+const SearchModal = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +26,7 @@ export default function SearchModal({ isOpen, onClose }) {
 
     const timer = setTimeout(async () => {
       try {
+        trackSearch(q);
         const items = await fetchProducts({ q, limit: 12 });
         setResults(items.slice(0, 12));
       } catch (err) {
@@ -35,6 +38,7 @@ export default function SearchModal({ isOpen, onClose }) {
 
     return () => clearTimeout(timer);
   }, [query]);
+
 
   if (!isOpen) return null;
 
@@ -123,4 +127,6 @@ export default function SearchModal({ isOpen, onClose }) {
       </div>
     </div>
   );
-}
+};
+
+export default SearchModal;
