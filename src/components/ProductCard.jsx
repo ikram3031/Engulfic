@@ -111,8 +111,8 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
       <div className="p-2.5 sm:p-4 flex flex-col flex-1 justify-between gap-1.5 sm:gap-2">
         <div>
           {/* Category & Rating */}
-          <div className="flex items-center justify-between text-[9px] sm:text-xs text-slate-500 dark:text-white/50 font-mono mb-0.5">
-            <span className="truncate pr-1 uppercase tracking-wider">{categoryName}</span>
+          <div className="flex items-center justify-between text-[9px] sm:text-xs text-slate-500 dark:text-white/50 mb-0.5">
+            <span className="truncate pr-1 uppercase tracking-wider" style={{ fontFamily: "'Roboto', sans-serif" }}>{categoryName}</span>
             {product.rating > 0 && (
               <div className="flex items-center gap-0.5 text-orange-500">
                 <Star className="w-3 h-3 fill-orange-500" />
@@ -122,7 +122,7 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
           </div>
 
           {/* Title */}
-          <h3 className="text-xs sm:text-sm md:text-base font-bold text-slate-900 dark:text-white tracking-tight hover:text-orange-500 transition line-clamp-1 leading-snug">
+          <h3 className="text-xs sm:text-sm md:text-base font-medium text-slate-900 dark:text-white tracking-tight hover:text-orange-500 transition line-clamp-1 leading-snug">
             {product.name}
           </h3>
         </div>
