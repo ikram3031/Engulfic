@@ -111,7 +111,7 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
       <div className="p-2.5 sm:p-4 flex flex-col flex-1 justify-between gap-1.5 sm:gap-2">
         <div>
           {/* Category & Rating */}
-          <div className="flex items-center justify-between text-[9px] sm:text-xs text-slate-500 dark:text-white/50 mb-0.5">
+          <div className="flex items-center justify-between text-[9px] sm:text-xs text-slate-500 dark:text-white/50 -mt-0.5 mb-1">
             <span className="truncate pr-1 uppercase tracking-wider" style={{ fontFamily: "'Roboto', sans-serif" }}>{categoryName}</span>
             {product.rating > 0 && (
               <div className="flex items-center gap-0.5 text-orange-500">
