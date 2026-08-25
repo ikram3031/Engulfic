@@ -102,16 +102,7 @@ const HeroBanner = ({ onExploreClick }) => {
 
       {/* Main Hero Content - Simplified */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 sm:pt-16 sm:pb-10 md:pt-24 md:pb-16 w-full my-auto flex flex-col items-center justify-end h-full min-h-[500px]">
-        {/* Minimal CTA button only, letting image shine */}
-        <div className="mb-8 sm:mb-16">
-          <button
-            onClick={onExploreClick}
-            className="px-6 py-3 sm:px-8 sm:py-4 bg-orange-500 text-white font-extrabold uppercase tracking-wider text-xs sm:text-sm hover:bg-orange-600 transition-all rounded-full flex items-center gap-2.5 sm:gap-3 group shadow-xl hover:shadow-orange-500/30"
-          >
-            <span>Explore Collection</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+        {/* No text as per user request */}
       </div>
 
       {/* Slider Controls & Progress Indicator (Only show if more than 1 slide) */}
