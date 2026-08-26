@@ -22,18 +22,6 @@ const SORT_MAP = {
   'rating': 'newest', // no rating field in backend, fall back
 };
 
-const CATEGORY_SLUG_MAP = {
-  'tees': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
-  't-shirt': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
-  't-shirts': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
-  'drop-shoulder-t-shirts': ['graphic-drop-shoulder-tee', 'drop-shoulder-tee', 'drop-shoulder-t-shirts'],
-  'shirts': ['casual-shirt', 'oversized-shirt', 'shirts'],
-  'sweatshirts': ['baggy-sweatpants', 'oversized-graphic-sweatshirt', 'solid-sweatshirt', 'sweatshirts'],
-  'pants': ['baggy-sweatpants', 'baggy-graphic-sweatpants', 'baggy-pants'],
-  'baggy-pants': ['baggy-sweatpants', 'baggy-graphic-sweatpants', 'baggy-pants'],
-  'jerseys': ['player-edition', 'fan-edition', 'retro-edition', 'jerseys']
-};
-
 /**
  * Fetch a paginated, filtered list of products.
  * Returns: { products: TransformedProduct[], meta: {...} }
@@ -67,30 +55,12 @@ export async function fetchProducts({
   const json = await response.json();
 
   // Backend returns { success, message, meta, data: [...] }
-  let rawProducts = json.data || json || [];
-  
-  if (rawProducts.length === 0 && category && CATEGORY_SLUG_MAP[category]) {
-    const altSlugs = CATEGORY_SLUG_MAP[category];
-    for (const alt of altSlugs) {
-      if (alt === category) continue;
-      try {
-        const altUrl = new URL(`${BASE_URL}/api/v1/products`);
-        const altParams = new URLSearchParams(params);
-        altParams.set('category', alt);
-        altUrl.search = altParams.toString();
-        const altRes = await fetch(altUrl.toString());
-        if (altRes.ok) {
-          const altJson = await altRes.json();
-          const altList = altJson.data || [];
-          if (altList.length > 0) {
-            rawProducts = rawProducts.concat(altList);
-          }
-        }
-      } catch (_) {}
-    }
-  }
+  const rawProducts = json.data || json || [];
+  const mapped = transformProducts(rawProducts);
+  mapped._meta = json.meta || json.pagination || null;
+  mapped._totalRows = json.pagination?.total ?? json.meta?.total_products ?? json.totalRows ?? mapped.length;
 
-  return transformProducts(rawProducts);
+  return mapped;
 }
 
 /**
@@ -236,7 +206,6 @@ export async function submitContactForm(data) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
     body: JSON.stringify(data),
   });
