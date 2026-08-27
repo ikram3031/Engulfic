@@ -15,31 +15,17 @@ export default function BestSellingProducts({ onShowToast }) {
 
   const tabs = [
     { name: 'All', slug: 'All' },
-    { name: 'T-Shirt', slug: 'drop-shoulder-t-shirts' },
-    { name: 'Shirts', slug: 'shirts' },
+    { name: 'T-Shirt', slug: 'graphic-drop-shoulder-tee' },
+    { name: 'Shirts', slug: 'casual-shirt' },
     { name: 'Sweatshirts', slug: 'sweatshirts' },
-    { name: 'Pants', slug: 'baggy-pants' }
+    { name: 'Pants', slug: 'baggy-sweatpants' }
   ];
 
   // Determine active categories slugs based on fetched products
   const activeCategorySlugs = new Set(
-    allProducts.flatMap(p => {
-      if (!p) return [];
-      const slug = (p.categorySlug || (typeof p.category === 'object' ? p.category?.slug : p.category) || '').toLowerCase();
-      const slugs = [slug];
-      if (slug.includes('shirt') && !slug.includes('t-shirt') && !slug.includes('tee')) {
-        slugs.push('shirts');
-      }
-      if (slug.includes('t-shirt') || slug.includes('tee')) {
-        slugs.push('drop-shoulder-t-shirts');
-      }
-      if (slug.includes('pant') || slug.includes('trouser')) {
-        slugs.push('baggy-pants');
-      }
-      if (slug.includes('sweatshirt') || slug.includes('hoodie')) {
-        slugs.push('sweatshirts');
-      }
-      return slugs;
+    allProducts.map(p => {
+      if (!p) return '';
+      return (p.categorySlug || (typeof p.category === 'object' ? p.category?.slug : p.category) || '').toLowerCase();
     }).filter(Boolean)
   );
 

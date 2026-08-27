@@ -16,7 +16,7 @@ const CATEGORY_CONFIG = [
   {
     id: 't-shirt',
     name: 'T-Shirt',
-    slug: 'drop-shoulder-t-shirts',
+    slug: 'graphic-drop-shoulder-tee',
     uploadPath: '/uploads/assets/T-shirt.webp',
     fallbackImg: tShirtImg,
     description: 'Heavyweight oversized drop shoulder tees in 300GSM organic cotton.'
@@ -32,7 +32,7 @@ const CATEGORY_CONFIG = [
   {
     id: 'pant',
     name: 'Pant',
-    slug: 'baggy-pants',
+    slug: 'baggy-sweatpants',
     uploadPath: '/uploads/assets/pant.webp',
     fallbackImg: pantImg,
     description: 'Signature baggy cut trousers with tailored drape and comfort.'
@@ -40,7 +40,7 @@ const CATEGORY_CONFIG = [
   {
     id: 'shirt',
     name: 'Shirt',
-    slug: 'shirts',
+    slug: 'casual-shirt',
     uploadPath: '/uploads/assets/shirt.webp',
     fallbackImg: shirtImg,
     description: 'Contemporary oversized and casual shirts in Italian cotton poplin.'

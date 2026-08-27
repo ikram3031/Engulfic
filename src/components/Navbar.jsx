@@ -342,29 +342,29 @@ export default function Navbar({ onOpenSearch }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest transition-all duration-300">
                 {/* 1. T-SHIRT */}
-                <Link to="/category/drop-shoulder-t-shirts"
+                <Link to="/category/graphic-drop-shoulder-tee"
                   className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
                     isScrolled ? 'py-1.5' : 'py-3.5'
                   } ${
-                    pathname.includes('drop-shoulder-t-shirts') || pathname.includes('tees') ? 'text-orange-500 font-extrabold' : ''
+                    pathname.includes('graphic-drop-shoulder-tee') || pathname.includes('drop-shoulder') || pathname.includes('tees') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   T-Shirt
-                  {(pathname.includes('drop-shoulder-t-shirts') || pathname.includes('tees')) && (
+                  {(pathname.includes('graphic-drop-shoulder-tee') || pathname.includes('drop-shoulder') || pathname.includes('tees')) && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
                   )}
                 </Link>
 
                 {/* 2. SHIRTS */}
-                <Link to="/category/shirts"
+                <Link to="/category/casual-shirt"
                   className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
                     isScrolled ? 'py-1.5' : 'py-3.5'
                   } ${
-                    pathname.includes('/category/shirts') ? 'text-orange-500 font-extrabold' : ''
+                    pathname.includes('casual-shirt') || pathname.includes('/category/shirts') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   Shirts
-                  {pathname.includes('/category/shirts') && (
+                  {(pathname.includes('casual-shirt') || pathname.includes('/category/shirts')) && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
                   )}
                 </Link>
@@ -381,11 +381,11 @@ export default function Navbar({ onOpenSearch }) {
                 </Link>
 
                 {/* 4. PANTS */}
-                <Link to="/category/baggy-pants"
+                <Link to="/category/baggy-sweatpants"
                   className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
                     isScrolled ? 'py-1.5' : 'py-3.5'
                   } ${
-                    pathname.includes('pants') ? 'text-orange-500 font-extrabold' : ''
+                    pathname.includes('baggy-sweatpants') || pathname.includes('pants') ? 'text-orange-500 font-extrabold' : ''
                   }`}
                 >
                   Pants
