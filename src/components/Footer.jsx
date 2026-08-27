@@ -7,12 +7,11 @@ import {
   Check,
   Loader2,
   AlertCircle,
-  Instagram,
-  Facebook,
   MapPin,
   Mail,
   Clock,
 } from 'lucide-react';
+import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
 import { subscribeNewsletter } from '@/lib/api';
 
 export default function Footer() {
@@ -113,13 +112,13 @@ export default function Footer() {
               Explore Engulfic's contemporary collection of premium apparel including shirts, jeans, sweatshirts, baggy pants, and essential unisex streetwear tailored for effortless modern styling.
             </p>
             <div className="flex items-center gap-4 text-slate-400 dark:text-white/50 pt-2">
-              <a href="https://www.facebook.com/Engulfclothing" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors">
-                <Facebook className="w-4 h-4" />
+              <a href="https://www.facebook.com/Engulfclothing" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-orange-400 transition-all duration-200 hover:scale-110">
+                <FacebookIcon className="w-4 h-4" />
               </a>
-              <a href="https://www.instagram.com/engul_fic/" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors">
-                <Instagram className="w-4 h-4" />
+              <a href="https://www.instagram.com/engul_fic/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-orange-400 transition-all duration-200 hover:scale-110">
+                <InstagramIcon className="w-4 h-4" />
               </a>
-              <a href="mailto:contact@engulfic.com" className="hover:text-orange-400 transition-colors">
+              <a href="mailto:contact@engulfic.com" aria-label="Email" className="hover:text-orange-400 transition-all duration-200 hover:scale-110">
                 <Mail className="w-4 h-4" />
               </a>
             </div>

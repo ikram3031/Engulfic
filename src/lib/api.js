@@ -22,6 +22,7 @@ const SORT_MAP = {
   'rating': 'newest', // no rating field in backend, fall back
 };
 
+
 /**
  * Fetch a paginated, filtered list of products.
  * Returns: { products: TransformedProduct[], meta: {...} }
@@ -53,8 +54,6 @@ export async function fetchProducts({
   }
 
   const json = await response.json();
-
-  // Backend returns { success, message, meta, data: [...] }
   const rawProducts = json.data || json || [];
   const mapped = transformProducts(rawProducts);
   mapped._meta = json.meta || json.pagination || null;

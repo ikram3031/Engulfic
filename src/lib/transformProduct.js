@@ -19,61 +19,22 @@ function formatImageUrl(url) {
   return `${API_BASE}${clean}`;
 }
 
-function isMongoObjectId(val) {
-  return typeof val === 'string' && /^[0-9a-fA-F]{24}$/.test(val);
-}
-
-function resolveFromTitle(name = '') {
-  const lower = (name || '').toLowerCase();
-  if (lower.includes('sweatpant') || lower.includes('baggy') || lower.includes('pant') || lower.includes('trouser')) {
-    return { name: 'Baggy Pants', slug: 'baggy-pants' };
-  }
-  if (lower.includes('t-shirt') || lower.includes('tee')) {
-    return { name: 'Drop Shoulder T-Shirts', slug: 'drop-shoulder-t-shirts' };
-  }
-  if (lower.includes('sweatshirt') || lower.includes('hoodie')) {
-    return { name: 'Sweatshirts', slug: 'sweatshirts' };
-  }
-  if (lower.includes('shirt')) {
-    return { name: 'Shirts', slug: 'shirts' };
-  }
-  if (lower.includes('jersey')) {
-    return { name: 'Jerseys', slug: 'jerseys' };
-  }
-  return { name: 'Apparel', slug: 'shop' };
-}
-
-function resolveCategory(cat, productName = '') {
-  if (!cat) return resolveFromTitle(productName);
+function resolveCategory(cat) {
+  if (!cat) return { name: 'Apparel', slug: 'all' };
 
   if (typeof cat === 'object') {
     const name = cat.name || cat.title || '';
-    const slug = cat.slug || '';
-    if (name && !isMongoObjectId(name)) {
-      return { name, slug: slug || name.toLowerCase().replace(/\s+/g, '-') };
+    const slug = cat.slug || (name ? name.toLowerCase().replace(/\s+/g, '-') : '');
+    if (name) {
+      return { name, slug };
     }
   }
 
-  // Try checking localStorage cache if populated
-  try {
-    const cached = localStorage.getItem("luxury_categories");
-    if (cached) {
-      const pool = JSON.parse(cached);
-      const targetId = typeof cat === 'object' ? (cat._id || cat.id || cat.slug) : cat;
-      const found = pool.find(c => String(c._id || c.id) === String(targetId) || String(c.slug) === String(targetId));
-      if (found && found.name && !isMongoObjectId(found.name)) {
-        return { name: found.name, slug: found.slug || found.name.toLowerCase().replace(/\s+/g, '-') };
-      }
-    }
-  } catch (_) {}
-
-  if (typeof cat === 'string') {
-    if (!isMongoObjectId(cat)) {
-      return { name: cat, slug: cat.toLowerCase().replace(/\s+/g, '-') };
-    }
+  if (typeof cat === 'string' && cat.trim()) {
+    return { name: cat, slug: cat.toLowerCase().replace(/\s+/g, '-') };
   }
 
-  return resolveFromTitle(productName);
+  return { name: 'Apparel', slug: 'all' };
 }
 
 export function transformProduct(p) {

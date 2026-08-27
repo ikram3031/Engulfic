@@ -74,10 +74,10 @@ export default function CatalogPage() {
 
   const mainCategories = [
     { name: 'All', slug: 'All' },
-    { name: 'Shirts', slug: 'casual-shirt' },
-    { name: 'T-Shirts', slug: 'graphic-drop-shoulder-tee' },
+    { name: 'Shirts', slug: 'shirts' },
+    { name: 'T-Shirts', slug: 'drop-shoulder-t-shirts' },
     { name: 'Sweatshirts', slug: 'sweatshirts' },
-    { name: 'Pants', slug: 'baggy-sweatpants' },
+    { name: 'Pants', slug: 'baggy-pants' },
   ];
 
   return (

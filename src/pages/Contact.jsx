@@ -6,7 +6,8 @@ import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 import SearchModal from '@/components/SearchModal';
 import Toast from '@/components/Toast';
-import { Mail, Phone, MapPin, Send, Sparkles, Facebook, Instagram, Loader2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Sparkles, Loader2 } from 'lucide-react';
+import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
 import { submitContactForm } from '@/lib/api';
 import { trackContact } from '@/lib/metaPixel';
 
@@ -162,11 +163,11 @@ const ContactPage = () => {
 
                 <div className="space-y-4 text-xs font-mono text-slate-700 dark:text-white/80">
                   <a href="https://www.facebook.com/Engulfclothing" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-orange-500 transition-colors">
-                    <Facebook className="w-4 h-4 shrink-0" />
+                    <FacebookIcon className="w-4 h-4 shrink-0" />
                     <span>Facebook (@Engulfclothing)</span>
                   </a>
                   <a href="https://www.instagram.com/engul_fic/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-orange-500 transition-colors">
-                    <Instagram className="w-4 h-4 shrink-0" />
+                    <InstagramIcon className="w-4 h-4 shrink-0" />
                     <span>Instagram (@engul_fic)</span>
                   </a>
                 </div>

@@ -15,18 +15,21 @@ export default function BestSellingProducts({ onShowToast }) {
 
   const tabs = [
     { name: 'All', slug: 'All' },
-    { name: 'T-Shirt', slug: 'graphic-drop-shoulder-tee' },
-    { name: 'Shirts', slug: 'casual-shirt' },
+    { name: 'T-Shirt', slug: 'drop-shoulder-t-shirts' },
+    { name: 'Shirts', slug: 'shirts' },
     { name: 'Sweatshirts', slug: 'sweatshirts' },
-    { name: 'Pants', slug: 'baggy-sweatpants' }
+    { name: 'Pants', slug: 'baggy-pants' }
   ];
 
   // Determine active categories slugs based on fetched products
   const activeCategorySlugs = new Set(
-    allProducts.map(p => {
-      if (!p) return '';
-      return (p.categorySlug || (typeof p.category === 'object' ? p.category?.slug : p.category) || '').toLowerCase();
-    }).filter(Boolean)
+    allProducts.flatMap(p => {
+      if (!p) return [];
+      const list = Array.isArray(p.categories) ? p.categories : [];
+      const slugs = list.map(c => typeof c === 'object' ? c.slug : c).filter(Boolean);
+      if (p.categorySlug) slugs.push(p.categorySlug);
+      return slugs.map(s => String(s).toLowerCase());
+    })
   );
 
   // Filter tabs to only show categories that contain products
