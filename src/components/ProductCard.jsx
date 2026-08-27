@@ -122,7 +122,7 @@ export default function ProductCard({ product, onShowToast, hideDetails = false 
           </div>
 
           {/* Title */}
-          <h3 className="text-sm sm:text-base md:text-lg font-medium text-slate-900 dark:text-white tracking-tight hover:text-orange-500 transition line-clamp-1 leading-snug lowercase capitalize">
+          <h3 className="text-sm sm:text-base md:text-lg font-medium text-slate-900 dark:text-white tracking-tight hover:text-orange-500 transition line-clamp-1 leading-snug uppercase font-sans">
             {product.name}
           </h3>
         </div>

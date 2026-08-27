@@ -1,6 +1,4 @@
-'use client';
-
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -8,7 +6,8 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { useAppStore } from '@/core/store/useAppStore';
+import { useProducts, useCategories } from '@/hooks/useProducts';
+import { ProductGridSkeleton } from '@/components/skeletons';
 import { Sparkles, ArrowUpDown } from 'lucide-react';
 
 // Local category asset fallbacks
@@ -100,13 +99,13 @@ const CATEGORY_STATIC_META = {
   },
   'jerseys': {
     name: 'Jerseys',
-    description: 'Official athletic archive performance garments and fan editions.',
-    image: 'https://images.unsplash.com/photo-1511746315387-c4a76990fdce?auto=format&fit=crop&q=80&w=1200',
+    description: 'Official athletic performance garments and fan editions.',
+    image: 'https://server.engulfic.com/uploads/assets/T-shirt.webp',
   },
   'sale': {
     name: 'Archive Sale',
     description: 'Exclusive seasonal markdowns on limited runway garments.',
-    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://server.engulfic.com/uploads/assets/slider-1.webp',
   },
 };
 
@@ -117,24 +116,35 @@ export default function CategoryPage() {
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Store bindings
-  const products = useAppStore((state) => state.products);
-  const fetchProducts = useAppStore((state) => state.fetchProducts);
-  const isProductsLoading = useAppStore((state) => state.isProductsLoading);
-  const categories = useAppStore((state) => state.categories);
+  // TanStack Query hooks
+  const { data: categories = [] } = useCategories();
+  const { data: products = [], isLoading: isProductsLoading } = useProducts({
+    category: slug,
+    sortBy: sortBy === 'newest' ? 'newest' : sortBy === 'name-asc' ? 'name-asc' : 'featured',
+  });
 
-  // Fetch category products whenever slug or sortBy changes
-  useEffect(() => {
-    fetchProducts({
-      category: slug,
-      sortBy: sortBy === 'newest' ? 'newest' : sortBy === 'name-asc' ? 'name-asc' : 'newest',
-      order: sortBy === 'price-asc' ? 'asc' : 'desc',
-    });
-  }, [slug, sortBy, fetchProducts]);
-
-  // Client-side sorted products for instant responsive sorting
+  // Client-side exact filter & sorting for instant responsive UI
   const displayProducts = useMemo(() => {
-    const list = Array.isArray(products) ? [...products] : [];
+    let list = Array.isArray(products) ? [...products] : [];
+    
+    // Strict exact match filter for category to fix backend fuzzy match issue
+    if (slug && slug !== 'all' && slug !== 'sale') {
+      list = list.filter(p => {
+        // If product has a categories array, check if any exactly matches the slug
+        if (p.categories && Array.isArray(p.categories) && p.categories.length > 0) {
+          return p.categories.some(c => {
+            const catSlug = c.slug || (c.name ? c.name.toLowerCase().replace(/\s+/g, '-') : '');
+            return catSlug === slug;
+          });
+        }
+        
+        // Fallback to single category check
+        const catName = (typeof p.category === 'object' ? p.category?.name : p.category) || '';
+        const catSlug = p.categorySlug || catName.toLowerCase().replace(/\s+/g, '-');
+        return catSlug === slug;
+      });
+    }
+
     if (sortBy === 'price-asc') {
       return list.sort((a, b) => (a.price || 0) - (b.price || 0));
     }
@@ -152,24 +162,24 @@ export default function CategoryPage() {
       });
     }
     return list;
-  }, [products, sortBy]);
+  }, [products, sortBy, slug]);
 
-  const apiCat = categories.find((c) => c.slug === slug);
+  const apiCat = categories.find((c) => c.slug === slug || c._id === slug);
   const staticMeta = (slug && CATEGORY_STATIC_META[slug.toLowerCase()]) || {};
 
   const categoryMeta = {
     name:
-      staticMeta.name ||
       apiCat?.name ||
+      staticMeta.name ||
       (slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) : 'Category'),
     description:
-      staticMeta.description ||
       apiCat?.description ||
+      staticMeta.description ||
       'Explore curated high fashion garments and limited edition archive pieces.',
     image:
-      staticMeta.image ||
       apiCat?.imageUrl ||
-      'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=1200',
+      staticMeta.image ||
+      'https://server.engulfic.com/uploads/assets/slider-2.webp',
   };
 
   const showToast = (msg) => {
@@ -192,26 +202,28 @@ export default function CategoryPage() {
         {/* Hero Category Banner */}
         <div className="relative h-[260px] sm:h-[320px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-4 rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10">
           <img
-            src={categoryMeta.image || categoryMeta.imageUrl || 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=1200'}
+            src={categoryMeta.image || categoryMeta.imageUrl || 'https://server.engulfic.com/uploads/assets/slider-2.webp'}
             alt={categoryMeta.name}
             className="absolute inset-0 w-full h-full object-cover object-center"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
 
-          <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center space-y-3 px-6 sm:px-10">
+          <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center space-y-2 sm:space-y-3 px-4 sm:px-10">
             <div className="inline-flex items-center gap-2 text-xs font-mono text-orange-400 uppercase tracking-widest">
-              <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 animate-pulse shrink-0" />
               <span>COLLECTION ARCHIVE</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-tight font-sans">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-normal sm:tracking-tight font-sans leading-[1.2] sm:leading-tight">
               {categoryMeta.name}
             </h1>
             
             {/* Clickable Breadcrumbs inside Banner */}
-            <Breadcrumb items={breadcrumbItems} isLight={true} />
+            <div className="w-full max-w-sm mx-auto overflow-hidden">
+              <Breadcrumb items={breadcrumbItems} isLight={true} />
+            </div>
 
-            <p className="text-xs sm:text-sm text-white/80 font-mono line-clamp-2 leading-relaxed max-w-lg">
+            <p className="text-[11px] sm:text-sm text-white/80 font-mono line-clamp-2 leading-relaxed max-w-lg mt-2 px-2">
               {categoryMeta.description}
             </p>
           </div>
@@ -223,16 +235,16 @@ export default function CategoryPage() {
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            <span className="text-xs font-mono text-slate-500 dark:text-white/50">
-              SHOWING <strong className="text-slate-900 dark:text-white">{displayProducts.length}</strong> GARMENTS
+            <span className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 font-medium">
+              Showing <strong className="text-slate-900 dark:text-white font-bold">{displayProducts.length}</strong> {displayProducts.length === 1 ? 'product' : 'products'}
             </span>
 
             <div className="flex items-center gap-2">
-              <ArrowUpDown className="w-4 h-4 text-orange-500" />
+              <ArrowUpDown className="w-3.5 h-3.5 text-orange-500" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-slate-200 dark:bg-white/10 border border-slate-300 dark:border-white/20 rounded-xl px-3 py-1.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
+                className="bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/15 rounded-full px-3.5 py-1.5 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
               >
                 <option value="featured" className="dark:bg-zinc-900">Featured</option>
                 <option value="newest" className="dark:bg-zinc-900">Newest</option>
@@ -247,15 +259,11 @@ export default function CategoryPage() {
         {/* Product Catalog Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {isProductsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                <div key={n} className="animate-pulse bg-slate-200 dark:bg-white/5 rounded-3xl aspect-[3/4]"></div>
-              ))}
-            </div>
+            <ProductGridSkeleton count={8} />
           ) : displayProducts.length === 0 ? (
             <div className="text-center py-16 bg-slate-100 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
-              <p className="text-xs font-mono text-slate-500 dark:text-white/60">
-                NO PRODUCTS FOUND.
+              <p className="text-sm font-medium text-slate-600 dark:text-zinc-400">
+                No products found in this category.
               </p>
             </div>
           ) : (

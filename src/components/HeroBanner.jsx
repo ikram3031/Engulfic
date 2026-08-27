@@ -61,7 +61,7 @@ const HeroBanner = ({ onExploreClick }) => {
 
   if (isLoading) {
     return (
-      <section className="relative overflow-hidden bg-zinc-900 min-h-[580px] sm:min-h-[650px] md:min-h-[700px] lg:h-[720px] animate-pulse">
+      <section className="relative overflow-hidden bg-zinc-900 w-full aspect-[4/3] sm:aspect-[16/9] md:h-[600px] lg:h-[720px] animate-pulse">
       </section>
     );
   }
@@ -70,7 +70,7 @@ const HeroBanner = ({ onExploreClick }) => {
 
   return (
     <section 
-      className={`relative overflow-hidden ${hasSlides ? 'bg-zinc-950' : 'bg-slate-800 dark:bg-zinc-900'} text-white min-h-[580px] sm:min-h-[650px] md:min-h-[700px] lg:h-[720px] flex flex-col justify-between`}
+      className={`relative overflow-hidden w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-auto md:h-[600px] lg:h-[720px] flex flex-col justify-between ${hasSlides ? 'bg-zinc-950' : 'bg-slate-800 dark:bg-zinc-900'} text-white`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -101,50 +101,50 @@ const HeroBanner = ({ onExploreClick }) => {
       )}
 
       {/* Main Hero Content - Simplified */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 sm:pt-16 sm:pb-10 md:pt-24 md:pb-16 w-full my-auto flex flex-col items-center justify-end h-full min-h-[500px]">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col items-center justify-end h-full">
         {/* No text as per user request */}
       </div>
 
       {/* Slider Controls & Progress Indicator (Only show if more than 1 slide) */}
       {validSlides.length > 1 && (
-        <div className="absolute bottom-6 left-0 right-0 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/20">
+        <div className="absolute bottom-2 sm:bottom-6 left-0 right-0 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="flex items-center justify-between gap-4 pt-2 sm:pt-4 border-t border-white/20">
             {/* Pagination Indicators & Numbers */}
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-1 sm:gap-2">
                 {validSlides.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentSlide(i)}
-                    className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 ${
+                    className={`h-1.5 sm:h-2.5 rounded-full transition-all duration-300 ${
                       i === currentSlide
-                        ? 'w-8 sm:w-10 bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)]'
-                        : 'w-2 sm:w-2.5 bg-white/40 hover:bg-white/80'
+                        ? 'w-6 sm:w-10 bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)]'
+                        : 'w-1.5 sm:w-2.5 bg-white/40 hover:bg-white/80'
                     }`}
                     aria-label={`Go to slide ${i + 1}`}
                   />
                 ))}
               </div>
-              <span className="text-[11px] sm:text-xs font-mono text-white/90 tracking-widest font-bold drop-shadow-md">
+              <span className="text-[10px] sm:text-xs font-mono text-white/90 tracking-widest font-bold drop-shadow-md hidden sm:inline-block">
                 0{currentSlide + 1} / 0{validSlides.length}
               </span>
             </div>
 
             {/* Next / Previous Controls */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1 sm:gap-3">
               <button
                 onClick={prevSlide}
-                className="p-2 sm:p-3 rounded-full bg-black/40 hover:bg-orange-500 text-white border border-white/30 transition backdrop-blur-md group"
+                className="p-1.5 sm:p-3 rounded-full bg-black/40 hover:bg-orange-500 text-white border border-white/30 transition backdrop-blur-md group"
                 aria-label="Previous Slide"
               >
-                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform" />
+                <ChevronLeft className="w-3.5 h-3.5 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform" />
               </button>
               <button
                 onClick={nextSlide}
-                className="p-2 sm:p-3 rounded-full bg-black/40 hover:bg-orange-500 text-white border border-white/30 transition backdrop-blur-md group"
+                className="p-1.5 sm:p-3 rounded-full bg-black/40 hover:bg-orange-500 text-white border border-white/30 transition backdrop-blur-md group"
                 aria-label="Next Slide"
               >
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
           </div>

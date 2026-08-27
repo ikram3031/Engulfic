@@ -92,24 +92,27 @@ function buildGroupedCategories(rawCategories) {
     const pSlug = p.slug;
     const subcats = children.filter(c => {
       const cParentId = typeof c.parent === 'object' ? String(c.parent.id || c.parent._id || c.parent.slug) : String(c.parent);
-      return cParentId === pId || cParentId === pSlug;
+      // Only include subcategories that have at least 1 product
+      return (cParentId === pId || cParentId === pSlug) && (c.productCount > 0 || c.product_count > 0);
     }).map(c => ({
       name: c.name,
       slug: c.slug
     }));
 
     return {
-      name: p.name,
+      name: p.name === 'Drop Shoulder T-Shirts' ? 'T-Shirt' : p.name === 'Baggy Pants' ? 'Pants' : p.name,
       slug: p.slug,
-      subcategories: subcats
+      subcategories: subcats,
+      productCount: p.productCount || p.product_count || 0
     };
-  });
+  }).filter(p => p.productCount > 0 || p.subcategories.length > 0);
 }
 
 export default function Navbar({ onOpenSearch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [openMobileCategory, setOpenMobileCategory] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const { pathname } = useLocation();
@@ -169,7 +172,7 @@ export default function Navbar({ onOpenSearch }) {
         </div>
       </div>
 
-      <header className="relative lg:sticky lg:top-0 z-40 bg-white/80 dark:bg-zinc-950/85 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-zinc-100 transition-all duration-300 group/header">
+      <header className="relative lg:sticky lg:top-0 z-40 bg-white dark:bg-[#080808] border-b border-slate-200 dark:border-white/10 text-slate-900 dark:text-zinc-100 transition-all duration-300 group/header">
 
         {/* MOBILE NAVIGATION BAR (lg:hidden) */}
         <div className="lg:hidden max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
@@ -196,7 +199,7 @@ export default function Navbar({ onOpenSearch }) {
           {/* Center: Mobile Logo */}
           <div className="text-center">
             <Link to="/" className="inline-block group">
-              <span className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans">
+              <span className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-['Josefin_Sans']">
                 ENGULFIC
               </span>
             </Link>
@@ -275,10 +278,10 @@ export default function Navbar({ onOpenSearch }) {
               </button>
             </div>
 
-            {/* Center Column */}
+            {/* Center Column: Logo */}
             <div className="flex items-center justify-center">
               <Link to="/" className="inline-block group">
-                <span className={`font-black tracking-tighter text-slate-900 dark:text-white uppercase font-sans group-hover:text-orange-500 transition-all duration-300 ${
+                <span className={`font-black tracking-tighter text-slate-900 dark:text-white uppercase font-['Josefin_Sans'] group-hover:text-orange-500 transition-all duration-300 ${
                   isScrolled ? 'text-xl' : 'text-3xl'
                 }`}>
                   ENGULFIC
@@ -338,113 +341,90 @@ export default function Navbar({ onOpenSearch }) {
           </div>
 
           {/* BOTTOM TIER: Centered Menu Items Row */}
-          <div className="border-t border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-black/20 relative transition-all duration-300">
+          <div className="border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#080808] relative transition-all duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <nav className="flex items-center justify-center gap-6 xl:gap-10 text-xs font-bold uppercase tracking-widest transition-all duration-300">
-                {/* 1. T-SHIRT */}
-                <Link to="/category/drop-shoulder-t-shirts"
-                  className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
-                    isScrolled ? 'py-1.5' : 'py-3.5'
-                  } ${
-                    pathname.includes('drop-shoulder-t-shirts') || pathname.includes('tees') ? 'text-orange-500 font-extrabold' : ''
-                  }`}
-                >
-                  T-Shirt
-                  {(pathname.includes('drop-shoulder-t-shirts') || pathname.includes('tees')) && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
-                  )}
-                </Link>
+                {/* 1. DYNAMIC CATEGORY MENU ITEMS WITH HOVER SUBMENUS */}
+                {groupedCategories
+                  .filter((cat) =>
+                    ['drop-shoulder-t-shirts', 'shirts', 'sweatshirts', 'baggy-pants', 'jerseys'].includes(cat.slug)
+                  )
+                  .map((cat) => {
+                    const isCurrentActive =
+                      pathname.includes(cat.slug) ||
+                      cat.subcategories?.some((s) => pathname.includes(s.slug));
 
-                {/* 2. SHIRTS */}
-                <Link to="/category/shirts"
-                  className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
-                    isScrolled ? 'py-1.5' : 'py-3.5'
-                  } ${
-                    pathname.includes('/category/shirts') ? 'text-orange-500 font-extrabold' : ''
-                  }`}
-                >
-                  Shirts
-                  {pathname.includes('/category/shirts') && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
-                  )}
-                </Link>
+                    return (
+                      <div key={cat.slug} className="relative group">
+                        <Link
+                          to={`/category/${cat.slug}`}
+                          className={`hover:text-orange-500 transition-all duration-300 relative flex items-center gap-1.5 ${
+                            isScrolled ? 'py-2' : 'py-3.5'
+                          } ${isCurrentActive ? 'text-orange-600 dark:text-orange-400 font-extrabold' : 'text-slate-800 dark:text-zinc-200'}`}
+                        >
+                          <span>{cat.name}</span>
+                          {cat.subcategories && cat.subcategories.length > 0 && (
+                            <ChevronDown className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 opacity-60 group-hover:opacity-100" />
+                          )}
+                          {isCurrentActive && (
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
+                          )}
+                        </Link>
 
-                {/* 3. SWEATSHIRTS */}
-                <Link to="/category/sweatshirts"
-                  className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
-                    isScrolled ? 'py-1.5' : 'py-3.5'
-                  } ${
-                    pathname.includes('sweatshirts') ? 'text-orange-500 font-extrabold' : ''
-                  }`}
-                >
-                  Sweatshirts
-                </Link>
+                        {/* Dropdown Submenu */}
+                        {cat.subcategories && cat.subcategories.length > 0 && (
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 pt-1.5 z-50 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto">
+                            <div className="bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 shadow-xl rounded-2xl p-2 text-slate-900 dark:text-white space-y-1 text-left">
+                              {/* Subcategories */}
+                              {cat.subcategories.map((sub) => {
+                                const isSubActive = pathname === `/category/${sub.slug}`;
+                                return (
+                                  <Link
+                                    key={sub.slug}
+                                    to={`/category/${sub.slug}`}
+                                    className={`flex items-center justify-between px-3.5 py-2 rounded-xl text-[11px] font-medium transition capitalize ${
+                                      isSubActive
+                                        ? 'bg-orange-500 text-white font-bold'
+                                        : 'text-slate-700 dark:text-zinc-300 hover:bg-orange-500/10 hover:text-orange-500 dark:hover:bg-white/10 dark:hover:text-white'
+                                    }`}
+                                  >
+                                    <span>{sub.name}</span>
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
 
-                {/* 4. PANTS */}
-                <Link to="/category/baggy-pants"
-                  className={`hover:text-orange-500 transition-all duration-300 relative flex items-center ${
-                    isScrolled ? 'py-1.5' : 'py-3.5'
-                  } ${
-                    pathname.includes('pants') ? 'text-orange-500 font-extrabold' : ''
-                  }`}
-                >
-                  Pants
-                </Link>
-
-
-
-                {/* 8. SALE */}
+                {/* 2. SALE */}
                 <Link to="/category/sale"
-                  className={`hover:text-orange-500 transition-all duration-300 text-orange-500 font-black flex items-center gap-1 ${
-                    isScrolled ? 'py-1.5' : 'py-3.5'
+                  className={`hover:text-orange-500 transition-all duration-300 text-orange-600 dark:text-orange-400 font-extrabold flex items-center gap-1 ${
+                    isScrolled ? 'py-2' : 'py-3.5'
                   }`}
                 >
                   <span>Sale</span>
-                  <span className="px-1.5 py-0.5 bg-orange-500 text-white text-[9px] rounded-full font-mono uppercase">
+                  <span className="px-1.5 py-0.5 bg-orange-500 text-white text-[9px] font-bold rounded-full font-mono uppercase">
                     Hot
                   </span>
                 </Link>
 
-                {/* 9. ABOUT */}
+                {/* 3. ABOUT */}
                 <Link to="/about"
                   className={`hover:text-orange-500 transition-all duration-300 ${
-                    isScrolled ? 'py-1.5' : 'py-3.5'
-                  }`}
+                    isScrolled ? 'py-2' : 'py-3.5'
+                  } ${pathname === '/about' ? 'text-orange-600 dark:text-orange-400 font-extrabold' : 'text-slate-800 dark:text-zinc-200'}`}
                 >
                   About
                 </Link>
 
-                {/* Submenu commented out for now
-                <div className={`group relative cursor-pointer transition-all duration-300 ${
-                  isScrolled ? 'py-1.5' : 'py-3.5'
-                }`}>
-                  <span className="hover:text-orange-500 transition-colors flex items-center gap-1">
-                    About
-                    <ChevronDown className="w-3 h-3 text-slate-400 dark:text-zinc-500 transition-transform group-hover:rotate-180" />
-                  </span>
-
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-48 hidden group-hover:block bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-zinc-800 shadow-xl rounded-2xl p-4 z-50 text-slate-900 dark:text-white space-y-2 text-left animate-fadeIn">
-                    <Link to="/about" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Our Story
-                    </Link>
-                    <Link to="/about#sustainability" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Sustainability
-                    </Link>
-                    <Link to="/size-guide" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Size Guide
-                    </Link>
-                    <Link to="/contact" className="block py-1.5 px-3 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 transition text-xs font-medium">
-                      Contact
-                    </Link>
-                  </div>
-                </div>
-                */}
-
-                {/* 10. CONTACT */}
+                {/* 4. CONTACT */}
                 <Link to="/contact"
-                  className={`py-3.5 hover:text-orange-500 transition-colors flex items-center ${
-                    pathname === '/contact' ? 'text-orange-500 font-extrabold' : ''
-                  }`}
+                  className={`hover:text-orange-500 transition-colors flex items-center ${
+                    isScrolled ? 'py-2' : 'py-3.5'
+                  } ${pathname === '/contact' ? 'text-orange-600 dark:text-orange-400 font-extrabold' : 'text-slate-800 dark:text-zinc-200'}`}
                 >
                   Contact
                 </Link>
@@ -456,63 +436,83 @@ export default function Navbar({ onOpenSearch }) {
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 px-6 py-6 animate-fadeIn text-slate-900 dark:text-white space-y-6">
-            <div className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-widest">
+            <div className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-widest">
               <Link to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-2 border-b border-slate-100 dark:border-white/5 text-slate-900 dark:text-white font-bold hover:text-orange-500 flex items-center justify-between"
+                className="py-2.5 border-b border-slate-100 dark:border-white/5 text-slate-900 dark:text-white font-bold hover:text-orange-500 flex items-center justify-between"
               >
                 <span>Home</span>
                 <ArrowRight className="w-4 h-4 text-orange-500" />
               </Link>
 
-              <Link to="/category/drop-shoulder-t-shirts"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-2 border-b border-slate-100 dark:border-white/5 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
-              >
-                <span>New Arrivals</span>
-                <ArrowRight className="w-4 h-4 text-slate-400 dark:text-white/30" />
-              </Link>
+              {/* CATEGORY ITEMS WITH EXPANDABLE SUBMENUS */}
+              {groupedCategories
+                .filter((cat) =>
+                  ['drop-shoulder-t-shirts', 'shirts', 'sweatshirts', 'baggy-pants', 'jerseys'].includes(cat.slug)
+                )
+                .map((cat) => {
+                  const isExpanded = openMobileCategory === cat.slug;
+                  const isCatActive =
+                    pathname.includes(cat.slug) ||
+                    cat.subcategories?.some((s) => pathname.includes(s.slug));
 
-              {/* Shop Section Accordion */}
-              <div className="py-2 border-b border-slate-100 dark:border-white/5 space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setShopOpen(!shopOpen)}
-                  className="w-full text-orange-500 font-extrabold text-xs flex items-center justify-between focus:outline-none"
-                >
-                  <span>Shop</span>
-                  <ChevronDown className={`w-4 h-4 text-orange-500 transition-transform duration-200 ${shopOpen ? 'rotate-180' : ''}`} />
-                </button>
-                {shopOpen && (
-                  <div className="pl-3 space-y-4 text-xs font-mono animate-fadeIn pt-2 pb-2">
-                    {groupedCategories.map((parentCat, pIdx) => (
-                      <div key={parentCat.slug || pIdx} className="space-y-1.5">
-                        <Link 
-                          to={`/category/${parentCat.slug}`}
+                  return (
+                    <div key={cat.slug} className="py-2 border-b border-slate-100 dark:border-white/5 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <Link
+                          to={`/category/${cat.slug}`}
                           onClick={() => setMobileMenuOpen(false)}
-                          className="font-extrabold text-slate-900 dark:text-white hover:text-orange-500 uppercase tracking-wide block border-b border-slate-100 dark:border-white/5 pb-1"
+                          className={`font-extrabold uppercase tracking-wider flex-1 text-left ${
+                            isCatActive ? 'text-orange-500' : 'text-slate-800 dark:text-zinc-200 hover:text-orange-500'
+                          }`}
                         >
-                          {parentCat.name}
+                          {cat.name}
                         </Link>
-                        {parentCat.subcategories && parentCat.subcategories.map((sub, sIdx) => (
-                          <Link 
-                            key={sub.slug || sIdx}
-                            to={`/category/${sub.slug}`} 
-                            onClick={() => setMobileMenuOpen(false)} 
-                            className="block text-slate-600 dark:text-zinc-400 hover:text-orange-500 pl-2 py-0.5"
+                        {cat.subcategories && cat.subcategories.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setOpenMobileCategory(isExpanded ? null : cat.slug)}
+                            className="p-1 text-slate-400 hover:text-orange-500 focus:outline-none"
+                            aria-label={`Toggle ${cat.name} subcategories`}
                           >
-                            • {sub.name}
-                          </Link>
-                        ))}
+                            <ChevronDown
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                isExpanded ? 'rotate-180 text-orange-500' : ''
+                              }`}
+                            />
+                          </button>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+
+                      {/* Expandable Subcategory List */}
+                      {isExpanded && cat.subcategories && cat.subcategories.length > 0 && (
+                        <div className="pl-3 space-y-2 pt-1 pb-1 text-[11px] animate-fadeIn">
+                          {cat.subcategories.map((sub) => {
+                            const isSubActive = pathname === `/category/${sub.slug}`;
+                            return (
+                              <Link
+                                key={sub.slug}
+                                to={`/category/${sub.slug}`}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={`block py-0.5 transition ${
+                                  isSubActive
+                                    ? 'text-orange-500 font-bold'
+                                    : 'text-slate-600 dark:text-zinc-400 hover:text-orange-500'
+                                }`}
+                              >
+                                • {sub.name}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
 
               <Link to="/category/sale"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-2 border-b border-slate-100 dark:border-white/5 text-orange-500 font-extrabold flex items-center justify-between"
+                className="py-2.5 border-b border-slate-100 dark:border-white/5 text-orange-500 font-extrabold flex items-center justify-between"
               >
                 <span>Sale</span>
                 <span className="px-2 py-0.5 bg-orange-500 text-white text-[9px] rounded-full">HOT</span>
@@ -520,7 +520,7 @@ export default function Navbar({ onOpenSearch }) {
 
               <Link to="/about"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-2 border-b border-slate-100 dark:border-white/5 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
+                className="py-2.5 border-b border-slate-100 dark:border-white/5 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
               >
                 <span>About</span>
                 <ArrowRight className="w-4 h-4 text-slate-400 dark:text-white/30" />
@@ -528,7 +528,7 @@ export default function Navbar({ onOpenSearch }) {
 
               <Link to="/contact"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-2 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
+                className="py-2.5 text-slate-800 dark:text-zinc-200 hover:text-orange-500 flex items-center justify-between"
               >
                 <span>Contact</span>
                 <ArrowRight className="w-4 h-4 text-slate-400 dark:text-white/30" />

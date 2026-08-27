@@ -13,7 +13,7 @@ import { trackContact } from '@/lib/metaPixel';
 
 // Customer contact and concierge inquiry page with Meta Pixel Contact event tracking
 const ContactPage = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -26,7 +26,7 @@ const ContactPage = () => {
       await submitContactForm(formData);
       trackContact({ email: formData.email, firstName: formData.name });
       setToastMessage('Thank you! Your message has been sent to Engulfic Concierge.');
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', message: '' });
     } catch (error) {
       setToastMessage(error.message || 'Failed to send message. Please try again.');
     } finally {
@@ -58,7 +58,7 @@ const ContactPage = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
             {/* Contact Form */}
-            <div className="lg:col-span-7 p-8 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl shadow-xl space-y-6">
+            <div className="lg:col-span-7 p-5 sm:p-8 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl shadow-xl space-y-5 sm:space-y-6">
               <h2 className="text-xl font-black uppercase tracking-wide">SEND A MESSAGE</h2>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,12 +86,11 @@ const ContactPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-500 dark:text-white/60 mb-1">Subject</label>
+                  <label className="block text-xs font-mono text-slate-500 dark:text-white/60 mb-1">Phone Number (Optional)</label>
                   <input
-                    type="text"
-                    required
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    type="tel"
+                    value={formData.phone || ''}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
                   />
                 </div>

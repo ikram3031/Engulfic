@@ -15,7 +15,7 @@ export default function LookbookSection({ onQuickView }) {
   const bag = products[2];
 
   return (
-    <section id="lookbook" className="bg-[#050505] py-20 border-t border-white/10 text-white relative">
+    <section id="lookbook" className="bg-[#050505] py-20 -mb-20 md:mb-0 border-t border-white/10 text-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-orange-400 text-xs font-mono tracking-widest uppercase mb-3 backdrop-blur-md">
@@ -33,7 +33,7 @@ export default function LookbookSection({ onQuickView }) {
         {/* Lookbook Showcase Container */}
         <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/5 aspect-[16/9] sm:aspect-[21/9] shadow-2xl backdrop-blur-md">
           <img
-            src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&q=80&w=2000"
+            src="https://server.engulfic.com/uploads/assets/slider-3.webp"
             alt="Fashion Lookbook Showcase"
             className="w-full h-full object-cover object-center"
             referrerPolicy="no-referrer"

@@ -1,10 +1,9 @@
-'use client';
-
 import { useQuery } from '@tanstack/react-query';
 import { fetchProducts } from '@/lib/api';
 import { useFilterStore } from '@/store/useFilterStore';
 import ProductCard from './ProductCard';
-import { PackageX, Loader2 } from 'lucide-react';
+import { ProductGridSkeleton } from '@/components/skeletons';
+import { PackageX } from 'lucide-react';
 
 export default function ProductGrid({ onShowToast, onTotalResultsChange }) {
   const { category, searchQuery, sortBy, inStockOnly } = useFilterStore();
@@ -21,21 +20,8 @@ export default function ProductGrid({ onShowToast, onTotalResultsChange }) {
 
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-center justify-center gap-3 text-orange-500 font-mono text-xs uppercase mb-8">
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>QUERYING ENGULFIC CATALOG ARCHIVE...</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="bg-slate-200/60 dark:bg-white/5 rounded-2xl p-4 border border-slate-300 dark:border-white/10 animate-pulse space-y-4 backdrop-blur-md">
-              <div className="aspect-[3/4] bg-slate-300 dark:bg-white/10 rounded-xl" />
-              <div className="h-4 bg-slate-300 dark:bg-white/10 rounded w-2/3" />
-              <div className="h-3 bg-slate-300 dark:bg-white/10 rounded w-1/2" />
-              <div className="h-8 bg-slate-300 dark:bg-white/10 rounded-xl" />
-            </div>
-          ))}
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <ProductGridSkeleton count={8} />
       </div>
     );
   }

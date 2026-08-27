@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProducts } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
+import { ProductCardSkeleton } from '@/components/skeletons';
 import {
   Carousel,
   CarouselContent,
@@ -85,7 +86,7 @@ export default function NewArrivalsSection({ onShowToast }) {
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="animate-pulse bg-slate-200 dark:bg-white/10 rounded-xl sm:rounded-2xl aspect-[3/4]" />
+            <ProductCardSkeleton key={i} />
           ))}
         </div>
       ) : newArrivals.length > 0 ? (

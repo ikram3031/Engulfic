@@ -200,19 +200,25 @@ export {
  * Submit Contact Form
  */
 export async function submitContactForm(data) {
-  const url = `${BASE_URL}/api/v1/contact`;
+  const url = `https://server.decantrebd.com/api/v1/contact`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      name: data.name,
+      email: data.email,
+      phone: data.phone || '',
+      message: data.message
+    }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Failed to submit contact form');
+  const json = await response.json().catch(() => ({}));
+  
+  if (!response.ok || !json.success) {
+    throw new Error(json.message || 'Failed to submit contact form');
   }
 
-  return response.json();
+  return json;
 }

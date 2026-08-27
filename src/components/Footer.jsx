@@ -105,7 +105,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-xs">
           {/* Col 1: ENGULFIC Heading & Description */}
           <div className="space-y-3">
-            <h2 className="text-2xl sm:text-3xl font-black text-orange-500 tracking-tight font-sans uppercase">
+            <h2 className="text-2xl sm:text-3xl font-black text-orange-500 tracking-tight font-['Josefin_Sans'] uppercase">
               ENGULFIC
             </h2>
             <p className="text-slate-400 dark:text-white/60 leading-relaxed font-light text-xs">

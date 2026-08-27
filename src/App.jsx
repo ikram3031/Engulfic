@@ -19,6 +19,7 @@ import SizeGuide from './pages/SizeGuide';
 import Terms from './pages/Terms';
 import Wishlist from './pages/Wishlist';
 import ScrollToTopOnRouteChange from './components/ScrollToTopOnRouteChange';
+import PageTransitionLoader from './components/PageTransitionLoader';
 import CartDrawer from './components/CartDrawer';
 
 // Main application root with global router, context provider, and routes
@@ -27,6 +28,7 @@ const App = () => {
     <AppProvider>
       <BrowserRouter>
         <ScrollToTopOnRouteChange />
+        <PageTransitionLoader minDuration={250} />
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow pb-20 md:pb-0">
           <Routes>

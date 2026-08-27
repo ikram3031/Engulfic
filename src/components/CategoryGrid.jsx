@@ -1,9 +1,7 @@
-'use client';
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { fetchCategories, getImageBaseUrl } from '@/lib/api';
+import { useCategories } from '@/hooks/useProducts';
+import { getImageBaseUrl } from '@/lib/api';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 // Local asset fallbacks
@@ -48,10 +46,7 @@ const CATEGORY_CONFIG = [
 ];
 
 export default function CategoryGrid() {
-  const { data: apiCategories = [], isLoading } = useQuery({
-    queryKey: ['categories'],
-    queryFn: fetchCategories
-  });
+  const { data: apiCategories = [], isLoading } = useCategories();
 
   const baseUrl = getImageBaseUrl();
 
@@ -123,7 +118,10 @@ function CategoryCard({ cat }) {
   const [imgSrc, setImgSrc] = useState(cat.primaryImageUrl);
 
   return (
-    <div className="group relative h-[210px] sm:h-[320px] md:h-[400px] lg:h-[450px] rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg hover:shadow-2xl transition-all duration-500 hover:border-orange-500/50 flex flex-col justify-end p-3.5 sm:p-5 md:p-6">
+    <Link 
+      to={`/category/${cat.slug}`} 
+      className="group relative block h-[210px] sm:h-[320px] md:h-[400px] lg:h-[450px] rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg hover:shadow-2xl transition-all duration-500 hover:border-orange-500/50 flex flex-col justify-end p-3.5 sm:p-5 md:p-6"
+    >
       {/* Background Image with Scale Animation & Fallback */}
       <img
         src={imgSrc}
@@ -142,17 +140,15 @@ function CategoryCard({ cat }) {
 
       {/* Bottom Content Area */}
       <div className="relative z-10">
-        <Link to={`/category/${cat.slug}`} className="block">
-          <div className="flex items-center justify-between gap-1">
-            <h3 className="text-sm sm:text-xl md:text-2xl font-black text-white uppercase tracking-wider font-sans group-hover:text-orange-400 transition-colors line-clamp-1">
-              {cat.name}
-            </h3>
-            <div className="p-1.5 sm:p-2.5 bg-orange-500 text-white rounded-full opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transform sm:translate-x-2 sm:group-hover:translate-x-0 transition-all duration-300 shadow-xl border border-orange-400/30 flex-shrink-0">
-              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-            </div>
+        <div className="flex items-center justify-between gap-1">
+          <h3 className="text-sm sm:text-xl md:text-2xl font-black text-white uppercase tracking-wider font-sans group-hover:text-orange-400 transition-colors line-clamp-1">
+            {cat.name}
+          </h3>
+          <div className="p-1.5 sm:p-2.5 bg-orange-500 text-white rounded-full opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transform sm:translate-x-2 sm:group-hover:translate-x-0 transition-all duration-300 shadow-xl border border-orange-400/30 flex-shrink-0">
+            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
           </div>
-        </Link>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }

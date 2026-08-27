@@ -8,8 +8,8 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { fetchProductDetails, fetchProducts } from '@/lib/api';
-import { useAppStore } from '@/core/store/useAppStore';
+import { useProductDetails, useProducts } from '@/hooks/useProducts';
+import { ProductDetailsSkeleton } from '@/components/skeletons';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
@@ -44,8 +44,7 @@ import {
 
 const SIZE_TABLE_DATA = {
   sweatshirts: {
-    title: 'Sweatshirts & Oversized Crews Size Chart',
-    unit: 'Inches (Chest / Length / Shoulder)',
+    unit: 'Inches',
     rows: [
       { size: 'XS', chest: '44"', length: '27"', shoulder: '21.5"' },
       { size: 'S', chest: '46"', length: '28"', shoulder: '22.5"' },
@@ -55,8 +54,7 @@ const SIZE_TABLE_DATA = {
     ]
   },
   pants: {
-    title: 'Baggy Pants & Sweatpants Size Chart',
-    unit: 'Inches (Waist / Inseam / Leg Opening)',
+    unit: 'Inches',
     rows: [
       { size: 'XS', waist: '28 - 30"', inseam: '30"', leg: '9.5"' },
       { size: 'S', waist: '30 - 32"', inseam: '31"', leg: '10.0"' },
@@ -66,8 +64,7 @@ const SIZE_TABLE_DATA = {
     ]
   },
   shirts: {
-    title: 'Oversized & Casual Shirts Size Chart',
-    unit: 'Inches (Chest / Length / Sleeve)',
+    unit: 'Inches',
     rows: [
       { size: 'XS', chest: '42"', length: '28"', sleeve: '23.5"' },
       { size: 'S', chest: '44"', length: '29"', sleeve: '24.0"' },
@@ -77,8 +74,7 @@ const SIZE_TABLE_DATA = {
     ]
   },
   tees: {
-    title: 'Drop Shoulder T-Shirts Size Chart',
-    unit: 'Inches (Chest / Length / Drop Sleeve)',
+    unit: 'Inches',
     rows: [
       { size: 'XS', chest: '44"', length: '27.5"', sleeve: '9.0"' },
       { size: 'S', chest: '46"', length: '28.5"', sleeve: '9.5"' },
@@ -88,8 +84,7 @@ const SIZE_TABLE_DATA = {
     ]
   },
   jerseys: {
-    title: 'Player & Fan Edition Jerseys Size Chart',
-    unit: 'Inches (Chest / Length)',
+    unit: 'Inches',
     rows: [
       { size: 'S', chest: '42"', length: '28.5"' },
       { size: 'M', chest: '44"', length: '29.5"' },
@@ -139,50 +134,17 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [product, setProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
+  // TanStack Query for product details
+  const { data: product, isLoading, isError, error } = useProductDetails(id);
 
-  // Multi-tier product detail resolving logic: 1. API details 2. State cache 3. Full catalog search
-  useEffect(() => {
-    const loadProductDetail = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const fetched = await fetchProductDetails(id);
-        if (fetched) {
-          setProduct(fetched);
-          return;
-        }
-
-        const stateProducts = useAppStore.getState().products;
-        if (stateProducts && stateProducts.length > 0) {
-          const found = stateProducts.find(p => p.id === id || String(p.raw?.id) === String(id) || p.slug === id);
-          if (found) {
-            setProduct(found);
-            return;
-          }
-        }
-
-        const allProds = await fetchProducts({ limit: 100 });
-        const found = allProds.find(p => p.id === id || String(p.raw?.id) === String(id) || p.slug === id);
-        if (found) {
-          setProduct(found);
-        } else {
-          setError('Product not found');
-        }
-      } catch (err) {
-        setError('Failed to fetch details');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (id) {
-      loadProductDetail();
-    }
-  }, [id]);
+  // TanStack Query for related items from same category
+  const { data: relatedProducts = [] } = useProducts(
+    {
+      category: product?.categorySlug,
+      limit: 4,
+    },
+    { enabled: Boolean(product?.categorySlug) }
+  );
 
   // Dynamic SEO metadata update & Meta Pixel ViewContent tracking
   useEffect(() => {
@@ -200,17 +162,6 @@ export default function ProductDetailPage() {
       }
     }
   }, [product]);
-
-  // Load related products on load
-  useEffect(() => {
-    const loadRelated = async () => {
-      try {
-        const items = await fetchProducts({ limit: 4 });
-        setRelatedProducts(items);
-      } catch (_) {}
-    };
-    loadRelated();
-  }, []);
 
   const [activeImage, setActiveImage] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
@@ -345,14 +296,12 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white flex flex-col justify-between transition-colors duration-300">
+    <main className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white flex flex-col justify-between transition-colors duration-300 overflow-x-hidden">
       <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
 
       <div className="flex-1 pb-16 md:pb-24">
         {isLoading || !product ? (
-          <div className="flex items-center justify-center min-h-[50vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-          </div>
+          <ProductDetailsSkeleton />
         ) : (
           <>
             {/* Clickable Breadcrumbs */}
@@ -480,8 +429,8 @@ export default function ProductDetailPage() {
                   )}
 
                   {/* Product Title & Identifiers (SKU) */}
-                  <div className="space-y-2">
-                    <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-wide">
+                  <div className="space-y-1 sm:space-y-2">
+                    <h1 className="text-[22px] sm:text-3xl font-semibold uppercase tracking-normal sm:tracking-wide font-sans leading-tight sm:leading-tight">
                       {product.name}
                     </h1>
 
@@ -650,20 +599,31 @@ export default function ProductDetailPage() {
                     const tableData = SIZE_TABLE_DATA[sizeKey];
                     if (!tableData) return null;
 
+                    // Filter rows by available product sizes
+                    const availableSizes = new Set(
+                      (product.sizes || []).map(s => s.toUpperCase())
+                    );
+                    
+                    const filteredRows = tableData.rows.filter(row => 
+                      availableSizes.has(row.size.toUpperCase())
+                    );
+
+                    if (filteredRows.length === 0) return null;
+
                     return (
-                      <div className="p-5 bg-slate-100/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
+                      <div className="p-4 sm:p-5 bg-slate-100/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
                         <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-white/10">
                           <div className="flex items-center gap-2">
                             <Ruler className="w-4 h-4 text-orange-500" />
                             <h3 className="text-xs font-bold font-mono uppercase text-slate-900 dark:text-white">
-                              {tableData.title}
+                              Size Chart
                             </h3>
                           </div>
                           <span className="text-[10px] font-mono text-orange-500 font-bold">{tableData.unit}</span>
                         </div>
 
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left font-mono text-[11px]">
+                        <div className="overflow-x-auto no-scrollbar">
+                          <table className="w-full text-left font-mono text-[11px] whitespace-nowrap">
                             <thead>
                               <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/50 uppercase">
                                 <th className="py-2 px-2">Size</th>
@@ -678,7 +638,7 @@ export default function ProductDetailPage() {
                                   <>
                                     <th className="py-2 px-2">Waist</th>
                                     <th className="py-2 px-2">Inseam</th>
-                                    <th className="py-2 px-2">Leg Opening</th>
+                                    <th className="py-2 px-2">Leg</th>
                                   </>
                                 )}
                                 {sizeKey === 'shirts' && (
@@ -692,7 +652,7 @@ export default function ProductDetailPage() {
                                   <>
                                     <th className="py-2 px-2">Chest</th>
                                     <th className="py-2 px-2">Length</th>
-                                    <th className="py-2 px-2">Drop Sleeve</th>
+                                    <th className="py-2 px-2">Sleeve</th>
                                   </>
                                 )}
                                 {sizeKey === 'jerseys' && (
@@ -703,42 +663,42 @@ export default function ProductDetailPage() {
                                 )}
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 dark:divide-white/5">
-                              {tableData.rows.map((row, i) => (
-                                <tr key={i} className="hover:bg-orange-500/5 transition">
-                                  <td className="py-2 px-2 font-bold text-orange-500">{row.size}</td>
+                            <tbody>
+                              {filteredRows.map((row, idx) => (
+                                <tr key={idx} className="border-b border-slate-200/50 dark:border-white/5 last:border-0 hover:bg-slate-200/30 dark:hover:bg-white/5 transition-colors">
+                                  <td className="py-2.5 px-2 font-bold text-orange-500">{row.size}</td>
                                   {sizeKey === 'sweatshirts' && (
                                     <>
-                                      <td className="py-2 px-2">{row.chest}</td>
-                                      <td className="py-2 px-2">{row.length}</td>
-                                      <td className="py-2 px-2">{row.shoulder}</td>
+                                      <td className="py-2.5 px-2">{row.chest}</td>
+                                      <td className="py-2.5 px-2">{row.length}</td>
+                                      <td className="py-2.5 px-2">{row.shoulder}</td>
                                     </>
                                   )}
                                   {sizeKey === 'pants' && (
                                     <>
-                                      <td className="py-2 px-2">{row.waist}</td>
-                                      <td className="py-2 px-2">{row.inseam}</td>
-                                      <td className="py-2 px-2">{row.leg}</td>
+                                      <td className="py-2.5 px-2">{row.waist}</td>
+                                      <td className="py-2.5 px-2">{row.inseam}</td>
+                                      <td className="py-2.5 px-2">{row.leg}</td>
                                     </>
                                   )}
                                   {sizeKey === 'shirts' && (
                                     <>
-                                      <td className="py-2 px-2">{row.chest}</td>
-                                      <td className="py-2 px-2">{row.length}</td>
-                                      <td className="py-2 px-2">{row.sleeve}</td>
+                                      <td className="py-2.5 px-2">{row.chest}</td>
+                                      <td className="py-2.5 px-2">{row.length}</td>
+                                      <td className="py-2.5 px-2">{row.sleeve}</td>
                                     </>
                                   )}
                                   {sizeKey === 'tees' && (
                                     <>
-                                      <td className="py-2 px-2">{row.chest}</td>
-                                      <td className="py-2 px-2">{row.length}</td>
-                                      <td className="py-2 px-2">{row.sleeve}</td>
+                                      <td className="py-2.5 px-2">{row.chest}</td>
+                                      <td className="py-2.5 px-2">{row.length}</td>
+                                      <td className="py-2.5 px-2">{row.sleeve}</td>
                                     </>
                                   )}
                                   {sizeKey === 'jerseys' && (
                                     <>
-                                      <td className="py-2 px-2">{row.chest}</td>
-                                      <td className="py-2 px-2">{row.length}</td>
+                                      <td className="py-2.5 px-2">{row.chest}</td>
+                                      <td className="py-2.5 px-2">{row.length}</td>
                                     </>
                                   )}
                                 </tr>
@@ -757,8 +717,8 @@ export default function ProductDetailPage() {
             {/* Long Description Section */}
             {product.longDescription && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 py-10 border-t border-slate-200 dark:border-white/10 space-y-4">
-                <h2 className="text-2xl font-black uppercase tracking-wide flex items-center gap-2">
-                  <Info className="w-5 h-5 text-orange-500" />
+                <h2 className="text-[20px] sm:text-2xl font-black uppercase tracking-wide flex items-center gap-2 whitespace-nowrap">
+                  <Info className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 shrink-0" />
                   <span>Detailed Overview</span>
                 </h2>
                 <div 
@@ -772,7 +732,7 @@ export default function ProductDetailPage() {
             {relatedProducts.length > 0 && (
               <div className="mt-20 pt-10 border-t border-slate-200 dark:border-white/10 space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 className="text-2xl font-black uppercase tracking-wide">
-                  MORE FROM {(typeof product.category === 'object' ? (product.category?.name || '') : (product.category || '')).toUpperCase() || 'THE COLLECTION'}
+                  MORE FROM {product.category ? product.category.toUpperCase() : 'THE COLLECTION'}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {relatedProducts.map((p) => (

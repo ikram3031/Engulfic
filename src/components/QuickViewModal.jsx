@@ -103,7 +103,7 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
               <span>{(typeof product.category === 'object' ? (product.category?.name || '') : (product.category || '')).toUpperCase()} {product.gender ? `• ${product.gender.toUpperCase()}` : ''}</span>
             </div>
 
-            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">{product.name}</h2>
+            <h2 className="text-2xl font-semibold uppercase tracking-tight text-slate-900 dark:text-white font-sans">{product.name}</h2>
             <p className="text-xs text-slate-500 dark:text-white/50 mt-1">{product.tagline}</p>
 
             {/* Rating & Stock */}

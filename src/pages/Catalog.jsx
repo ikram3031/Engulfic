@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -8,8 +6,9 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { useAppStore } from '@/core/store/useAppStore';
-import { Sparkles, Search, Loader2, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { useProducts } from '@/hooks/useProducts';
+import { ProductGridSkeleton } from '@/components/skeletons';
+import { Sparkles, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 export default function CatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,19 +18,23 @@ export default function CatalogPage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'featured');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalProducts, setTotalProducts] = useState(0);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  // Store bindings
-  const products = useAppStore((state) => state.products);
-  const fetchProducts = useAppStore((state) => state.fetchProducts);
-  const isProductsLoading = useAppStore((state) => state.isProductsLoading);
-  const categories = useAppStore((state) => state.categories);
-
   const pageSize = 20;
+
+  // TanStack Query for products fetching with auto caching
+  const { data: products = [], isLoading: isProductsLoading } = useProducts({
+    category: selectedCategory && selectedCategory !== 'All' ? selectedCategory.toLowerCase() : undefined,
+    searchQuery: searchQuery || undefined,
+    sortBy: sortBy,
+    limit: pageSize,
+    skip: (page - 1) * pageSize,
+  });
+
+  const totalProducts = products._totalRows ?? products.length;
+  const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize));
 
   // Sync state changes with URL Search Params
   useEffect(() => {
@@ -42,35 +45,6 @@ export default function CatalogPage() {
     if (page > 1) params.page = String(page);
     setSearchParams(params);
   }, [selectedCategory, searchQuery, sortBy, page, setSearchParams]);
-
-  // Load products based on page, category, search, and sort choices
-  useEffect(() => {
-    const loadProducts = async () => {
-      const opts = {
-        skip: (page - 1) * pageSize,
-        limit: pageSize,
-        sortBy: sortBy === 'newest' ? 'createdAt' : sortBy === 'name-asc' ? 'name' : 'createdAt',
-        order: sortBy === 'price-asc' ? 'asc' : 'desc',
-      };
-      if (selectedCategory && selectedCategory !== 'All') {
-        opts.category = selectedCategory.toLowerCase();
-      }
-      if (searchQuery) {
-        opts.q = searchQuery;
-      }
-
-      try {
-        const result = await fetchProducts(opts);
-        const totalRows = result._totalRows ?? result.length;
-        setTotalProducts(totalRows);
-        setTotalPages(Math.max(1, Math.ceil(totalRows / pageSize)));
-      } catch (err) {
-        console.error('Failed to load products page', err);
-      }
-    };
-
-    loadProducts();
-  }, [page, selectedCategory, searchQuery, sortBy, fetchProducts]);
 
   const mainCategories = [
     { name: 'All', slug: 'All' },
@@ -146,7 +120,7 @@ export default function CatalogPage() {
                   setSelectedCategory(e.target.value);
                   setPage(1);
                 }}
-                className="w-full appearance-none pl-3.5 pr-8 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-full text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
+                className="w-full appearance-none pl-3.5 pr-8 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-full text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
               >
                 {mainCategories.map((cat) => (
                   <option key={cat.slug} value={cat.slug} className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">
@@ -165,7 +139,7 @@ export default function CatalogPage() {
                   setSortBy(e.target.value);
                   setPage(1);
                 }}
-                className="appearance-none pl-3.5 sm:pl-4 pr-8 sm:pr-9 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-full text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
+                className="appearance-none pl-3.5 sm:pl-4 pr-8 sm:pr-9 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-full text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
               >
                 <option value="featured" className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">Sort: Featured</option>
                 <option value="newest" className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white">Sort: Newest First</option>
@@ -179,10 +153,8 @@ export default function CatalogPage() {
 
           {/* Product Cards Grid */}
           {isProductsLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 pt-4">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                <div key={n} className="animate-pulse bg-slate-200 dark:bg-white/5 rounded-3xl aspect-[3/4]"></div>
-              ))}
+            <div className="pt-4">
+              <ProductGridSkeleton count={8} />
             </div>
           ) : products.length > 0 ? (
             <div className="space-y-8">

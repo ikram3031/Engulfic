@@ -31,6 +31,10 @@ function resolveCategory(cat) {
   }
 
   if (typeof cat === 'string' && cat.trim()) {
+    // If string is a mongo ObjectId or DID (e.g. 6a7f...), don't use it as name
+    if (/^[0-9a-fA-F]{16,24}$/.test(cat.trim())) {
+      return { name: 'Apparel', slug: 'all' }; // No fallback to hex ID
+    }
     return { name: cat, slug: cat.toLowerCase().replace(/\s+/g, '-') };
   }
 
@@ -108,14 +112,18 @@ export function transformProduct(p) {
 
   // --- Category: resolve to display name & slug ---
   let rawCat = null;
-  if (p._populatedCategories && p._populatedCategories.length > 0) {
+  if (p._populatedCategories && p._populatedCategories.length > 0 && typeof p._populatedCategories[0] === 'object' && p._populatedCategories[0].name) {
     rawCat = p._populatedCategories[0];
+  } else if (Array.isArray(p.categories) && p.categories.length > 0 && typeof p.categories[0] === 'object' && p.categories[0].name) {
+    rawCat = p.categories[0];
+  } else if (p.category && typeof p.category === 'object' && p.category.name) {
+    rawCat = p.category;
+  } else if (p.categoryName) {
+    rawCat = p.categoryName;
   } else if (p.category) {
     rawCat = p.category;
   } else if (Array.isArray(p.categories) && p.categories.length > 0) {
     rawCat = p.categories[0];
-  } else if (p.categoryName) {
-    rawCat = p.categoryName;
   }
 
   const { name: categoryName, slug: categorySlug } = resolveCategory(rawCat, p.name);

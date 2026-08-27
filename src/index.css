@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Josefin Sans', sans-serif;
+  --font-sans: 'Poppins', sans-serif;
+  --font-poppins: 'Poppins', sans-serif;
+  --font-logo: 'Josefin Sans', sans-serif;
   --font-mono: 'Roboto', sans-serif;
 
   /* Use pure neutral (black/white) variations for grayscales */
@@ -20,7 +22,7 @@
 
 @layer base {
   body {
-    font-family: 'Josefin Sans', sans-serif;
+    @apply bg-slate-50 text-slate-900 antialiased font-sans overflow-x-hidden;
   }
 }
 
@@ -88,6 +90,12 @@
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes float-slow {
