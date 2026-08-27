@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -10,6 +10,105 @@ import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
 import { useAppStore } from '@/core/store/useAppStore';
 import { Sparkles, ArrowUpDown } from 'lucide-react';
+
+// Local category asset fallbacks
+import tShirtImg from '@/assets/T-shirt.webp';
+import sweatshirtImg from '@/assets/sweatshirt.webp';
+import pantImg from '@/assets/pant.webp';
+import shirtImg from '@/assets/shirt.webp';
+
+const CATEGORY_STATIC_META = {
+  'drop-shoulder-t-shirts': {
+    name: 'T-Shirts',
+    description: 'Heavyweight oversized drop shoulder tees in 300GSM organic cotton.',
+    image: tShirtImg,
+  },
+  'drop-shoulder-tee': {
+    name: 'Drop Shoulder Tee',
+    description: 'Minimalist drop shoulder t-shirts in heavyweight cotton.',
+    image: tShirtImg,
+  },
+  'graphic-drop-shoulder-tee': {
+    name: 'Graphic Drop Shoulder Tee',
+    description: 'Signature graphic print drop shoulder tees with high-density artwork.',
+    image: tShirtImg,
+  },
+  't-shirt': {
+    name: 'T-Shirts',
+    description: 'Heavyweight oversized drop shoulder tees in 300GSM organic cotton.',
+    image: tShirtImg,
+  },
+  'sweatshirts': {
+    name: 'Sweatshirts',
+    description: 'Relaxed fit architectural silhouettes in premium French terry.',
+    image: sweatshirtImg,
+  },
+  'oversized-sweatshirt': {
+    name: 'Oversized Sweatshirt',
+    description: 'Relaxed fit architectural sweatshirts in premium French terry.',
+    image: sweatshirtImg,
+  },
+  'oversized-graphic-sweatshirt': {
+    name: 'Graphic Sweatshirt',
+    description: 'Bold oversized graphic sweatshirts crafted from premium cotton fleece.',
+    image: sweatshirtImg,
+  },
+  'crewneck-sweatshirt': {
+    name: 'Crewneck Sweatshirt',
+    description: 'Classic crewneck silhouettes with drop shoulder cut.',
+    image: sweatshirtImg,
+  },
+  'baggy-pants': {
+    name: 'Pants',
+    description: 'Signature baggy cut trousers and sweatpants with tailored drape and comfort.',
+    image: pantImg,
+  },
+  'baggy-sweatpants': {
+    name: 'Baggy Sweatpants',
+    description: 'Signature heavyweight French terry baggy sweatpants with deep pocket structure.',
+    image: pantImg,
+  },
+  'baggy-graphic-sweatpants': {
+    name: 'Baggy Graphic Sweatpants',
+    description: 'Graphic screen-printed baggy sweatpants with relaxed leg opening.',
+    image: pantImg,
+  },
+  'pant': {
+    name: 'Pants',
+    description: 'Signature baggy cut trousers with tailored drape and comfort.',
+    image: pantImg,
+  },
+  'shirts': {
+    name: 'Shirts',
+    description: 'Contemporary oversized and casual shirts in Italian cotton poplin.',
+    image: shirtImg,
+  },
+  'oversized-shirt': {
+    name: 'Oversized Shirt',
+    description: 'Clean structured oversized silhouette shirts tailored for modern styling.',
+    image: shirtImg,
+  },
+  'casual-shirt': {
+    name: 'Casual Shirt',
+    description: 'Signature button-down casual shirts in premium lightweight fabrics.',
+    image: shirtImg,
+  },
+  'shirt': {
+    name: 'Shirts',
+    description: 'Contemporary oversized and casual shirts in Italian cotton poplin.',
+    image: shirtImg,
+  },
+  'jerseys': {
+    name: 'Jerseys',
+    description: 'Official athletic archive performance garments and fan editions.',
+    image: 'https://images.unsplash.com/photo-1511746315387-c4a76990fdce?auto=format&fit=crop&q=80&w=1200',
+  },
+  'sale': {
+    name: 'Archive Sale',
+    description: 'Exclusive seasonal markdowns on limited runway garments.',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200',
+  },
+};
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -28,16 +127,49 @@ export default function CategoryPage() {
   useEffect(() => {
     fetchProducts({
       category: slug,
-      sortBy: sortBy === 'newest' ? 'createdAt' : sortBy === 'name-asc' ? 'name' : 'createdAt',
-      order: sortBy === 'price-asc' ? 'asc' : 'desc'
+      sortBy: sortBy === 'newest' ? 'newest' : sortBy === 'name-asc' ? 'name-asc' : 'newest',
+      order: sortBy === 'price-asc' ? 'asc' : 'desc',
     });
   }, [slug, sortBy, fetchProducts]);
 
-  const categoryMeta = categories.find((c) => c.slug === slug) || {
-    name: slug ? slug.replace(/-/g, ' ').toUpperCase() : '',
-    description: 'Explore curated high fashion products.',
-    image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=1200',
-    tagline: 'Signature Engulfic Archive'
+  // Client-side sorted products for instant responsive sorting
+  const displayProducts = useMemo(() => {
+    const list = Array.isArray(products) ? [...products] : [];
+    if (sortBy === 'price-asc') {
+      return list.sort((a, b) => (a.price || 0) - (b.price || 0));
+    }
+    if (sortBy === 'price-desc') {
+      return list.sort((a, b) => (b.price || 0) - (a.price || 0));
+    }
+    if (sortBy === 'name-asc') {
+      return list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+    if (sortBy === 'newest') {
+      return list.sort((a, b) => {
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return timeB - timeA;
+      });
+    }
+    return list;
+  }, [products, sortBy]);
+
+  const apiCat = categories.find((c) => c.slug === slug);
+  const staticMeta = (slug && CATEGORY_STATIC_META[slug.toLowerCase()]) || {};
+
+  const categoryMeta = {
+    name:
+      staticMeta.name ||
+      apiCat?.name ||
+      (slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) : 'Category'),
+    description:
+      staticMeta.description ||
+      apiCat?.description ||
+      'Explore curated high fashion garments and limited edition archive pieces.',
+    image:
+      staticMeta.image ||
+      apiCat?.imageUrl ||
+      'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=1200',
   };
 
   const showToast = (msg) => {
@@ -92,7 +224,7 @@ export default function CategoryPage() {
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <span className="text-xs font-mono text-slate-500 dark:text-white/50">
-              SHOWING <strong className="text-slate-900 dark:text-white">{products.length}</strong> GARMENTS
+              SHOWING <strong className="text-slate-900 dark:text-white">{displayProducts.length}</strong> GARMENTS
             </span>
 
             <div className="flex items-center gap-2">
@@ -106,6 +238,7 @@ export default function CategoryPage() {
                 <option value="newest" className="dark:bg-zinc-900">Newest</option>
                 <option value="price-asc" className="dark:bg-zinc-900">Price: Low to High</option>
                 <option value="price-desc" className="dark:bg-zinc-900">Price: High to Low</option>
+                <option value="name-asc" className="dark:bg-zinc-900">Name: A to Z</option>
               </select>
             </div>
           </div>
@@ -119,7 +252,7 @@ export default function CategoryPage() {
                 <div key={n} className="animate-pulse bg-slate-200 dark:bg-white/5 rounded-3xl aspect-[3/4]"></div>
               ))}
             </div>
-          ) : products.length === 0 ? (
+          ) : displayProducts.length === 0 ? (
             <div className="text-center py-16 bg-slate-100 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
               <p className="text-xs font-mono text-slate-500 dark:text-white/60">
                 NO PRODUCTS FOUND.
@@ -127,7 +260,7 @@ export default function CategoryPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
-              {products.map((product) => (
+              {displayProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}

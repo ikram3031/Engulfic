@@ -23,11 +23,24 @@ export default function BestSellingProducts({ onShowToast }) {
 
   // Determine active categories slugs based on fetched products
   const activeCategorySlugs = new Set(
-    allProducts.map(p => {
-      if (!p) return '';
-      if (typeof p.category === 'object') return p.category?.slug || '';
-      return p.category || '';
-    }).filter(Boolean).map(s => s.toLowerCase())
+    allProducts.flatMap(p => {
+      if (!p) return [];
+      const slug = (p.categorySlug || (typeof p.category === 'object' ? p.category?.slug : p.category) || '').toLowerCase();
+      const slugs = [slug];
+      if (slug.includes('shirt') && !slug.includes('t-shirt') && !slug.includes('tee')) {
+        slugs.push('shirts');
+      }
+      if (slug.includes('t-shirt') || slug.includes('tee')) {
+        slugs.push('drop-shoulder-t-shirts');
+      }
+      if (slug.includes('pant') || slug.includes('trouser')) {
+        slugs.push('baggy-pants');
+      }
+      if (slug.includes('sweatshirt') || slug.includes('hoodie')) {
+        slugs.push('sweatshirts');
+      }
+      return slugs;
+    }).filter(Boolean)
   );
 
   // Filter tabs to only show categories that contain products

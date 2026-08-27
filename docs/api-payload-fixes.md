@@ -6,6 +6,22 @@
 
 ## Comment Logs
 
+### [E45] 2026-08-27: Fixed Category-Wise Products Not Showing on Category Card Click
+- **সমস্যা:** হোম পেজ থেকে ক্যাটাগরি কার্ডে (যেমন T-Shirt, Shirts, Pants) ক্লিক করে ক্যাটাগরি পেজে গেলে (`/category/:slug`) কোনো প্রোডাক্ট দেখাচ্ছিল না (0 Garments Found)। ব্যাকএন্ড ডাটাবেজে প্রোডাক্টগুলো চাইল্ড/লিফ ক্যাটাগরি স্ল্যাগে (`graphic-drop-shoulder-tee`, `casual-shirt`, `baggy-sweatpants`) স্টোর থাকায় প্যারেন্ট স্ল্যাগ কুয়েরি করলে ম্যাচ করছিল না।
+- **Fix:**
+  - `src/lib/api.js` ও `src/core/lib/api.js`: `expandCategoryQuery(category)` ফাংশন যোগ করা হয়েছে যা প্যারেন্ট ক্যাটাগরি রিকোয়েস্টে কমা-সেপারেটেড চাইল্ড স্ল্যাগসমূহ (যেমন `drop-shoulder-t-shirts,drop-shoulder-tee,graphic-drop-shoulder-tee`) একটি একক সিঙ্গেল HTTP GET এপিআই রিকোয়েস্টে পাঠায়।
+  - `src/pages/Category.jsx`: ক্যাটাগরি মেটাডাটা ও ইমেজ ফলব্যাক যুক্ত করা হয়েছে এবং দ্রুত রেসপন্সিভ সর্টিং-এর জন্য ক্লায়েন্ট-সাইড সর্টিং দেওয়া হয়েছে।
+  - `src/components/BestSellingProducts.jsx`: প্রোডাক্টের ক্যাটাগরি টু প্যারেন্ট ট্যাব ম্যাপিং ঠিক করা হয়েছে।
+- **ফাইলসমূহ:**
+  - [`src/lib/api.js`](file:///f:/Engulfic/src/lib/api.js)
+  - [`src/core/lib/api.js`](file:///f:/Engulfic/src/core/lib/api.js)
+  - [`src/pages/Category.jsx`](file:///f:/Engulfic/src/pages/Category.jsx)
+  - [`src/components/BestSellingProducts.jsx`](file:///f:/Engulfic/src/components/BestSellingProducts.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
+---
+
 ### [E24] 2026-08-18: Integrated Smooth Transform-Based Carousel Slider in New Arrivals Section (Decantre Pattern)
 - **সমস্যা:** `NewArrivalsSection.jsx`-এর পূর্ববর্তী ক্যারোসেলটি নেটিভ স্ক্রল/ওভারফ্লো বিহেভিয়ার ব্যবহার করছিল, যা মোবাইল এবং ট্যাবলেটে স্মুথ মনে হচ্ছিল না এবং ট্রানজিশন ঠিকমতো স্লাইড হচ্ছিল না।
 - **Fix:**

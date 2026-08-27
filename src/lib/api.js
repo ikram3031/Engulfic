@@ -22,6 +22,55 @@ const SORT_MAP = {
   'rating': 'newest', // no rating field in backend, fall back
 };
 
+// ── Parent Category → Subcategory Expansion Map ───────────────
+const PARENT_CATEGORY_MAP = {
+  'drop-shoulder-t-shirts': ['drop-shoulder-t-shirts', 'drop-shoulder-tee', 'graphic-drop-shoulder-tee'],
+  't-shirt': ['drop-shoulder-t-shirts', 'drop-shoulder-tee', 'graphic-drop-shoulder-tee'],
+  't-shirts': ['drop-shoulder-t-shirts', 'drop-shoulder-tee', 'graphic-drop-shoulder-tee'],
+  'tshirt': ['drop-shoulder-t-shirts', 'drop-shoulder-tee', 'graphic-drop-shoulder-tee'],
+  'shirts': ['shirts', 'oversized-shirt', 'casual-shirt'],
+  'shirt': ['shirts', 'oversized-shirt', 'casual-shirt'],
+  'baggy-pants': ['baggy-pants', 'baggy-sweatpants', 'baggy-graphic-sweatpants'],
+  'pant': ['baggy-pants', 'baggy-sweatpants', 'baggy-graphic-sweatpants'],
+  'pants': ['baggy-pants', 'baggy-sweatpants', 'baggy-graphic-sweatpants'],
+  'sweatshirts': ['sweatshirts', 'crewneck-sweatshirt', 'oversized-graphic-sweatshirt', 'oversized-sweatshirt'],
+  'sweatshirt': ['sweatshirts', 'crewneck-sweatshirt', 'oversized-graphic-sweatshirt', 'oversized-sweatshirt'],
+  'jerseys': ['jerseys', 'player-edition', 'fan-edition', 'retro-edition'],
+  'jersey': ['jerseys', 'player-edition', 'fan-edition', 'retro-edition'],
+};
+
+export function expandCategoryQuery(cat) {
+  if (!cat || cat === 'All' || cat === 'all') return '';
+  const normalized = String(cat).trim().toLowerCase();
+
+  if (PARENT_CATEGORY_MAP[normalized]) {
+    return PARENT_CATEGORY_MAP[normalized].join(',');
+  }
+
+  try {
+    const cached = typeof localStorage !== 'undefined' ? localStorage.getItem('luxury_categories') : null;
+    if (cached) {
+      const pool = JSON.parse(cached);
+      const parent = pool.find(
+        (c) => c.slug === normalized || c.name?.toLowerCase() === normalized || String(c.id || c._id) === normalized
+      );
+      if (parent) {
+        const parentId = String(parent.id || parent._id || parent.slug);
+        const children = pool.filter((c) => {
+          const cParentId = typeof c.parent === 'object' ? String(c.parent?.id || c.parent?._id || c.parent?.slug) : String(c.parent);
+          return cParentId === parentId || cParentId === parent.slug;
+        });
+        if (children.length > 0) {
+          const slugs = [parent.slug, ...children.map((c) => c.slug)].filter(Boolean);
+          return Array.from(new Set(slugs)).join(',');
+        }
+      }
+    }
+  } catch (_) {}
+
+  return cat;
+}
+
 /**
  * Fetch a paginated, filtered list of products.
  * Returns: { products: TransformedProduct[], meta: {...} }
@@ -37,7 +86,10 @@ export async function fetchProducts({
   const url = new URL(`${BASE_URL}/api/v1/products`);
   const params = new URLSearchParams();
 
-  if (category && category !== 'All' && category !== 'all') params.append('category', category);
+  if (category && category !== 'All' && category !== 'all') {
+    const expandedCategory = expandCategoryQuery(category);
+    if (expandedCategory) params.append('category', expandedCategory);
+  }
   if (searchQuery && searchQuery.trim() !== '') params.append('q', searchQuery.trim());
   if (inStockOnly) params.append('stockStatus', 'instock');
   if (sortBy && SORT_MAP[sortBy]) params.append('sort', SORT_MAP[sortBy]);

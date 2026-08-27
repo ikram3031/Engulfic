@@ -101,6 +101,7 @@ export const authFetch = async (url, options = {}, timeout = 10000) => {
 // ---------------------------------------------------------
 
 import { mapRemoteProduct } from "../store/productHelpers";
+import { expandCategoryQuery } from "@/lib/api";
 
 export async function fetchProducts(opts = {}) {
   const apiBaseUrl = getApiBaseUrl();
@@ -113,7 +114,8 @@ export async function fetchProducts(opts = {}) {
   const params = new URLSearchParams();
   if (q) params.set("q", q);
   if (opts.category && opts.category !== 'All' && opts.category !== 'all') {
-    params.set("category", opts.category);
+    const expandedCategory = typeof expandCategoryQuery === 'function' ? expandCategoryQuery(opts.category) : opts.category;
+    if (expandedCategory) params.set("category", expandedCategory);
   }
   // Removed brand support as requested
   if (opts.season) params.set("season", opts.season);
