@@ -146,6 +146,23 @@ export async function fetchCategories() {
   }));
 }
 
+// Fetches size chart configuration by category DID or slug
+export const fetchSizeChartByCategory = async (categoryDidOrSlug) => {
+  if (!categoryDidOrSlug) return null;
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/size-charts/category/${encodeURIComponent(categoryDidOrSlug)}`);
+    if (!response.ok) {
+      return null;
+    }
+
+    const json = await response.json().catch(() => ({}));
+    return json.data || null;
+  } catch {
+    return null;
+  }
+};
+
 /**
  * Subscribe email to newsletter / Runway Club
  */

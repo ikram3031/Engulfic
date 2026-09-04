@@ -132,6 +132,7 @@ export const transformProduct = (p) => {
   }
 
   const { name: categoryName, slug: categorySlug } = resolveCategory(rawCat, p.name);
+  const categoryDid = (typeof rawCat === 'object' && rawCat?.did) || p.categoryDid || (typeof p.category === 'object' && p.category?.did) || '';
 
   return {
     // Core identity
@@ -170,6 +171,7 @@ export const transformProduct = (p) => {
     // Categorization
     category: categoryName,
     categorySlug,
+    categoryDid,
     categories: p.categories || [],
     tags: p.tags || [],
     notes: p.notes || [],

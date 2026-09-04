@@ -1,5 +1,5 @@
-﻿import { useQuery } from '@tanstack/react-query';
-import { fetchProducts, fetchProductDetails, fetchCategories, fetchCombos } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { fetchProducts, fetchProductDetails, fetchCategories, fetchCombos, fetchSizeChartByCategory } from '@/lib/api';
 
 /**
  * Hook to fetch paginated & filtered products list with TanStack Query.
@@ -75,3 +75,14 @@ export function useBestSellingProducts({ category, limit = 4 } = {}, options = {
     ...options,
   });
 }
+
+// Hook to fetch category size chart configuration with TanStack Query
+export const useSizeChartByCategory = (categoryDidOrSlug, options = {}) => {
+  return useQuery({
+    queryKey: ['size-chart', categoryDidOrSlug],
+    queryFn: () => fetchSizeChartByCategory(categoryDidOrSlug),
+    enabled: Boolean(categoryDidOrSlug),
+    staleTime: 1000 * 60 * 15,
+    ...options,
+  });
+};

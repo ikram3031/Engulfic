@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
-import { useProductDetails, useProducts } from '@/hooks/useProducts';
+import { useProductDetails, useProducts, useSizeChartByCategory } from '@/hooks/useProducts';
 import { ProductDetailsSkeleton } from '@/components/skeletons';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
@@ -194,6 +194,8 @@ const ProductDetailPage = () => {
     },
     { enabled: Boolean(product?.categorySlug) }
   );
+
+  const { data: apiSizeChart } = useSizeChartByCategory(product?.categoryDid || product?.categorySlug);
 
   // Dynamic SEO metadata update & Meta Pixel ViewContent tracking
   useEffect(() => {
@@ -714,15 +716,147 @@ const ProductDetailPage = () => {
                   )}
 
                   {(() => {
-                    const sizeKey = getCategorySizeKey(product);
-                    const tableData = SIZE_TABLE_DATA[sizeKey];
-                    if (!tableData) return null;
-
                     const productVariantSizes = (product.variants && product.variants.length > 0)
                       ? product.variants.map((v) => v.size).filter(Boolean)
                       : (product.sizes || []);
 
                     if (productVariantSizes.length === 0) return null;
+
+                    const hasDynamicChart = Boolean(
+                      apiSizeChart &&
+                      Array.isArray(apiSizeChart.columns) &&
+                      apiSizeChart.columns.length > 0 &&
+                      Array.isArray(apiSizeChart.rows) &&
+                      apiSizeChart.rows.length > 0
+                    );
+
+                    if (hasDynamicChart) {
+                      const columns = apiSizeChart.columns;
+                      const unit = apiSizeChart.unit || 'Inches';
+                      const matchedRows = [];
+                      const seenSizes = new Set();
+
+                      productVariantSizes.forEach((pSize) => {
+                        const pSizeTrimmed = String(pSize).trim();
+                        const pSizeUpper = pSizeTrimmed.toUpperCase();
+                        if (seenSizes.has(pSizeUpper)) return;
+                        seenSizes.add(pSizeUpper);
+
+                        const foundRow = apiSizeChart.rows.find((r) => matchesSize(pSizeTrimmed, r.size));
+                        const matchingVariant = product.variants?.find((v) => matchesSize(pSizeTrimmed, v.size)) || null;
+
+                        if (foundRow) {
+                          matchedRows.push({
+                            size: foundRow.size || pSizeTrimmed,
+                            displaySize: pSizeTrimmed,
+                            values: foundRow.values || {},
+                            variant: matchingVariant,
+                          });
+                        } else {
+                          matchedRows.push({
+                            size: pSizeTrimmed,
+                            displaySize: pSizeTrimmed,
+                            values: {},
+                            variant: matchingVariant,
+                          });
+                        }
+                      });
+
+                      matchedRows.sort((a, b) => {
+                        const idxA = STANDARD_SIZE_ORDER.indexOf(a.displaySize.toUpperCase());
+                        const idxB = STANDARD_SIZE_ORDER.indexOf(b.displaySize.toUpperCase());
+                        const valA = idxA !== -1 ? idxA : 999;
+                        const valB = idxB !== -1 ? idxB : 999;
+                        return valA - valB;
+                      });
+
+                      if (matchedRows.length === 0) return null;
+
+                      return (
+                        <div className="p-4 sm:p-5 bg-slate-100/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3 shadow-sm transition-colors duration-300">
+                          <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-white/10">
+                            <div className="flex items-center gap-2">
+                              <Ruler className="w-4 h-4 text-orange-500" />
+                              <h3 className="text-xs font-bold font-mono uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                                <span>Size Chart</span>
+                                <span className="text-[10px] font-normal text-slate-500 dark:text-white/50 tracking-normal">
+                                  ({matchedRows.length} Available {matchedRows.length === 1 ? 'Variation' : 'Variations'})
+                                </span>
+                              </h3>
+                            </div>
+                            <span className="text-[10px] font-mono text-orange-500 font-bold tracking-wider">{unit}</span>
+                          </div>
+
+                          <div className="overflow-x-auto no-scrollbar">
+                            <table className="w-full text-left font-mono text-[11px] whitespace-nowrap">
+                              <thead>
+                                <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/50 uppercase text-[10px]">
+                                  <th className="py-2.5 px-3">Size</th>
+                                  {columns.map((col, cIdx) => (
+                                    <th key={cIdx} className="py-2.5 px-3">{col}</th>
+                                  ))}
+                                  <th className="py-2.5 px-3 text-right">Variation</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-200/50 dark:divide-white/5">
+                                {matchedRows.map((row, idx) => {
+                                  const isSelected = isSizeSelected(row.displaySize);
+                                  return (
+                                    <tr
+                                      key={idx}
+                                      onClick={() => {
+                                        if (row.variant) {
+                                          handleSelectVariant(row.variant);
+                                        } else {
+                                          handleSelectSize(row.displaySize);
+                                        }
+                                      }}
+                                      className={`cursor-pointer transition-all duration-200 ${
+                                        isSelected
+                                          ? 'bg-red-500/15 dark:bg-red-500/25 text-red-600 dark:text-red-400 font-bold border-l-4 border-red-600 shadow-sm'
+                                          : 'hover:bg-slate-200/50 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
+                                      }`}
+                                    >
+                                      <td className="py-3 px-3.5 font-bold flex items-center gap-1.5">
+                                        <span className={isSelected ? 'text-red-600 dark:text-red-400 font-black' : 'text-slate-900 dark:text-white'}>
+                                          {row.displaySize}
+                                        </span>
+                                        {isSelected && (
+                                          <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                                        )}
+                                      </td>
+                                      {columns.map((col, cIdx) => {
+                                        const val = row.values?.[col] ?? row.values?.[col.toLowerCase()] ?? row.values?.[col.toUpperCase()] ?? row[col] ?? '-';
+                                        return (
+                                          <td key={cIdx} className="py-3 px-3.5">
+                                            {val}
+                                          </td>
+                                        );
+                                      })}
+                                      <td className="py-3 px-3.5 text-right">
+                                        {isSelected ? (
+                                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-600 text-white uppercase tracking-wider shadow-sm">
+                                            Selected <CheckCircle2 className="w-3 h-3 text-white" />
+                                          </span>
+                                        ) : (
+                                          <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-red-600">
+                                            Select
+                                          </span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    const sizeKey = getCategorySizeKey(product);
+                    const tableData = SIZE_TABLE_DATA[sizeKey];
+                    if (!tableData) return null;
 
                     const matchedRows = [];
                     const seenSizes = new Set();
@@ -740,7 +874,7 @@ const ProductDetailPage = () => {
                         matchedRows.push({
                           ...foundRow,
                           displaySize: pSizeTrimmed,
-                          variant: matchingVariant
+                          variant: matchingVariant,
                         });
                       } else {
                         matchedRows.push({
@@ -753,7 +887,7 @@ const ProductDetailPage = () => {
                           inseam: '-',
                           leg: '-',
                           sleeve: '-',
-                          variant: matchingVariant
+                          variant: matchingVariant,
                         });
                       }
                     });
