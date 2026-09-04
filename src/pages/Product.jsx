@@ -270,6 +270,19 @@ const ProductDetailPage = () => {
     }
   };
 
+  const handleSelectSize = (s) => {
+    setSelectedSize(s);
+    const matchingVar = product?.variants?.find((v) => matchesSize(s, v.size));
+    if (matchingVar) {
+      setSelectedVariant(matchingVar);
+      if (matchingVar.imageUrl) {
+        setActiveImage(matchingVar.imageUrl);
+        const matchIdx = allImages.indexOf(matchingVar.imageUrl);
+        if (matchIdx !== -1) setActiveIndex(matchIdx);
+      }
+    }
+  };
+
   const handlePrevImage = () => {
     if (allImages.length > 1) {
       const newIndex = (activeIndex - 1 + allImages.length) % allImages.length;
@@ -542,38 +555,77 @@ const ProductDetailPage = () => {
                     )}
                   </div>
 
-                  {/* Variant Selection (Type = variant or variants schema list) */}
-                  {product.variants && product.variants.length > 0 && (
+                  {/* Variant and Size Selection */}
+                  {(product.variants?.length > 0 || product.sizes?.length > 0) && (
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-xs font-mono">
-                        <span className="text-slate-500 dark:text-white/60 uppercase tracking-wider font-bold">SELECT VARIANT / SIZE:</span>
-                        {selectedVariant?.size && (
-                          <span className="font-bold text-orange-500">{selectedVariant.size}</span>
-                        )}
+                        <span className="text-slate-500 dark:text-white/60 uppercase tracking-wider font-bold">SELECT SIZE / VARIANT:</span>
+                        <span className="font-bold text-orange-500 bg-orange-500/10 dark:bg-orange-500/20 px-2.5 py-0.5 rounded-lg border border-orange-500/30 uppercase">
+                          {selectedSize || selectedVariant?.size || 'Standard'}
+                        </span>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {product.variants.map((v, idx) => {
-                          const isSelected = selectedVariant?.id ? selectedVariant.id === v.id : matchesSize(selectedSize, v.size);
-                          return (
-                            <button
-                              key={v.id || v.size || idx}
-                              onClick={() => handleSelectVariant(v)}
-                              className={`p-3 rounded-2xl text-left font-mono transition border flex flex-col justify-between ${
-                                isSelected
-                                  ? 'bg-orange-500/10 border-orange-500 text-slate-900 dark:text-white shadow-lg'
-                                  : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-700 dark:text-white/80 hover:border-orange-500/50'
-                              }`}
-                            >
-                              <span className="text-xs font-bold block">{v.size}</span>
-                              <div className="flex items-center justify-between mt-1 text-[11px]">
-                                <span className="font-mono text-orange-500">{formatPrice(v.price)}</span>
-                                {v.originalPrice && v.originalPrice > v.price && (
-                                  <span className="line-through text-slate-400 text-[10px]">{formatPrice(v.originalPrice)}</span>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        {product.variants?.length > 0 ? (
+                          product.variants.map((v, idx) => {
+                            const isSelected = selectedVariant?.id
+                              ? (v.id ? selectedVariant.id === v.id : matchesSize(selectedSize, v.size))
+                              : matchesSize(selectedSize, v.size);
+                            return (
+                              <button
+                                key={v.id || v.size || idx}
+                                type="button"
+                                onClick={() => handleSelectVariant(v)}
+                                className={`p-3.5 rounded-2xl text-left font-mono transition-all duration-200 border flex flex-col justify-between cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/50 scale-[1.02]'
+                                    : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-orange-500/60 hover:bg-slate-200/50 dark:hover:bg-white/10'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className={`text-xs font-black uppercase ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+                                    {v.size}
+                                  </span>
+                                  {isSelected && (
+                                    <CheckCircle2 className="w-4 h-4 text-white shrink-0" />
+                                  )}
+                                </div>
+                                <div className="flex items-center justify-between mt-1.5 text-[11px]">
+                                  <span className={`font-mono font-bold ${isSelected ? 'text-white' : 'text-orange-500'}`}>
+                                    {formatPrice(v.price)}
+                                  </span>
+                                  {v.originalPrice && v.originalPrice > v.price && (
+                                    <span className={`line-through text-[10px] ${isSelected ? 'text-orange-100' : 'text-slate-400'}`}>
+                                      {formatPrice(v.originalPrice)}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })
+                        ) : (
+                          product.sizes?.map((s, idx) => {
+                            const isSelected = matchesSize(selectedSize, s);
+                            return (
+                              <button
+                                key={s || idx}
+                                type="button"
+                                onClick={() => handleSelectSize(s)}
+                                className={`p-3.5 rounded-2xl text-center font-mono transition-all duration-200 border flex items-center justify-between cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/50 scale-[1.02]'
+                                    : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-orange-500/60 hover:bg-slate-200/50 dark:hover:bg-white/10'
+                                }`}
+                              >
+                                <span className={`text-xs font-black uppercase ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+                                  {s}
+                                </span>
+                                {isSelected && (
+                                  <CheckCircle2 className="w-4 h-4 text-white shrink-0" />
                                 )}
-                              </div>
-                            </button>
-                          );
-                        })}
+                              </button>
+                            );
+                          })
+                        )}
                       </div>
                     </div>
                   )}
@@ -764,64 +816,64 @@ const ProductDetailPage = () => {
                                       if (row.variant) {
                                         handleSelectVariant(row.variant);
                                       } else {
-                                        setSelectedSize(row.displaySize);
+                                        handleSelectSize(row.displaySize);
                                       }
                                     }}
                                     className={`cursor-pointer transition-all duration-200 ${
                                       isSelected
-                                        ? 'bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 font-bold border-l-2 border-orange-500'
-                                        : 'hover:bg-slate-200/40 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
+                                        ? 'bg-orange-500/20 dark:bg-orange-500/30 text-orange-600 dark:text-orange-400 font-bold border-l-4 border-orange-500 shadow-sm'
+                                        : 'hover:bg-slate-200/50 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
                                     }`}
                                   >
-                                    <td className="py-2.5 px-3 font-bold flex items-center gap-1.5">
-                                      <span className={isSelected ? 'text-orange-500' : 'text-slate-900 dark:text-white'}>
+                                    <td className="py-3 px-3.5 font-bold flex items-center gap-1.5">
+                                      <span className={isSelected ? 'text-orange-600 dark:text-orange-400 font-black' : 'text-slate-900 dark:text-white'}>
                                         {row.displaySize}
                                       </span>
                                       {isSelected && (
-                                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
                                       )}
                                     </td>
                                     {sizeKey === 'sweatshirts' && (
                                       <>
-                                        <td className="py-2.5 px-3">{row.chest}</td>
-                                        <td className="py-2.5 px-3">{row.length}</td>
-                                        <td className="py-2.5 px-3">{row.shoulder}</td>
+                                        <td className="py-3 px-3.5">{row.chest}</td>
+                                        <td className="py-3 px-3.5">{row.length}</td>
+                                        <td className="py-3 px-3.5">{row.shoulder}</td>
                                       </>
                                     )}
                                     {sizeKey === 'pants' && (
                                       <>
-                                        <td className="py-2.5 px-3">{row.waist}</td>
-                                        <td className="py-2.5 px-3">{row.inseam}</td>
-                                        <td className="py-2.5 px-3">{row.leg}</td>
+                                        <td className="py-3 px-3.5">{row.waist}</td>
+                                        <td className="py-3 px-3.5">{row.inseam}</td>
+                                        <td className="py-3 px-3.5">{row.leg}</td>
                                       </>
                                     )}
                                     {sizeKey === 'shirts' && (
                                       <>
-                                        <td className="py-2.5 px-3">{row.chest}</td>
-                                        <td className="py-2.5 px-3">{row.length}</td>
-                                        <td className="py-2.5 px-3">{row.sleeve}</td>
+                                        <td className="py-3 px-3.5">{row.chest}</td>
+                                        <td className="py-3 px-3.5">{row.length}</td>
+                                        <td className="py-3 px-3.5">{row.sleeve}</td>
                                       </>
                                     )}
                                     {sizeKey === 'tees' && (
                                       <>
-                                        <td className="py-2.5 px-3">{row.chest}</td>
-                                        <td className="py-2.5 px-3">{row.length}</td>
-                                        <td className="py-2.5 px-3">{row.sleeve}</td>
+                                        <td className="py-3 px-3.5">{row.chest}</td>
+                                        <td className="py-3 px-3.5">{row.length}</td>
+                                        <td className="py-3 px-3.5">{row.sleeve}</td>
                                       </>
                                     )}
                                     {sizeKey === 'jerseys' && (
                                       <>
-                                        <td className="py-2.5 px-3">{row.chest}</td>
-                                        <td className="py-2.5 px-3">{row.length}</td>
+                                        <td className="py-3 px-3.5">{row.chest}</td>
+                                        <td className="py-3 px-3.5">{row.length}</td>
                                       </>
                                     )}
-                                    <td className="py-2.5 px-3 text-right">
+                                    <td className="py-3 px-3.5 text-right">
                                       {isSelected ? (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-orange-500 text-white uppercase tracking-wider">
-                                          Selected
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase tracking-wider shadow-sm">
+                                          Selected <CheckCircle2 className="w-3 h-3 text-white" />
                                         </span>
                                       ) : (
-                                        <span className="text-[10px] text-slate-400 dark:text-white/40 group-hover:text-orange-500">
+                                        <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-orange-500">
                                           Select
                                         </span>
                                       )}

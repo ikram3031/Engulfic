@@ -157,38 +157,48 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
 
           {/* Size Selector */}
           {(product.sizes?.length > 0 || product.variants?.length > 0) && (
-          <div>
-            <div className="flex items-center justify-between mb-2">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
               <label className="text-xs font-mono text-slate-500 dark:text-white/50 uppercase tracking-wider">
-                {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'} <span className="text-slate-900 dark:text-white font-bold">{selectedSize}</span>
+                {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'} <span className="text-orange-500 font-bold">{selectedSize}</span>
               </label>
             </div>
             <div className="flex flex-wrap gap-2">
-              {product.variants?.length > 0 ? product.variants.map((v) => (
-                <button
-                  key={v.size}
-                  onClick={() => setSelectedSize(v.size)}
-                  className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition ${
-                    selectedSize === v.size
-                      ? 'bg-orange-500 text-white shadow-md scale-105'
-                      : 'bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white/70 hover:border-slate-300 dark:hover:border-white/20 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {v.size} {v.price ? `- ${formatPrice(v.price)}` : ''}
-                </button>
-              )) : product.sizes?.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSelectedSize(s)}
-                  className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition ${
-                    selectedSize === s
-                      ? 'bg-orange-500 text-white shadow-md scale-105'
-                      : 'bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white/70 hover:border-slate-300 dark:hover:border-white/20 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
+              {product.variants?.length > 0 ? product.variants.map((v) => {
+                const isSelected = selectedSize === v.size;
+                return (
+                  <button
+                    key={v.size}
+                    type="button"
+                    onClick={() => setSelectedSize(v.size)}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border flex items-center gap-1.5 cursor-pointer ${
+                      isSelected
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/50 scale-[1.02]'
+                        : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-orange-500/60 hover:bg-slate-200/50 dark:hover:bg-white/10'
+                    }`}
+                  >
+                    <span>{v.size} {v.price ? `- ${formatPrice(v.price)}` : ''}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
+                  </button>
+                );
+              }) : product.sizes?.map((s) => {
+                const isSelected = selectedSize === s;
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setSelectedSize(s)}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border flex items-center gap-1.5 cursor-pointer ${
+                      isSelected
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/50 scale-[1.02]'
+                        : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-orange-500/60 hover:bg-slate-200/50 dark:hover:bg-white/10'
+                    }`}
+                  >
+                    <span>{s}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
           )}
