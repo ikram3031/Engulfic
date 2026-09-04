@@ -160,21 +160,21 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-mono text-slate-500 dark:text-white/50 uppercase tracking-wider">
-                {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'} <span className="text-orange-500 font-bold">{selectedSize}</span>
+                {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'} <span className="text-red-600 dark:text-red-400 font-bold">{selectedSize}</span>
               </label>
             </div>
             <div className="flex flex-wrap gap-2">
               {product.variants?.length > 0 ? product.variants.map((v) => {
-                const isSelected = selectedSize === v.size;
+                const isSelected = Boolean(selectedSize && v.size && String(selectedSize).trim().toUpperCase() === String(v.size).trim().toUpperCase());
                 return (
                   <button
                     key={v.size}
                     type="button"
                     onClick={() => setSelectedSize(v.size)}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border-2 flex items-center gap-1.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/50 scale-[1.02]'
-                        : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-orange-500/60 hover:bg-slate-200/50 dark:hover:bg-white/10'
+                        ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
+                        : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/30'
                     }`}
                   >
                     <span>{v.size} {v.price ? `- ${formatPrice(v.price)}` : ''}</span>
@@ -182,16 +182,16 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
                   </button>
                 );
               }) : product.sizes?.map((s) => {
-                const isSelected = selectedSize === s;
+                const isSelected = Boolean(selectedSize && s && String(selectedSize).trim().toUpperCase() === String(s).trim().toUpperCase());
                 return (
                   <button
                     key={s}
                     type="button"
                     onClick={() => setSelectedSize(s)}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border-2 flex items-center gap-1.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/50 scale-[1.02]'
-                        : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-orange-500/60 hover:bg-slate-200/50 dark:hover:bg-white/10'
+                        ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
+                        : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/30'
                     }`}
                   >
                     <span>{s}</span>

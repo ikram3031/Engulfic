@@ -196,21 +196,21 @@ export {
   setStoredMemberTokens
 } from '@/core/lib/api';
 
-/**
- * Submit Contact Form
- */
+// Submits customer contact form to backend
 export async function submitContactForm(data) {
-  const url = `https://server.decantrebd.com/api/v1/contact`;
+  const url = `${BASE_URL}/api/v1/contact`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify({
       name: data.name,
       email: data.email,
       phone: data.phone || '',
-      message: data.message
+      message: data.message,
+      recaptchaToken: data.recaptchaToken || undefined,
     }),
   });
 
@@ -222,3 +222,4 @@ export async function submitContactForm(data) {
 
   return json;
 }
+

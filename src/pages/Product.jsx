@@ -283,6 +283,27 @@ const ProductDetailPage = () => {
     }
   };
 
+  const isVariantSelected = (v) => {
+    if (selectedVariant && (selectedVariant.id || selectedVariant._id)) {
+      const vId = v.id || v._id;
+      const selId = selectedVariant.id || selectedVariant._id;
+      if (vId && selId && vId === selId) return true;
+    }
+    return Boolean(
+      selectedSize &&
+      v.size &&
+      String(selectedSize).trim().toUpperCase() === String(v.size).trim().toUpperCase()
+    );
+  };
+
+  const isSizeSelected = (s) => {
+    return Boolean(
+      selectedSize &&
+      s &&
+      String(selectedSize).trim().toUpperCase() === String(s).trim().toUpperCase()
+    );
+  };
+
   const handlePrevImage = () => {
     if (allImages.length > 1) {
       const newIndex = (activeIndex - 1 + allImages.length) % allImages.length;
@@ -559,26 +580,24 @@ const ProductDetailPage = () => {
                   {(product.variants?.length > 0 || product.sizes?.length > 0) && (
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-xs font-mono">
-                        <span className="text-slate-500 dark:text-white/60 uppercase tracking-wider font-bold">SELECT SIZE / VARIANT:</span>
-                        <span className="font-bold text-orange-500 bg-orange-500/10 dark:bg-orange-500/20 px-2.5 py-0.5 rounded-lg border border-orange-500/30 uppercase">
+                        <span className="text-slate-500 dark:text-white/60 uppercase tracking-wider font-bold">SELECT VARIANT / SIZE:</span>
+                        <span className="font-bold text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-500/20 px-2.5 py-0.5 rounded-lg border border-red-500/30 uppercase">
                           {selectedSize || selectedVariant?.size || 'Standard'}
                         </span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                         {product.variants?.length > 0 ? (
                           product.variants.map((v, idx) => {
-                            const isSelected = selectedVariant?.id
-                              ? (v.id ? selectedVariant.id === v.id : matchesSize(selectedSize, v.size))
-                              : matchesSize(selectedSize, v.size);
+                            const isSelected = isVariantSelected(v);
                             return (
                               <button
                                 key={v.id || v.size || idx}
                                 type="button"
                                 onClick={() => handleSelectVariant(v)}
-                                className={`p-3.5 rounded-2xl text-left font-mono transition-all duration-200 border flex flex-col justify-between cursor-pointer ${
+                                className={`p-3.5 rounded-2xl text-left font-mono transition-all duration-200 border-2 flex flex-col justify-between cursor-pointer ${
                                   isSelected
-                                    ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/50 scale-[1.02]'
-                                    : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-orange-500/60 hover:bg-slate-200/50 dark:hover:bg-white/10'
+                                    ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
+                                    : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/30'
                                 }`}
                               >
                                 <div className="flex items-center justify-between">
@@ -590,11 +609,11 @@ const ProductDetailPage = () => {
                                   )}
                                 </div>
                                 <div className="flex items-center justify-between mt-1.5 text-[11px]">
-                                  <span className={`font-mono font-bold ${isSelected ? 'text-white' : 'text-orange-500'}`}>
+                                  <span className={`font-mono font-bold ${isSelected ? 'text-white' : 'text-slate-500 dark:text-white/60'}`}>
                                     {formatPrice(v.price)}
                                   </span>
                                   {v.originalPrice && v.originalPrice > v.price && (
-                                    <span className={`line-through text-[10px] ${isSelected ? 'text-orange-100' : 'text-slate-400'}`}>
+                                    <span className={`line-through text-[10px] ${isSelected ? 'text-red-200' : 'text-slate-400 dark:text-white/40'}`}>
                                       {formatPrice(v.originalPrice)}
                                     </span>
                                   )}
@@ -604,16 +623,16 @@ const ProductDetailPage = () => {
                           })
                         ) : (
                           product.sizes?.map((s, idx) => {
-                            const isSelected = matchesSize(selectedSize, s);
+                            const isSelected = isSizeSelected(s);
                             return (
                               <button
                                 key={s || idx}
                                 type="button"
                                 onClick={() => handleSelectSize(s)}
-                                className={`p-3.5 rounded-2xl text-center font-mono transition-all duration-200 border flex items-center justify-between cursor-pointer ${
+                                className={`p-3.5 rounded-2xl text-center font-mono transition-all duration-200 border-2 flex items-center justify-between cursor-pointer ${
                                   isSelected
-                                    ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/50 scale-[1.02]'
-                                    : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-orange-500/60 hover:bg-slate-200/50 dark:hover:bg-white/10'
+                                    ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
+                                    : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/30'
                                 }`}
                               >
                                 <span className={`text-xs font-black uppercase ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
@@ -808,7 +827,7 @@ const ProductDetailPage = () => {
                             </thead>
                             <tbody className="divide-y divide-slate-200/50 dark:divide-white/5">
                               {matchedRows.map((row, idx) => {
-                                const isSelected = matchesSize(selectedSize, row.displaySize);
+                                const isSelected = isSizeSelected(row.displaySize);
                                 return (
                                   <tr
                                     key={idx}
@@ -821,16 +840,16 @@ const ProductDetailPage = () => {
                                     }}
                                     className={`cursor-pointer transition-all duration-200 ${
                                       isSelected
-                                        ? 'bg-orange-500/20 dark:bg-orange-500/30 text-orange-600 dark:text-orange-400 font-bold border-l-4 border-orange-500 shadow-sm'
+                                        ? 'bg-red-500/15 dark:bg-red-500/25 text-red-600 dark:text-red-400 font-bold border-l-4 border-red-600 shadow-sm'
                                         : 'hover:bg-slate-200/50 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
                                     }`}
                                   >
                                     <td className="py-3 px-3.5 font-bold flex items-center gap-1.5">
-                                      <span className={isSelected ? 'text-orange-600 dark:text-orange-400 font-black' : 'text-slate-900 dark:text-white'}>
+                                      <span className={isSelected ? 'text-red-600 dark:text-red-400 font-black' : 'text-slate-900 dark:text-white'}>
                                         {row.displaySize}
                                       </span>
                                       {isSelected && (
-                                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                                        <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
                                       )}
                                     </td>
                                     {sizeKey === 'sweatshirts' && (
@@ -869,11 +888,11 @@ const ProductDetailPage = () => {
                                     )}
                                     <td className="py-3 px-3.5 text-right">
                                       {isSelected ? (
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase tracking-wider shadow-sm">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-600 text-white uppercase tracking-wider shadow-sm">
                                           Selected <CheckCircle2 className="w-3 h-3 text-white" />
                                         </span>
                                       ) : (
-                                        <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-orange-500">
+                                        <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-red-600">
                                           Select
                                         </span>
                                       )}
