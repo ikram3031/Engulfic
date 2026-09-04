@@ -9,10 +9,10 @@ import { X, Star, Heart, ShoppingCart, Truck, ShieldCheck, Check, Sparkles } fro
 
 // Displays product quick view modal with variant selectors and Meta Pixel ViewContent tracking
 const QuickViewModal = ({ product, onClose, onShowToast }) => {
-  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || product?.variants?.[0]?.size || '');
+  const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]?.name || '');
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState('details'); // details, fabric, shipping
+  const [activeTab, setActiveTab] = useState('details');
   const [activeImage, setActiveImage] = useState(product?.image || '');
 
   useEffect(() => {
@@ -21,7 +21,6 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
     }
   }, [product]);
 
-
   const addToCart = useCartStore((state) => state.addToCart);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const isWishlisted = product ? isInWishlist(product.id) : false;
@@ -29,6 +28,11 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
   if (!product) return null;
 
   const handleAddToCart = () => {
+    const hasSizesOrVariants = (product?.variants?.length > 0 || product?.sizes?.length > 0);
+    if (hasSizesOrVariants && !selectedSize) {
+      if (onShowToast) onShowToast('Please select a size before adding to cart.');
+      return;
+    }
     addToCart(product, selectedSize, selectedColor, quantity);
     onClose();
   };
@@ -160,7 +164,12 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-mono text-slate-500 dark:text-white/50 uppercase tracking-wider">
-                {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'} <span className="text-red-600 dark:text-red-400 font-bold">{selectedSize}</span>
+                {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'}{' '}
+                {selectedSize ? (
+                  <span className="text-red-600 dark:text-red-400 font-bold">{selectedSize}</span>
+                ) : (
+                  <span className="text-slate-400 dark:text-white/40 text-[11px] italic font-normal">None Selected</span>
+                )}
               </label>
             </div>
             <div className="flex flex-wrap gap-2">

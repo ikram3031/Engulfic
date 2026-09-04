@@ -240,9 +240,8 @@ const ProductDetailPage = () => {
       const defaultImg = product.image || (product.images && product.images[0]) || '';
       setActiveImage(defaultImg);
       setActiveIndex(0);
-      const defaultVar = product.variants?.[0] || null;
-      setSelectedVariant(defaultVar);
-      setSelectedSize(defaultVar?.size || product.sizes?.[0] || 'Standard');
+      setSelectedVariant(null);
+      setSelectedSize('');
       setSelectedColor(product.colors?.[0]?.name || 'Default');
     }
   }, [product]);
@@ -286,24 +285,21 @@ const ProductDetailPage = () => {
   };
 
   const isVariantSelected = (v) => {
+    if (!selectedSize && !selectedVariant) return false;
     if (selectedVariant && (selectedVariant.id || selectedVariant._id)) {
       const vId = v.id || v._id;
       const selId = selectedVariant.id || selectedVariant._id;
       if (vId && selId && vId === selId) return true;
     }
-    return Boolean(
-      selectedSize &&
-      v.size &&
-      String(selectedSize).trim().toUpperCase() === String(v.size).trim().toUpperCase()
-    );
+    if (selectedSize && v.size) {
+      return String(selectedSize).trim().toUpperCase() === String(v.size).trim().toUpperCase();
+    }
+    return false;
   };
 
   const isSizeSelected = (s) => {
-    return Boolean(
-      selectedSize &&
-      s &&
-      String(selectedSize).trim().toUpperCase() === String(s).trim().toUpperCase()
-    );
+    if (!selectedSize) return false;
+    return String(selectedSize).trim().toUpperCase() === String(s).trim().toUpperCase();
   };
 
   const handlePrevImage = () => {
@@ -340,6 +336,12 @@ const ProductDetailPage = () => {
     : 0;
 
   const handleAddToCart = () => {
+    const hasSizesOrVariants = (product?.variants?.length > 0 || product?.sizes?.length > 0);
+    if (hasSizesOrVariants && !selectedSize) {
+      setToastMessage('Please select a size before adding to cart.');
+      setTimeout(() => setToastMessage(''), 3500);
+      return;
+    }
     const itemToCart = {
       ...product,
       price: currentPrice,
@@ -350,6 +352,12 @@ const ProductDetailPage = () => {
   };
 
   const handleBuyNow = () => {
+    const hasSizesOrVariants = (product?.variants?.length > 0 || product?.sizes?.length > 0);
+    if (hasSizesOrVariants && !selectedSize) {
+      setToastMessage('Please select a size before checkout.');
+      setTimeout(() => setToastMessage(''), 3500);
+      return;
+    }
     const itemToCart = {
       ...product,
       price: currentPrice,
@@ -583,9 +591,15 @@ const ProductDetailPage = () => {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-xs font-mono">
                         <span className="text-slate-500 dark:text-white/60 uppercase tracking-wider font-bold">SELECT VARIANT / SIZE:</span>
-                        <span className="font-bold text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-500/20 px-2.5 py-0.5 rounded-lg border border-red-500/30 uppercase">
-                          {selectedSize || selectedVariant?.size || 'Standard'}
-                        </span>
+                        {selectedSize || selectedVariant?.size ? (
+                          <span className="font-bold text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-500/20 px-2.5 py-0.5 rounded-lg border border-red-500/30 uppercase">
+                            {selectedSize || selectedVariant?.size}
+                          </span>
+                        ) : (
+                          <span className="text-[11px] font-semibold text-slate-400 dark:text-white/40 italic">
+                            None Selected
+                          </span>
+                        )}
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                         {product.variants?.length > 0 ? (
