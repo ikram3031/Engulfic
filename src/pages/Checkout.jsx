@@ -8,6 +8,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 import Toast from '@/components/Toast';
 import SearchModal from '@/components/SearchModal';
+import ReCaptcha from '@/components/ReCaptcha';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatPrice } from '@/lib/utils';
@@ -60,10 +61,11 @@ const CheckoutPage = () => {
 
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [step, setStep] = useState(1); // 1: Checkout Form, 2: Order Complete / Invoice
+  const [step, setStep] = useState(1);
   const [orderId, setOrderId] = useState('');
   const [orderSummary, setOrderSummary] = useState(null);
   const [isCustomerAccountOpen, setIsCustomerAccountOpen] = useState(false);
+  const [isRecaptchaVerified, setIsRecaptchaVerified] = useState(false);
 
   // Auth toggle tab
   const [authTab, setAuthTab] = useState('signin'); // 'signin' or 'signup'
@@ -234,13 +236,16 @@ const CheckoutPage = () => {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
 
-    // Verify billing address fields
+    if (!isRecaptchaVerified) {
+      setToastMessage('Please complete the security reCAPTCHA verification.');
+      return;
+    }
+
     if (!billingForm.firstName || !billingForm.lastName || !billingForm.email || !billingForm.phone || !billingForm.address || !billingForm.town || !billingForm.district) {
       setToastMessage('Please fill in all mandatory billing fields.');
       return;
     }
 
-    // Verify shipping address fields if shipping to different address is checked
     if (shipToDifferent) {
       if (!shippingForm.firstName || !shippingForm.lastName || !shippingForm.email || !shippingForm.phone || !shippingForm.address || !shippingForm.town || !shippingForm.district) {
         setToastMessage('Please fill in all mandatory shipping fields.');
@@ -800,7 +805,13 @@ const CheckoutPage = () => {
                       </div>
                     </div>
 
-                    {/* Checkout Action CTA */}
+                    <div className="pt-2">
+                      <ReCaptcha
+                        onVerify={setIsRecaptchaVerified}
+                        verified={isRecaptchaVerified}
+                      />
+                    </div>
+
                     <button
                       type="submit"
                       className="w-full py-4 bg-orange-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-orange-600 transition shadow-2xl border border-orange-400/30 flex items-center justify-center gap-2"

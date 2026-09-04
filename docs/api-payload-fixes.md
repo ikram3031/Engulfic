@@ -6,6 +6,22 @@
 
 ## Comment Logs
 
+### [E48] 2026-08-31: Dynamic Size Chart Display & Two-Way Sync with Available Product Variations
+- **সমস্যা:** প্রোডাক্ট ডিটেইলস পেজের সাইজ চার্ট সব সাইজ হার্ডকোডেড দেখাচ্ছিল এবং প্রোডাক্টের একচুয়াল ভ্যারিয়েশন (যেমন শুধু M, L, XL) অনুযায়ী ফিল্টার হচ্ছিল না। এছাড়াও ভ্যারিয়েন্ট সিলেক্ট করলে সাইজ চার্টের সাথে ইন্টার‍্যাক্টিভ সিংকিং ছিল না।
+- **Fix:**
+  - `src/lib/transformProduct.js`: ভ্যারিয়েন্টের ইউনিক `id` ও রুট `sizes` অ্যারের সাথে ভ্যারিয়েন্ট সাইজ মার্জ নিশ্চিত করা হয়েছে।
+  - `src/pages/Product.jsx`:
+    - `SIZE_TABLE_DATA`-তে সব সাইজের সঠিক মেজারমেন্ট (XS থেকে 3XL এবং প্যান্টের জন্য 28-38 ওয়েস্ট সাইজ) যুক্ত করা হয়েছে।
+    - সাইজ এলিয়াস ও নরমালাইজার (`2XL` <=> `XXL` ইত্যাদি) হ্যান্ডলিং দেওয়া হয়েছে।
+    - `getCategorySizeKey` উন্নত করা হয়েছে যাতে ক্যাটাগরি, সাবক্যাটাগরি ও প্রোডাক্ট নামের উপর ভিত্তি করে সঠিক চার্ট লোড হয়।
+    - সাইজ চার্ট টেবিলটিতে শুধুমাত্র প্রোডাক্টে উপলব্ধ সাইজ ভ্যারিয়েশনগুলো রেন্ডার করা হয়েছে।
+    - টু-ওয়ে ইন্টার‍্যাক্টিভ সিংকিং: ভ্যারিয়েন্ট সিলেক্ট করলে সাইজ চার্ট টেবিলে সেই রো হাইলাইট হয় এবং টেবিলে ক্লিক করে ভ্যারিয়েন্ট পরিবর্তন করা যায়।
+- **ফাইলসমূহ:**
+  - [`src/lib/transformProduct.js`](file:///f:/Engulfic/src/lib/transformProduct.js)
+  - [`src/pages/Product.jsx`](file:///f:/Engulfic/src/pages/Product.jsx)
+  - [`docs/api-payload-fixes.md`](file:///f:/Engulfic/docs/api-payload-fixes.md)
+  - [`docs/E01-100.md`](file:///f:/Engulfic/docs/E01-100.md)
+
 ### [E45] 2026-08-27: Fixed Category-Wise Products Not Showing on Category Card Click
 - **সমস্যা:** হোম পেজ থেকে ক্যাটাগরি কার্ডে (যেমন T-Shirt, Shirts, Pants) ক্লিক করে ক্যাটাগরি পেজে গেলে (`/category/:slug`) কোনো প্রোডাক্ট দেখাচ্ছিল না (0 Garments Found)। ব্যাকএন্ড ডাটাবেজে প্রোডাক্টগুলো চাইল্ড/লিফ ক্যাটাগরি স্ল্যাগে (`graphic-drop-shoulder-tee`, `casual-shirt`, `baggy-sweatpants`) স্টোর থাকায় প্যারেন্ট স্ল্যাগ কুয়েরি করলে ম্যাচ করছিল না।
 - **Fix:**

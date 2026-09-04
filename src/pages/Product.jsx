@@ -51,6 +51,9 @@ const SIZE_TABLE_DATA = {
       { size: 'M', chest: '48"', length: '29"', shoulder: '23.5"' },
       { size: 'L', chest: '50"', length: '30"', shoulder: '24.5"' },
       { size: 'XL', chest: '52"', length: '31"', shoulder: '25.5"' },
+      { size: 'XXL', chest: '54"', length: '32"', shoulder: '26.5"' },
+      { size: '2XL', chest: '54"', length: '32"', shoulder: '26.5"' },
+      { size: '3XL', chest: '56"', length: '33"', shoulder: '27.5"' },
     ]
   },
   pants: {
@@ -61,6 +64,14 @@ const SIZE_TABLE_DATA = {
       { size: 'M', waist: '32 - 34"', inseam: '31.5"', leg: '10.5"' },
       { size: 'L', waist: '34 - 36"', inseam: '32"', leg: '11.0"' },
       { size: 'XL', waist: '36 - 38"', inseam: '32.5"', leg: '11.5"' },
+      { size: 'XXL', waist: '38 - 40"', inseam: '33"', leg: '12.0"' },
+      { size: '2XL', waist: '38 - 40"', inseam: '33"', leg: '12.0"' },
+      { size: '28', waist: '28"', inseam: '30"', leg: '9.5"' },
+      { size: '30', waist: '30"', inseam: '31"', leg: '10.0"' },
+      { size: '32', waist: '32"', inseam: '31.5"', leg: '10.5"' },
+      { size: '34', waist: '34"', inseam: '32"', leg: '11.0"' },
+      { size: '36', waist: '36"', inseam: '32.5"', leg: '11.5"' },
+      { size: '38', waist: '38"', inseam: '33"', leg: '12.0"' },
     ]
   },
   shirts: {
@@ -71,6 +82,9 @@ const SIZE_TABLE_DATA = {
       { size: 'M', chest: '46"', length: '30"', sleeve: '24.5"' },
       { size: 'L', chest: '48"', length: '31"', sleeve: '25.0"' },
       { size: 'XL', chest: '50"', length: '32"', sleeve: '25.5"' },
+      { size: 'XXL', chest: '52"', length: '33"', sleeve: '26.0"' },
+      { size: '2XL', chest: '52"', length: '33"', sleeve: '26.0"' },
+      { size: '3XL', chest: '54"', length: '34"', sleeve: '26.5"' },
     ]
   },
   tees: {
@@ -81,6 +95,9 @@ const SIZE_TABLE_DATA = {
       { size: 'M', chest: '48"', length: '29.5"', sleeve: '10.0"' },
       { size: 'L', chest: '50"', length: '30.5"', sleeve: '10.5"' },
       { size: 'XL', chest: '52"', length: '31.5"', sleeve: '11.0"' },
+      { size: 'XXL', chest: '54"', length: '32.5"', sleeve: '11.5"' },
+      { size: '2XL', chest: '54"', length: '32.5"', sleeve: '11.5"' },
+      { size: '3XL', chest: '56"', length: '33.5"', sleeve: '12.0"' },
     ]
   },
   jerseys: {
@@ -90,54 +107,86 @@ const SIZE_TABLE_DATA = {
       { size: 'M', chest: '44"', length: '29.5"' },
       { size: 'L', chest: '46"', length: '30.5"' },
       { size: 'XL', chest: '48"', length: '31.5"' },
+      { size: 'XXL', chest: '50"', length: '32.5"' },
+      { size: '2XL', chest: '50"', length: '32.5"' },
     ]
   }
 };
 
-function getCategorySizeKey(product) {
-  const catSlug = (product?.categorySlug || product?.category || '').toLowerCase();
-  const name = (product?.name || '').toLowerCase();
-  const rawCat = typeof product?.raw?.category === 'object' 
-    ? (product?.raw?.category?.slug || product?.raw?.category?.name || '') 
-    : String(product?.raw?.category || '');
-  const combined = `${catSlug} ${name} ${rawCat}`.toLowerCase();
+const SIZE_ALIASES = {
+  'XXL': ['2XL', 'XXL', 'EXTRA EXTRA LARGE', 'XX-LARGE'],
+  '2XL': ['2XL', 'XXL', 'EXTRA EXTRA LARGE', 'XX-LARGE'],
+  'XXXL': ['3XL', 'XXXL', '3X-LARGE'],
+  '3XL': ['3XL', 'XXXL', '3X-LARGE'],
+  'XS': ['XS', 'EXTRA SMALL', 'X-SMALL'],
+  'S': ['S', 'SMALL'],
+  'M': ['M', 'MEDIUM', 'MED'],
+  'L': ['L', 'LARGE', 'LRG'],
+  'XL': ['XL', 'EXTRA LARGE', 'X-LARGE', '1XL'],
+};
 
-  // 1. Pants & Sweatpants (baggy-pants, baggy-sweatpants, baggy-graphic-sweatpants)
-  if (combined.includes('pant') || combined.includes('sweatpant') || combined.includes('baggy') || combined.includes('trouser')) {
+const STANDARD_SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '28', '30', '32', '34', '36', '38'];
+
+// Evaluates whether a product variation size matches a size chart standard identifier
+const matchesSize = (productSize, chartSize) => {
+  if (!productSize || !chartSize) return false;
+  const pNorm = String(productSize).trim().toUpperCase();
+  const cNorm = String(chartSize).trim().toUpperCase();
+  if (pNorm === cNorm) return true;
+
+  const aliases = SIZE_ALIASES[cNorm] || [cNorm];
+  return aliases.includes(pNorm);
+};
+
+// Resolves category size key for measurements table based on product category metadata
+const getCategorySizeKey = (product) => {
+  if (!product) return 'tees';
+
+  const catSlug = (product.categorySlug || '').toLowerCase();
+  const catName = (product.category || '').toLowerCase();
+  const prodName = (product.name || '').toLowerCase();
+  const allCats = Array.isArray(product.categories)
+    ? product.categories.map((c) => `${c.slug || ''} ${c.name || ''}`).join(' ').toLowerCase()
+    : '';
+
+  const combined = `${catSlug} ${catName} ${prodName} ${allCats}`.toLowerCase();
+
+  if (combined.includes('sweatshirt') || combined.includes('hoodie') || combined.includes('crew')) {
+    if (!combined.includes('sweatpant') && !combined.includes('baggy-sweatpants')) {
+      return 'sweatshirts';
+    }
+  }
+
+  if (combined.includes('pant') || combined.includes('sweatpant') || combined.includes('trouser') || combined.includes('jeans') || combined.includes('jogger')) {
     return 'pants';
   }
 
-  // 2. Sweatshirts & Crews (sweatshirts, oversized-sweatshirt, oversized-graphic-sweatshirt)
-  if (combined.includes('sweatshirt') || combined.includes('hoodie') || combined.includes('crew')) {
-    return 'sweatshirts';
+  if (combined.includes('t-shirt') || combined.includes('tee') || combined.includes('tshirt') || combined.includes('drop-shoulder')) {
+    return 'tees';
   }
 
-  // 3. Jerseys (jerseys, player-edition, fan-edition, retro-edition)
   if (combined.includes('jersey') || combined.includes('player-edition') || combined.includes('fan-edition') || combined.includes('retro-edition')) {
     return 'jerseys';
   }
 
-  // 4. Drop Shoulder T-Shirts (drop-shoulder-t-shirts, drop-shoulder-tee, graphic-drop-shoulder-tee)
-  if (combined.includes('t-shirt') || combined.includes('tee') || combined.includes('drop-shoulder')) {
-    return 'tees';
-  }
-
-  // 5. Shirts (shirts, oversized-shirt, casual-shirt)
   if (combined.includes('shirt')) {
     return 'shirts';
   }
 
-  return 'pants';
-}
+  if (catSlug.includes('baggy') || catSlug.includes('pant')) {
+    return 'pants';
+  }
 
-export default function ProductDetailPage() {
+  return 'tees';
+};
+
+// Renders product details, gallery, size selection, custom size table, and related items
+const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // TanStack Query for product details
   const { data: product, isLoading, isError, error } = useProductDetails(id);
 
-  // TanStack Query for related items from same category
   const { data: relatedProducts = [] } = useProducts(
     {
       category: product?.categorySlug,
@@ -503,11 +552,11 @@ export default function ProductDetailPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {product.variants.map((v) => {
-                          const isSelected = selectedVariant?.id === v.id || selectedSize === v.size;
+                        {product.variants.map((v, idx) => {
+                          const isSelected = selectedVariant?.id ? selectedVariant.id === v.id : matchesSize(selectedSize, v.size);
                           return (
                             <button
-                              key={v.id}
+                              key={v.id || v.size || idx}
                               onClick={() => handleSelectVariant(v)}
                               className={`p-3 rounded-2xl text-left font-mono transition border flex flex-col justify-between ${
                                 isSelected
@@ -593,116 +642,193 @@ export default function ProductDetailPage() {
                     </div>
                   )}
 
-                  {/* Category Wise Size Chart Table */}
                   {(() => {
                     const sizeKey = getCategorySizeKey(product);
                     const tableData = SIZE_TABLE_DATA[sizeKey];
                     if (!tableData) return null;
 
-                    // Filter rows by available product sizes
-                    const availableSizes = new Set(
-                      (product.sizes || []).map(s => s.toUpperCase())
-                    );
-                    
-                    const filteredRows = tableData.rows.filter(row => 
-                      availableSizes.has(row.size.toUpperCase())
-                    );
+                    const productVariantSizes = (product.variants && product.variants.length > 0)
+                      ? product.variants.map((v) => v.size).filter(Boolean)
+                      : (product.sizes || []);
 
-                    if (filteredRows.length === 0) return null;
+                    if (productVariantSizes.length === 0) return null;
+
+                    const matchedRows = [];
+                    const seenSizes = new Set();
+
+                    productVariantSizes.forEach((pSize) => {
+                      const pSizeTrimmed = String(pSize).trim();
+                      const pSizeUpper = pSizeTrimmed.toUpperCase();
+                      if (seenSizes.has(pSizeUpper)) return;
+                      seenSizes.add(pSizeUpper);
+
+                      const foundRow = tableData.rows.find((r) => matchesSize(pSizeTrimmed, r.size));
+                      const matchingVariant = product.variants?.find((v) => matchesSize(pSizeTrimmed, v.size)) || null;
+
+                      if (foundRow) {
+                        matchedRows.push({
+                          ...foundRow,
+                          displaySize: pSizeTrimmed,
+                          variant: matchingVariant
+                        });
+                      } else {
+                        matchedRows.push({
+                          size: pSizeTrimmed,
+                          displaySize: pSizeTrimmed,
+                          chest: '-',
+                          length: '-',
+                          shoulder: '-',
+                          waist: '-',
+                          inseam: '-',
+                          leg: '-',
+                          sleeve: '-',
+                          variant: matchingVariant
+                        });
+                      }
+                    });
+
+                    matchedRows.sort((a, b) => {
+                      const idxA = STANDARD_SIZE_ORDER.indexOf(a.displaySize.toUpperCase());
+                      const idxB = STANDARD_SIZE_ORDER.indexOf(b.displaySize.toUpperCase());
+                      const valA = idxA !== -1 ? idxA : 999;
+                      const valB = idxB !== -1 ? idxB : 999;
+                      return valA - valB;
+                    });
+
+                    if (matchedRows.length === 0) return null;
 
                     return (
-                      <div className="p-4 sm:p-5 bg-slate-100/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
+                      <div className="p-4 sm:p-5 bg-slate-100/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3 shadow-sm transition-colors duration-300">
                         <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-white/10">
                           <div className="flex items-center gap-2">
                             <Ruler className="w-4 h-4 text-orange-500" />
-                            <h3 className="text-xs font-bold font-mono uppercase text-slate-900 dark:text-white">
-                              Size Chart
+                            <h3 className="text-xs font-bold font-mono uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                              <span>Size Chart</span>
+                              <span className="text-[10px] font-normal text-slate-500 dark:text-white/50 tracking-normal">
+                                ({matchedRows.length} Available {matchedRows.length === 1 ? 'Variation' : 'Variations'})
+                              </span>
                             </h3>
                           </div>
-                          <span className="text-[10px] font-mono text-orange-500 font-bold">{tableData.unit}</span>
+                          <span className="text-[10px] font-mono text-orange-500 font-bold tracking-wider">{tableData.unit}</span>
                         </div>
 
                         <div className="overflow-x-auto no-scrollbar">
                           <table className="w-full text-left font-mono text-[11px] whitespace-nowrap">
                             <thead>
-                              <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/50 uppercase">
-                                <th className="py-2 px-2">Size</th>
+                              <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/50 uppercase text-[10px]">
+                                <th className="py-2.5 px-3">Size</th>
                                 {sizeKey === 'sweatshirts' && (
                                   <>
-                                    <th className="py-2 px-2">Chest</th>
-                                    <th className="py-2 px-2">Length</th>
-                                    <th className="py-2 px-2">Shoulder</th>
+                                    <th className="py-2.5 px-3">Chest</th>
+                                    <th className="py-2.5 px-3">Length</th>
+                                    <th className="py-2.5 px-3">Shoulder</th>
                                   </>
                                 )}
                                 {sizeKey === 'pants' && (
                                   <>
-                                    <th className="py-2 px-2">Waist</th>
-                                    <th className="py-2 px-2">Inseam</th>
-                                    <th className="py-2 px-2">Leg</th>
+                                    <th className="py-2.5 px-3">Waist</th>
+                                    <th className="py-2.5 px-3">Inseam</th>
+                                    <th className="py-2.5 px-3">Leg</th>
                                   </>
                                 )}
                                 {sizeKey === 'shirts' && (
                                   <>
-                                    <th className="py-2 px-2">Chest</th>
-                                    <th className="py-2 px-2">Length</th>
-                                    <th className="py-2 px-2">Sleeve</th>
+                                    <th className="py-2.5 px-3">Chest</th>
+                                    <th className="py-2.5 px-3">Length</th>
+                                    <th className="py-2.5 px-3">Sleeve</th>
                                   </>
                                 )}
                                 {sizeKey === 'tees' && (
                                   <>
-                                    <th className="py-2 px-2">Chest</th>
-                                    <th className="py-2 px-2">Length</th>
-                                    <th className="py-2 px-2">Sleeve</th>
+                                    <th className="py-2.5 px-3">Chest</th>
+                                    <th className="py-2.5 px-3">Length</th>
+                                    <th className="py-2.5 px-3">Drop Sleeve</th>
                                   </>
                                 )}
                                 {sizeKey === 'jerseys' && (
                                   <>
-                                    <th className="py-2 px-2">Chest</th>
-                                    <th className="py-2 px-2">Length</th>
+                                    <th className="py-2.5 px-3">Chest</th>
+                                    <th className="py-2.5 px-3">Length</th>
                                   </>
                                 )}
+                                <th className="py-2.5 px-3 text-right">Variation</th>
                               </tr>
                             </thead>
-                            <tbody>
-                              {filteredRows.map((row, idx) => (
-                                <tr key={idx} className="border-b border-slate-200/50 dark:border-white/5 last:border-0 hover:bg-slate-200/30 dark:hover:bg-white/5 transition-colors">
-                                  <td className="py-2.5 px-2 font-bold text-orange-500">{row.size}</td>
-                                  {sizeKey === 'sweatshirts' && (
-                                    <>
-                                      <td className="py-2.5 px-2">{row.chest}</td>
-                                      <td className="py-2.5 px-2">{row.length}</td>
-                                      <td className="py-2.5 px-2">{row.shoulder}</td>
-                                    </>
-                                  )}
-                                  {sizeKey === 'pants' && (
-                                    <>
-                                      <td className="py-2.5 px-2">{row.waist}</td>
-                                      <td className="py-2.5 px-2">{row.inseam}</td>
-                                      <td className="py-2.5 px-2">{row.leg}</td>
-                                    </>
-                                  )}
-                                  {sizeKey === 'shirts' && (
-                                    <>
-                                      <td className="py-2.5 px-2">{row.chest}</td>
-                                      <td className="py-2.5 px-2">{row.length}</td>
-                                      <td className="py-2.5 px-2">{row.sleeve}</td>
-                                    </>
-                                  )}
-                                  {sizeKey === 'tees' && (
-                                    <>
-                                      <td className="py-2.5 px-2">{row.chest}</td>
-                                      <td className="py-2.5 px-2">{row.length}</td>
-                                      <td className="py-2.5 px-2">{row.sleeve}</td>
-                                    </>
-                                  )}
-                                  {sizeKey === 'jerseys' && (
-                                    <>
-                                      <td className="py-2.5 px-2">{row.chest}</td>
-                                      <td className="py-2.5 px-2">{row.length}</td>
-                                    </>
-                                  )}
-                                </tr>
-                              ))}
+                            <tbody className="divide-y divide-slate-200/50 dark:divide-white/5">
+                              {matchedRows.map((row, idx) => {
+                                const isSelected = matchesSize(selectedSize, row.displaySize);
+                                return (
+                                  <tr
+                                    key={idx}
+                                    onClick={() => {
+                                      if (row.variant) {
+                                        handleSelectVariant(row.variant);
+                                      } else {
+                                        setSelectedSize(row.displaySize);
+                                      }
+                                    }}
+                                    className={`cursor-pointer transition-all duration-200 ${
+                                      isSelected
+                                        ? 'bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 font-bold border-l-2 border-orange-500'
+                                        : 'hover:bg-slate-200/40 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
+                                    }`}
+                                  >
+                                    <td className="py-2.5 px-3 font-bold flex items-center gap-1.5">
+                                      <span className={isSelected ? 'text-orange-500' : 'text-slate-900 dark:text-white'}>
+                                        {row.displaySize}
+                                      </span>
+                                      {isSelected && (
+                                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                                      )}
+                                    </td>
+                                    {sizeKey === 'sweatshirts' && (
+                                      <>
+                                        <td className="py-2.5 px-3">{row.chest}</td>
+                                        <td className="py-2.5 px-3">{row.length}</td>
+                                        <td className="py-2.5 px-3">{row.shoulder}</td>
+                                      </>
+                                    )}
+                                    {sizeKey === 'pants' && (
+                                      <>
+                                        <td className="py-2.5 px-3">{row.waist}</td>
+                                        <td className="py-2.5 px-3">{row.inseam}</td>
+                                        <td className="py-2.5 px-3">{row.leg}</td>
+                                      </>
+                                    )}
+                                    {sizeKey === 'shirts' && (
+                                      <>
+                                        <td className="py-2.5 px-3">{row.chest}</td>
+                                        <td className="py-2.5 px-3">{row.length}</td>
+                                        <td className="py-2.5 px-3">{row.sleeve}</td>
+                                      </>
+                                    )}
+                                    {sizeKey === 'tees' && (
+                                      <>
+                                        <td className="py-2.5 px-3">{row.chest}</td>
+                                        <td className="py-2.5 px-3">{row.length}</td>
+                                        <td className="py-2.5 px-3">{row.sleeve}</td>
+                                      </>
+                                    )}
+                                    {sizeKey === 'jerseys' && (
+                                      <>
+                                        <td className="py-2.5 px-3">{row.chest}</td>
+                                        <td className="py-2.5 px-3">{row.length}</td>
+                                      </>
+                                    )}
+                                    <td className="py-2.5 px-3 text-right">
+                                      {isSelected ? (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-orange-500 text-white uppercase tracking-wider">
+                                          Selected
+                                        </span>
+                                      ) : (
+                                        <span className="text-[10px] text-slate-400 dark:text-white/40 group-hover:text-orange-500">
+                                          Select
+                                        </span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
                           </table>
                         </div>
@@ -751,4 +877,6 @@ export default function ProductDetailPage() {
       <Toast message={toastMessage} onClose={() => setToastMessage('')} />
     </main>
   );
-}
+};
+
+export default ProductDetailPage;

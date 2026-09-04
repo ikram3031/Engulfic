@@ -7,7 +7,8 @@ import Footer from '@/components/Footer';
 import SearchModal from '@/components/SearchModal';
 import { Ruler, Sparkles, Check } from 'lucide-react';
 
-export default function SizeGuidePage() {
+// Brand sizing specifications, garment dimension tables, and measuring instructions
+const SizeGuidePage = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('sweatshirts');
 
@@ -203,4 +204,6 @@ export default function SizeGuidePage() {
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </main>
   );
-}
+};
+
+export default SizeGuidePage;

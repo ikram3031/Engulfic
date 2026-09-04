@@ -10,16 +10,18 @@ const API_BASE = (
   'https://server.engulfic.com'
 ).replace(/\/$/, '');
 
-function formatImageUrl(url) {
+// Formats relative image paths to complete static asset URLs
+const formatImageUrl = (url) => {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) {
     return url;
   }
   const clean = url.startsWith('/') ? url : `/${url}`;
   return `${API_BASE}${clean}`;
-}
+};
 
-function resolveCategory(cat) {
+// Normalizes category object or string identifier into unified name and slug
+const resolveCategory = (cat) => {
   if (!cat) return { name: 'Apparel', slug: 'all' };
 
   if (typeof cat === 'object') {
@@ -31,17 +33,17 @@ function resolveCategory(cat) {
   }
 
   if (typeof cat === 'string' && cat.trim()) {
-    // If string is a mongo ObjectId or DID (e.g. 6a7f...), don't use it as name
     if (/^[0-9a-fA-F]{16,24}$/.test(cat.trim())) {
-      return { name: 'Apparel', slug: 'all' }; // No fallback to hex ID
+      return { name: 'Apparel', slug: 'all' };
     }
     return { name: cat, slug: cat.toLowerCase().replace(/\s+/g, '-') };
   }
 
   return { name: 'Apparel', slug: 'all' };
-}
+};
 
-export function transformProduct(p) {
+// Maps backend product response payload to normalized frontend shape
+export const transformProduct = (p) => {
   if (!p) return null;
 
   // --- Price logic ---
@@ -86,16 +88,19 @@ export function transformProduct(p) {
   const inStock = p.stockStatus === 'instock';
 
   // --- Variants → sizes extraction ---
-  const variants = (p.variants || []).map((v) => ({
+  const variants = (p.variants || []).map((v, index) => ({
+    id: v.id || v._id || `${v.size || ''}-${v.sku || index}-${v.price || ''}`,
     size: v.size,
     price: v.offerPrice && v.offerPrice < v.price ? v.offerPrice : v.price,
     originalPrice: v.offerPrice && v.offerPrice < v.price ? v.price : null,
     stockQuantity: v.stockQuantity || 0,
     sku: v.sku || '',
     imageUrl: v.imageUrl ? formatImageUrl(v.imageUrl) : null,
-    sortOrder: v.sortOrder || 0,
+    sortOrder: v.sortOrder || index,
   }));
-  const sizes = variants.map((v) => v.size).filter(Boolean);
+  const rawSizes = Array.isArray(p.sizes) ? p.sizes : [];
+  const variantSizes = variants.map((v) => v.size).filter(Boolean);
+  const sizes = Array.from(new Set([...variantSizes, ...rawSizes]));
 
   // --- isNew: created within last 30 days ---
   const isNew = p.createdAt
@@ -191,10 +196,8 @@ export function transformProduct(p) {
   };
 }
 
-/**
- * Transform an array of backend products
- */
-export function transformProducts(products) {
+// Transforms an array of backend product payloads into normalized shapes
+export const transformProducts = (products) => {
   if (!Array.isArray(products)) return [];
   return products.map(transformProduct).filter(Boolean);
-}
+};

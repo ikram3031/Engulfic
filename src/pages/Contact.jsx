@@ -6,6 +6,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 import SearchModal from '@/components/SearchModal';
 import Toast from '@/components/Toast';
+import ReCaptcha from '@/components/ReCaptcha';
 import { Mail, Phone, MapPin, Send, Sparkles, Loader2 } from 'lucide-react';
 import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
 import { submitContactForm } from '@/lib/api';
@@ -16,17 +17,24 @@ const ContactPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-
+  const [isRecaptchaVerified, setIsRecaptchaVerified] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isRecaptchaVerified) {
+      setToastMessage('Please complete the security reCAPTCHA verification before sending.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await submitContactForm(formData);
       trackContact({ email: formData.email, firstName: formData.name });
       setToastMessage('Thank you! Your message has been sent to Engulfic Concierge.');
       setFormData({ name: '', email: '', phone: '', message: '' });
+      setIsRecaptchaVerified(false);
     } catch (error) {
       setToastMessage(error.message || 'Failed to send message. Please try again.');
     } finally {
@@ -103,6 +111,13 @@ const ContactPage = () => {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <ReCaptcha
+                    onVerify={setIsRecaptchaVerified}
+                    verified={isRecaptchaVerified}
                   />
                 </div>
 
