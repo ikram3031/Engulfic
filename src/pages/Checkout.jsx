@@ -56,8 +56,12 @@ const BANGLADESH_DISTRICTS = [
 // Handles end-to-end checkout flow, address collection, order generation, and Meta Pixel Purchase tracking
 const CheckoutPage = () => {
   const router = useNavigate();
-  const { cart, getSubtotal, getDiscountAmount, promoCode, applyPromoCode, removePromoCode, clearCart } = useCartStore();
+  const { cart, getSubtotal, getDiscountAmount, promoCode, applyPromoCode, removePromoCode, clearCart, closeCart } = useCartStore();
   const { isLoggedIn, user, login, logout, updateProfile } = useAuthStore();
+
+  useEffect(() => {
+    closeCart();
+  }, [closeCart]);
 
   const [toastMessage, setToastMessage] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);

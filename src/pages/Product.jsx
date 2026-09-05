@@ -382,7 +382,7 @@ const ProductDetailPage = () => {
     setTimeout(() => setToastMessage(''), 3500);
   };
 
-  // Validates selection, adds item to cart, and navigates to checkout
+  // Validates selection, adds item to cart without opening drawer, and navigates to checkout
   const handleBuyNow = () => {
     const hasSizes = (product?.variants?.length > 0) || (product?.sizes?.length > 0);
     if (hasSizes && (!selectedSize || !selectedSize.trim())) {
@@ -398,7 +398,8 @@ const ProductDetailPage = () => {
       originalPrice: currentOriginalPrice,
       sku: currentSku
     };
-    addToCart(itemToCart, selectedSize, selectedColor);
+    addToCart(itemToCart, selectedSize, selectedColor, 1, false);
+    useCartStore.getState().closeCart();
     navigate('/checkout');
   };
 

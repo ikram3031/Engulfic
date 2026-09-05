@@ -24,7 +24,7 @@ export const useCartStore = create((set, get) => ({
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
 
-  addToCart: (product, size = 'M', color = 'Default', quantity = 1) => {
+  addToCart: (product, size = 'M', color = 'Default', quantity = 1, openDrawer = true) => {
     set((state) => {
       const existingIndex = state.cart.findIndex(
         (item) => item.id === product.id && item.selectedSize === size && item.selectedColor === color
@@ -50,9 +50,11 @@ export const useCartStore = create((set, get) => ({
         ];
       }
 
-      return { cart: updatedCart, isOpen: true };
+      return { cart: updatedCart, isOpen: Boolean(openDrawer) };
     });
-    get().showToast(`Added ${quantity > 1 ? `${quantity}x ` : ''}"${product.name}" (${size}, ${color}) to Cart!`);
+    if (openDrawer) {
+      get().showToast(`Added ${quantity > 1 ? `${quantity}x ` : ''}"${product.name}" (${size}, ${color}) to Cart!`);
+    }
     trackAddToCart(product, quantity, size, color);
   },
 
