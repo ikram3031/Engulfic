@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -82,7 +82,17 @@ const ProductDetailPage = () => {
     { enabled: Boolean(product?.categorySlug) }
   );
 
-  const { data: apiSizeChart } = useSizeChartByCategory(product?.categoryDid || product?.categorySlug);
+  const targetCategoryIdentifier = useMemo(() => {
+    if (!product) return null;
+    const cats = Array.isArray(product.categories) ? product.categories : [];
+    const parentCat = cats.find((c) => !c.parent && (c.did || c.slug));
+    if (parentCat) return parentCat.did || parentCat.slug;
+    const anyCat = cats.find((c) => c.did || c.slug);
+    if (anyCat) return anyCat.did || anyCat.slug;
+    return product.categoryDid || product.categorySlug || null;
+  }, [product]);
+
+  const { data: apiSizeChart } = useSizeChartByCategory(targetCategoryIdentifier);
 
   // Dynamic SEO metadata update & Meta Pixel ViewContent tracking
   useEffect(() => {
@@ -694,13 +704,6 @@ const ProductDetailPage = () => {
                             size: foundRow.size || pSizeTrimmed,
                             displaySize: pSizeTrimmed,
                             values: foundRow.values || {},
-                            variant: matchingVariant,
-                          });
-                        } else {
-                          matchedRows.push({
-                            size: pSizeTrimmed,
-                            displaySize: pSizeTrimmed,
-                            values: {},
                             variant: matchingVariant,
                           });
                         }
