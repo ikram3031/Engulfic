@@ -175,13 +175,13 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
                 {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'}
               </label>
               {selectedSize ? (
-                <span className="text-white bg-red-600 font-bold px-2 py-0.5 rounded-md text-[11px] uppercase shadow-sm">
+                <span className="text-white bg-orange-500 font-bold px-2 py-0.5 rounded-md text-[11px] uppercase shadow-sm">
                   {selectedSize} Selected
                 </span>
               ) : (
                 <span className={`font-medium px-2 py-0.5 rounded-md text-[11px] uppercase transition-all ${
                   sizeError
-                    ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500 font-bold animate-pulse'
+                    ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500 font-bold animate-pulse'
                     : 'text-slate-400 dark:text-white/40 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10'
                 }`}>
                   {sizeError ? 'Please select a size!' : 'None Selected'}
@@ -201,9 +201,9 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
                     }}
                     className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border-2 flex items-center gap-1.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/40 scale-[1.02]'
                         : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-400 dark:hover:border-white/30'
-                    } ${sizeError && !isSelected ? 'border-red-300 dark:border-red-900/50' : ''}`}
+                    } ${sizeError && !isSelected ? 'border-rose-300 dark:border-rose-900/50' : ''}`}
                   >
                     <span>{v.size} {v.price ? `- ${formatPrice(v.price)}` : ''}</span>
                     {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
@@ -221,9 +221,9 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
                     }}
                     className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border-2 flex items-center gap-1.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/40 scale-[1.02]'
                         : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-400 dark:hover:border-white/30'
-                    } ${sizeError && !isSelected ? 'border-red-300 dark:border-red-900/50' : ''}`}
+                    } ${sizeError && !isSelected ? 'border-rose-300 dark:border-rose-900/50' : ''}`}
                   >
                     <span>{s}</span>
                     {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}

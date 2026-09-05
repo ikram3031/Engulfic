@@ -630,13 +630,13 @@ const ProductDetailPage = () => {
                           SELECT VARIANT / SIZE:
                         </span>
                         {selectedSize ? (
-                          <span className="font-bold text-white bg-red-600 px-2.5 py-0.5 rounded-lg border border-red-600 uppercase text-[11px] shadow-sm">
+                          <span className="font-bold text-white bg-orange-500 px-2.5 py-0.5 rounded-lg border border-orange-500 uppercase text-[11px] shadow-sm">
                             {selectedSize} Selected
                           </span>
                         ) : (
                           <span className={`font-medium px-2.5 py-0.5 rounded-lg border uppercase text-[11px] transition-all ${
                             sizeError
-                              ? 'bg-red-500/20 text-red-600 dark:text-red-400 border-red-500 animate-pulse font-bold'
+                              ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500 animate-pulse font-bold'
                               : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 border-slate-200 dark:border-white/10'
                           }`}>
                             {sizeError ? 'Please select a size!' : 'None Selected'}
@@ -654,9 +654,9 @@ const ProductDetailPage = () => {
                                 onClick={() => handleSelectVariant(v)}
                                 className={`p-3.5 rounded-2xl text-left font-mono transition-all duration-200 border-2 flex flex-col justify-between cursor-pointer ${
                                   isSelected
-                                    ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
+                                    ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/40 scale-[1.02]'
                                     : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-400 dark:hover:border-white/30'
-                                } ${sizeError && !isSelected ? 'border-red-300 dark:border-red-900/50' : ''}`}
+                                } ${sizeError && !isSelected ? 'border-rose-300 dark:border-rose-900/50' : ''}`}
                               >
                                 <div className="flex items-center justify-between">
                                   <span className={`text-xs font-black uppercase ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
@@ -671,7 +671,7 @@ const ProductDetailPage = () => {
                                     {formatPrice(v.price)}
                                   </span>
                                   {v.originalPrice && v.originalPrice > v.price && (
-                                    <span className={`line-through text-[10px] ${isSelected ? 'text-red-200' : 'text-slate-400 dark:text-white/40'}`}>
+                                    <span className={`line-through text-[10px] ${isSelected ? 'text-orange-200' : 'text-slate-400 dark:text-white/40'}`}>
                                       {formatPrice(v.originalPrice)}
                                     </span>
                                   )}
@@ -689,9 +689,9 @@ const ProductDetailPage = () => {
                                 onClick={() => handleSelectSize(s)}
                                 className={`p-3.5 rounded-2xl text-center font-mono transition-all duration-200 border-2 flex items-center justify-between cursor-pointer ${
                                   isSelected
-                                    ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
+                                    ? 'bg-orange-500 text-white border-orange-500 shadow-xl ring-2 ring-orange-500/40 scale-[1.02]'
                                     : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-400 dark:hover:border-white/30'
-                                } ${sizeError && !isSelected ? 'border-red-300 dark:border-red-900/50' : ''}`}
+                                } ${sizeError && !isSelected ? 'border-rose-300 dark:border-rose-900/50' : ''}`}
                               >
                                 <span className={`text-xs font-black uppercase ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
                                   {s}
@@ -869,16 +869,16 @@ const ProductDetailPage = () => {
                                       }}
                                       className={`cursor-pointer transition-all duration-200 ${
                                         isSelected
-                                          ? 'bg-red-500/15 dark:bg-red-500/25 text-red-600 dark:text-red-400 font-bold border-l-4 border-red-600 shadow-sm'
+                                          ? 'bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 font-bold border-l-4 border-orange-500 shadow-sm'
                                           : 'hover:bg-slate-200/50 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
                                       }`}
                                     >
                                       <td className="py-3 px-3.5 font-bold flex items-center gap-1.5">
-                                        <span className={isSelected ? 'text-red-600 dark:text-red-400 font-black' : 'text-slate-900 dark:text-white'}>
+                                        <span className={isSelected ? 'text-orange-600 dark:text-orange-400 font-black' : 'text-slate-900 dark:text-white'}>
                                           {row.displaySize}
                                         </span>
                                         {isSelected && (
-                                          <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                                          <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
                                         )}
                                       </td>
                                       {columns.map((col, cIdx) => {
@@ -891,11 +891,11 @@ const ProductDetailPage = () => {
                                       })}
                                       <td className="py-3 px-3.5 text-right">
                                         {isSelected ? (
-                                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-600 text-white uppercase tracking-wider shadow-sm">
+                                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase tracking-wider shadow-sm">
                                             Selected <CheckCircle2 className="w-3 h-3 text-white" />
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-red-600">
+                                          <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-orange-500">
                                             Select
                                           </span>
                                         )}
@@ -1030,16 +1030,16 @@ const ProductDetailPage = () => {
                                     }}
                                     className={`cursor-pointer transition-all duration-200 ${
                                       isSelected
-                                        ? 'bg-red-500/15 dark:bg-red-500/25 text-red-600 dark:text-red-400 font-bold border-l-4 border-red-600 shadow-sm'
+                                        ? 'bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 font-bold border-l-4 border-orange-500 shadow-sm'
                                         : 'hover:bg-slate-200/50 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
                                     }`}
                                   >
                                     <td className="py-3 px-3.5 font-bold flex items-center gap-1.5">
-                                      <span className={isSelected ? 'text-red-600 dark:text-red-400 font-black' : 'text-slate-900 dark:text-white'}>
+                                      <span className={isSelected ? 'text-orange-600 dark:text-orange-400 font-black' : 'text-slate-900 dark:text-white'}>
                                         {row.displaySize}
                                       </span>
                                       {isSelected && (
-                                        <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
                                       )}
                                     </td>
                                     {sizeKey === 'sweatshirts' && (
@@ -1078,11 +1078,11 @@ const ProductDetailPage = () => {
                                     )}
                                     <td className="py-3 px-3.5 text-right">
                                       {isSelected ? (
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-600 text-white uppercase tracking-wider shadow-sm">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase tracking-wider shadow-sm">
                                           Selected <CheckCircle2 className="w-3 h-3 text-white" />
                                         </span>
                                       ) : (
-                                        <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-red-600">
+                                        <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-orange-500">
                                           Select
                                         </span>
                                       )}
