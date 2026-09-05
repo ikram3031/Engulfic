@@ -690,23 +690,21 @@ const ProductDetailPage = () => {
                       const matchedRows = [];
                       const seenSizes = new Set();
 
-                      productVariantSizes.forEach((pSize) => {
-                        const pSizeTrimmed = String(pSize).trim();
-                        const pSizeUpper = pSizeTrimmed.toUpperCase();
-                        if (seenSizes.has(pSizeUpper)) return;
-                        seenSizes.add(pSizeUpper);
+                      apiSizeChart.rows.forEach((row) => {
+                        const rowSize = String(row.size || '').trim();
+                        const rowSizeUpper = rowSize.toUpperCase();
+                        if (!rowSize || seenSizes.has(rowSizeUpper)) return;
+                        seenSizes.add(rowSizeUpper);
 
-                        const foundRow = apiSizeChart.rows.find((r) => matchesSize(pSizeTrimmed, r.size));
-                        const matchingVariant = product.variants?.find((v) => matchesSize(pSizeTrimmed, v.size)) || null;
+                        const matchingVariant = product.variants?.find((v) => matchesSize(v.size, rowSize)) || null;
 
-                        if (foundRow) {
-                          matchedRows.push({
-                            size: foundRow.size || pSizeTrimmed,
-                            displaySize: pSizeTrimmed,
-                            values: foundRow.values || {},
-                            variant: matchingVariant,
-                          });
-                        }
+                        matchedRows.push({
+                          size: rowSize,
+                          displaySize: rowSize,
+                          values: row.values || {},
+                          variant: matchingVariant,
+                          isAvailable: Boolean(matchingVariant),
+                        });
                       });
 
                       matchedRows.sort((a, b) => {
@@ -727,7 +725,7 @@ const ProductDetailPage = () => {
                               <h3 className="text-xs font-bold font-mono uppercase text-slate-900 dark:text-white flex items-center gap-2">
                                 <span>Size Chart</span>
                                 <span className="text-[10px] font-normal text-slate-500 dark:text-white/50 tracking-normal">
-                                  ({matchedRows.length} Available {matchedRows.length === 1 ? 'Variation' : 'Variations'})
+                                  ({matchedRows.length} {matchedRows.length === 1 ? 'Size' : 'Sizes'})
                                 </span>
                               </h3>
                             </div>
@@ -752,16 +750,19 @@ const ProductDetailPage = () => {
                                     <tr
                                       key={idx}
                                       onClick={() => {
+                                        if (!row.isAvailable) return;
                                         if (row.variant) {
                                           handleSelectVariant(row.variant);
                                         } else {
                                           handleSelectSize(row.displaySize);
                                         }
                                       }}
-                                      className={`cursor-pointer transition-all duration-200 ${
-                                        isSelected
-                                          ? 'bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 font-bold border-l-4 border-orange-500 shadow-sm'
-                                          : 'hover:bg-slate-200/50 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
+                                      className={`transition-all duration-200 ${
+                                        !row.isAvailable
+                                          ? 'opacity-40 cursor-not-allowed text-slate-400 dark:text-white/40'
+                                          : isSelected
+                                            ? 'cursor-pointer bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 font-bold border-l-4 border-orange-500 shadow-sm'
+                                            : 'cursor-pointer hover:bg-slate-200/50 dark:hover:bg-white/5 text-slate-700 dark:text-white/80'
                                       }`}
                                     >
                                       <td className="py-3 px-3.5 font-bold flex items-center gap-1.5">
@@ -781,13 +782,19 @@ const ProductDetailPage = () => {
                                         );
                                       })}
                                       <td className="py-3 px-3.5 text-right">
-                                        {isSelected ? (
-                                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase tracking-wider shadow-sm">
-                                            Selected <CheckCircle2 className="w-3 h-3 text-white" />
-                                          </span>
+                                        {row.isAvailable ? (
+                                          isSelected ? (
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase tracking-wider shadow-sm">
+                                              Selected <CheckCircle2 className="w-3 h-3 text-white" />
+                                            </span>
+                                          ) : (
+                                            <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-orange-500">
+                                              Select
+                                            </span>
+                                          )
                                         ) : (
-                                          <span className="text-[10px] font-bold text-slate-400 dark:text-white/40 group-hover:text-orange-500">
-                                            Select
+                                          <span className="text-[10px] font-semibold text-slate-400 dark:text-white/30 italic">
+                                            Out of stock
                                           </span>
                                         )}
                                       </td>
