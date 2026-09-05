@@ -220,6 +220,7 @@ const ProductDetailPage = () => {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [isAutoPlayPaused, setIsAutoPlayPaused] = useState(false);
+  const [sizeError, setSizeError] = useState(false);
 
   // Compute all unique gallery & main images available for this product
   const allImages = product
@@ -243,6 +244,7 @@ const ProductDetailPage = () => {
       setSelectedVariant(null);
       setSelectedSize('');
       setSelectedColor(product.colors?.[0]?.name || 'Default');
+      setSizeError(false);
     }
   }, [product]);
 
@@ -261,9 +263,40 @@ const ProductDetailPage = () => {
     return () => clearInterval(interval);
   }, [allImages, isAutoPlayPaused]);
 
+  // Determines whether a specific variant is currently active
+  const isVariantSelected = (v) => {
+    if (!selectedSize && !selectedVariant) return false;
+    if (selectedVariant) {
+      const vId = v.id || v._id;
+      const selId = selectedVariant.id || selectedVariant._id;
+      if (vId && selId && String(vId) === String(selId)) return true;
+    }
+    return Boolean(
+      selectedSize &&
+      v.size &&
+      String(selectedSize).trim().toUpperCase() === String(v.size).trim().toUpperCase()
+    );
+  };
+
+  // Determines whether a specific size string is currently active
+  const isSizeSelected = (s) => {
+    if (!selectedSize) return false;
+    return Boolean(
+      s &&
+      String(selectedSize).trim().toUpperCase() === String(s).trim().toUpperCase()
+    );
+  };
+
+  // Selects or deselects product variant and updates active gallery image
   const handleSelectVariant = (v) => {
+    setSizeError(false);
+    if (isVariantSelected(v)) {
+      setSelectedVariant(null);
+      setSelectedSize('');
+      return;
+    }
     setSelectedVariant(v);
-    setSelectedSize(v.size);
+    setSelectedSize(v.size || '');
     if (v.imageUrl) {
       setActiveImage(v.imageUrl);
       const matchIdx = allImages.indexOf(v.imageUrl);
@@ -271,7 +304,14 @@ const ProductDetailPage = () => {
     }
   };
 
+  // Selects or deselects product size and matches corresponding variant
   const handleSelectSize = (s) => {
+    setSizeError(false);
+    if (isSizeSelected(s)) {
+      setSelectedSize('');
+      setSelectedVariant(null);
+      return;
+    }
     setSelectedSize(s);
     const matchingVar = product?.variants?.find((v) => matchesSize(s, v.size));
     if (matchingVar) {
@@ -281,27 +321,12 @@ const ProductDetailPage = () => {
         const matchIdx = allImages.indexOf(matchingVar.imageUrl);
         if (matchIdx !== -1) setActiveIndex(matchIdx);
       }
+    } else {
+      setSelectedVariant(null);
     }
   };
 
-  const isVariantSelected = (v) => {
-    if (!selectedSize && !selectedVariant) return false;
-    if (selectedVariant && (selectedVariant.id || selectedVariant._id)) {
-      const vId = v.id || v._id;
-      const selId = selectedVariant.id || selectedVariant._id;
-      if (vId && selId && vId === selId) return true;
-    }
-    if (selectedSize && v.size) {
-      return String(selectedSize).trim().toUpperCase() === String(v.size).trim().toUpperCase();
-    }
-    return false;
-  };
-
-  const isSizeSelected = (s) => {
-    if (!selectedSize) return false;
-    return String(selectedSize).trim().toUpperCase() === String(s).trim().toUpperCase();
-  };
-
+  // Switches to the previous gallery image
   const handlePrevImage = () => {
     if (allImages.length > 1) {
       const newIndex = (activeIndex - 1 + allImages.length) % allImages.length;
@@ -310,6 +335,7 @@ const ProductDetailPage = () => {
     }
   };
 
+  // Switches to the next gallery image
   const handleNextImage = () => {
     if (allImages.length > 1) {
       const newIndex = (activeIndex + 1) % allImages.length;
@@ -335,11 +361,14 @@ const ProductDetailPage = () => {
     ? Math.round(((currentOriginalPrice - currentPrice) / currentOriginalPrice) * 100)
     : 0;
 
+  // Validates selection and adds the item to cart
   const handleAddToCart = () => {
-    const hasSizesOrVariants = (product?.variants?.length > 0 || product?.sizes?.length > 0);
-    if (hasSizesOrVariants && !selectedSize) {
-      setToastMessage('Please select a size before adding to cart.');
+    const hasSizes = (product?.variants?.length > 0) || (product?.sizes?.length > 0);
+    if (hasSizes && (!selectedSize || !selectedSize.trim())) {
+      setSizeError(true);
+      setToastMessage('Please select a size / variant first!');
       setTimeout(() => setToastMessage(''), 3500);
+      setTimeout(() => setSizeError(false), 3000);
       return;
     }
     const itemToCart = {
@@ -349,13 +378,18 @@ const ProductDetailPage = () => {
       sku: currentSku
     };
     addToCart(itemToCart, selectedSize, selectedColor);
+    setToastMessage(`Added "${product.name}" (${selectedSize}) to cart`);
+    setTimeout(() => setToastMessage(''), 3500);
   };
 
+  // Validates selection, adds item to cart, and navigates to checkout
   const handleBuyNow = () => {
-    const hasSizesOrVariants = (product?.variants?.length > 0 || product?.sizes?.length > 0);
-    if (hasSizesOrVariants && !selectedSize) {
-      setToastMessage('Please select a size before checkout.');
+    const hasSizes = (product?.variants?.length > 0) || (product?.sizes?.length > 0);
+    if (hasSizes && (!selectedSize || !selectedSize.trim())) {
+      setSizeError(true);
+      setToastMessage('Please select a size / variant first!');
       setTimeout(() => setToastMessage(''), 3500);
+      setTimeout(() => setSizeError(false), 3000);
       return;
     }
     const itemToCart = {
@@ -368,6 +402,7 @@ const ProductDetailPage = () => {
     navigate('/checkout');
   };
 
+  // Toggles item in user wishlist
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     setToastMessage(
@@ -378,6 +413,7 @@ const ProductDetailPage = () => {
     setTimeout(() => setToastMessage(''), 3500);
   };
 
+  // Returns weather icon matching seasonality tag
   const getSeasonIcon = (seasonName) => {
     switch (seasonName?.toLowerCase()) {
       case 'summer': return <Sun className="w-3.5 h-3.5 text-amber-500" />;
@@ -590,14 +626,20 @@ const ProductDetailPage = () => {
                   {(product.variants?.length > 0 || product.sizes?.length > 0) && (
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-xs font-mono">
-                        <span className="text-slate-500 dark:text-white/60 uppercase tracking-wider font-bold">SELECT VARIANT / SIZE:</span>
-                        {selectedSize || selectedVariant?.size ? (
-                          <span className="font-bold text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-500/20 px-2.5 py-0.5 rounded-lg border border-red-500/30 uppercase">
-                            {selectedSize || selectedVariant?.size}
+                        <span className="text-slate-500 dark:text-white/60 uppercase tracking-wider font-bold">
+                          SELECT VARIANT / SIZE:
+                        </span>
+                        {selectedSize ? (
+                          <span className="font-bold text-white bg-red-600 px-2.5 py-0.5 rounded-lg border border-red-600 uppercase text-[11px] shadow-sm">
+                            {selectedSize} Selected
                           </span>
                         ) : (
-                          <span className="text-[11px] font-semibold text-slate-400 dark:text-white/40 italic">
-                            None Selected
+                          <span className={`font-medium px-2.5 py-0.5 rounded-lg border uppercase text-[11px] transition-all ${
+                            sizeError
+                              ? 'bg-red-500/20 text-red-600 dark:text-red-400 border-red-500 animate-pulse font-bold'
+                              : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 border-slate-200 dark:border-white/10'
+                          }`}>
+                            {sizeError ? 'Please select a size!' : 'None Selected'}
                           </span>
                         )}
                       </div>
@@ -607,14 +649,14 @@ const ProductDetailPage = () => {
                             const isSelected = isVariantSelected(v);
                             return (
                               <button
-                                key={v.id || v.size || idx}
+                                key={v.id || v._id || v.size || idx}
                                 type="button"
                                 onClick={() => handleSelectVariant(v)}
                                 className={`p-3.5 rounded-2xl text-left font-mono transition-all duration-200 border-2 flex flex-col justify-between cursor-pointer ${
                                   isSelected
                                     ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
-                                    : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/30'
-                                }`}
+                                    : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-400 dark:hover:border-white/30'
+                                } ${sizeError && !isSelected ? 'border-red-300 dark:border-red-900/50' : ''}`}
                               >
                                 <div className="flex items-center justify-between">
                                   <span className={`text-xs font-black uppercase ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
@@ -648,8 +690,8 @@ const ProductDetailPage = () => {
                                 className={`p-3.5 rounded-2xl text-center font-mono transition-all duration-200 border-2 flex items-center justify-between cursor-pointer ${
                                   isSelected
                                     ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
-                                    : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/30'
-                                }`}
+                                    : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-400 dark:hover:border-white/30'
+                                } ${sizeError && !isSelected ? 'border-red-300 dark:border-red-900/50' : ''}`}
                               >
                                 <span className={`text-xs font-black uppercase ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
                                   {s}

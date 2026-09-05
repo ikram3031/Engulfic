@@ -12,8 +12,9 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]?.name || '');
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState('details');
+  const [activeTab, setActiveTab] = useState('details'); // details, fabric, shipping
   const [activeImage, setActiveImage] = useState(product?.image || '');
+  const [sizeError, setSizeError] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -21,22 +22,29 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
     }
   }, [product]);
 
+
   const addToCart = useCartStore((state) => state.addToCart);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const isWishlisted = product ? isInWishlist(product.id) : false;
 
   if (!product) return null;
 
+  // Validates size selection before adding to cart
   const handleAddToCart = () => {
-    const hasSizesOrVariants = (product?.variants?.length > 0 || product?.sizes?.length > 0);
-    if (hasSizesOrVariants && !selectedSize) {
-      if (onShowToast) onShowToast('Please select a size before adding to cart.');
+    const hasSizes = (product?.variants?.length > 0) || (product?.sizes?.length > 0);
+    if (hasSizes && (!selectedSize || !selectedSize.trim())) {
+      setSizeError(true);
+      if (onShowToast) {
+        onShowToast('Please select a size / variant first!');
+      }
+      setTimeout(() => setSizeError(false), 3000);
       return;
     }
     addToCart(product, selectedSize, selectedColor, quantity);
     onClose();
   };
 
+  // Toggles item wishlist status
   const handleWishlist = () => {
     toggleWishlist(product);
     if (onShowToast) {
@@ -164,13 +172,21 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-mono text-slate-500 dark:text-white/50 uppercase tracking-wider">
-                {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'}{' '}
-                {selectedSize ? (
-                  <span className="text-red-600 dark:text-red-400 font-bold">{selectedSize}</span>
-                ) : (
-                  <span className="text-slate-400 dark:text-white/40 text-[11px] italic font-normal">None Selected</span>
-                )}
+                {product.variants?.length > 0 ? 'VARIANT:' : 'SIZE:'}
               </label>
+              {selectedSize ? (
+                <span className="text-white bg-red-600 font-bold px-2 py-0.5 rounded-md text-[11px] uppercase shadow-sm">
+                  {selectedSize} Selected
+                </span>
+              ) : (
+                <span className={`font-medium px-2 py-0.5 rounded-md text-[11px] uppercase transition-all ${
+                  sizeError
+                    ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500 font-bold animate-pulse'
+                    : 'text-slate-400 dark:text-white/40 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10'
+                }`}>
+                  {sizeError ? 'Please select a size!' : 'None Selected'}
+                </span>
+              )}
             </div>
             <div className="flex flex-wrap gap-2">
               {product.variants?.length > 0 ? product.variants.map((v) => {
@@ -179,12 +195,15 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
                   <button
                     key={v.size}
                     type="button"
-                    onClick={() => setSelectedSize(v.size)}
+                    onClick={() => {
+                      setSizeError(false);
+                      setSelectedSize((prev) => (prev && String(prev).trim().toUpperCase() === String(v.size).trim().toUpperCase() ? '' : (v.size || '')));
+                    }}
                     className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border-2 flex items-center gap-1.5 cursor-pointer ${
                       isSelected
                         ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
-                        : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/30'
-                    }`}
+                        : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-400 dark:hover:border-white/30'
+                    } ${sizeError && !isSelected ? 'border-red-300 dark:border-red-900/50' : ''}`}
                   >
                     <span>{v.size} {v.price ? `- ${formatPrice(v.price)}` : ''}</span>
                     {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
@@ -196,12 +215,15 @@ const QuickViewModal = ({ product, onClose, onShowToast }) => {
                   <button
                     key={s}
                     type="button"
-                    onClick={() => setSelectedSize(s)}
+                    onClick={() => {
+                      setSizeError(false);
+                      setSelectedSize((prev) => (prev && String(prev).trim().toUpperCase() === String(s).trim().toUpperCase() ? '' : s));
+                    }}
                     className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all duration-200 border-2 flex items-center gap-1.5 cursor-pointer ${
                       isSelected
                         ? 'bg-red-600 text-white border-red-600 shadow-xl ring-2 ring-red-500/40 scale-[1.02]'
-                        : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/30'
-                    }`}
+                        : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/15 text-slate-800 dark:text-white/80 hover:border-slate-400 dark:hover:border-white/30'
+                    } ${sizeError && !isSelected ? 'border-red-300 dark:border-red-900/50' : ''}`}
                   >
                     <span>{s}</span>
                     {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
