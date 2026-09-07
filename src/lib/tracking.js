@@ -1,6 +1,6 @@
-﻿const BASE_URL = import.meta.env.VITE_API_URL || 'https://server.engulfic.com';
-const DEFAULT_META_PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID || '881944871465552';
-const DEFAULT_TIKTOK_PIXEL_ID = import.meta.env.VITE_TIKTOK_PIXEL_ID || '';
+const BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || 'https://server.engulfic.com';
+const DEFAULT_META_PIXEL_ID = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_META_PIXEL_ID) || '881944871465552';
+const DEFAULT_TIKTOK_PIXEL_ID = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_TIKTOK_PIXEL_ID) || '';
 
 let metaPixelId = '';
 let tiktokPixelId = '';
