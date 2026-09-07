@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://server.engulfic.com';
+﻿const BASE_URL = import.meta.env.VITE_API_URL || 'https://server.engulfic.com';
+const DEFAULT_META_PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID || '881944871465552';
+const DEFAULT_TIKTOK_PIXEL_ID = import.meta.env.VITE_TIKTOK_PIXEL_ID || '';
 
 let metaPixelId = '';
 let tiktokPixelId = '';
@@ -8,7 +10,7 @@ let isInitializing = false;
 
 // Dynamically injects Meta Pixel base script and stubs into document head
 const injectMetaScript = (pixelId) => {
-  if (typeof window === 'undefined' || !pixelId || isMetaLoaded) return;
+  if (typeof window === 'undefined' || !pixelId) return;
 
   if (!window.fbq) {
     (function (f, b, e, v, n, t, s) {
@@ -29,15 +31,17 @@ const injectMetaScript = (pixelId) => {
     })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
   }
 
-  window.fbq('init', pixelId);
-  window.fbq('track', 'PageView');
-  metaPixelId = pixelId;
-  isMetaLoaded = true;
+  if (metaPixelId !== pixelId) {
+    window.fbq('init', pixelId);
+    window.fbq('track', 'PageView');
+    metaPixelId = pixelId;
+    isMetaLoaded = true;
+  }
 };
 
 // Dynamically injects TikTok Pixel base script and stubs into document head
 const injectTikTokScript = (pixelId) => {
-  if (typeof window === 'undefined' || !pixelId || isTikTokLoaded) return;
+  if (typeof window === 'undefined' || !pixelId) return;
 
   if (!window.ttq) {
     (function (w, d, t) {
@@ -91,15 +95,26 @@ const injectTikTokScript = (pixelId) => {
     })(window, document, 'ttq');
   }
 
-  window.ttq.load(pixelId);
-  window.ttq.page();
-  tiktokPixelId = pixelId;
-  isTikTokLoaded = true;
+  if (tiktokPixelId !== pixelId) {
+    window.ttq.load(pixelId);
+    window.ttq.page();
+    tiktokPixelId = pixelId;
+    isTikTokLoaded = true;
+  }
 };
 
 // Fetches public tracking configurations and bootstraps Meta and TikTok pixels dynamically
 export const initTrackingPixels = async () => {
-  if (typeof window === 'undefined' || isInitializing || (isMetaLoaded && isTikTokLoaded)) return;
+  if (typeof window === 'undefined') return;
+
+  if (DEFAULT_META_PIXEL_ID && !isMetaLoaded) {
+    injectMetaScript(DEFAULT_META_PIXEL_ID);
+  }
+  if (DEFAULT_TIKTOK_PIXEL_ID && !isTikTokLoaded) {
+    injectTikTokScript(DEFAULT_TIKTOK_PIXEL_ID);
+  }
+
+  if (isInitializing) return;
   isInitializing = true;
 
   try {
@@ -111,12 +126,20 @@ export const initTrackingPixels = async () => {
     const metaData = metaRes.status === 'fulfilled' ? metaRes.value?.data : null;
     const tiktokData = tiktokRes.status === 'fulfilled' ? tiktokRes.value?.data : null;
 
-    if (metaData?.isEnabled && metaData?.enableBrowserPixel && metaData?.pixelId) {
-      injectMetaScript(metaData.pixelId);
+    const targetMetaId = (metaData?.isEnabled && metaData?.enableBrowserPixel && metaData?.pixelId)
+      ? metaData.pixelId
+      : DEFAULT_META_PIXEL_ID;
+
+    if (targetMetaId) {
+      injectMetaScript(targetMetaId);
     }
 
-    if (tiktokData?.isEnabled && tiktokData?.enableBrowserPixel && tiktokData?.pixelId) {
-      injectTikTokScript(tiktokData.pixelId);
+    const targetTikTokId = (tiktokData?.isEnabled && tiktokData?.enableBrowserPixel && tiktokData?.pixelId)
+      ? tiktokData.pixelId
+      : DEFAULT_TIKTOK_PIXEL_ID;
+
+    if (targetTikTokId) {
+      injectTikTokScript(targetTikTokId);
     }
   } catch (err) {
     console.warn('[Pixel Tracker] Initialization failed:', err.message);
@@ -129,11 +152,11 @@ export const initTrackingPixels = async () => {
 export const trackPageView = (path) => {
   if (typeof window === 'undefined') return;
 
-  if (isMetaLoaded && window.fbq) {
+  if (window.fbq) {
     window.fbq('track', 'PageView');
   }
 
-  if (isTikTokLoaded && window.ttq) {
+  if (window.ttq) {
     window.ttq.page();
   }
 };
@@ -145,7 +168,7 @@ export const trackViewContent = (product) => {
   const contentId = String(product.did || product.id || product.raw?.id || product.slug || '');
   const price = Number(product.price || 0);
 
-  if (isMetaLoaded && window.fbq) {
+  if (window.fbq) {
     window.fbq('track', 'ViewContent', {
       content_name: product.name,
       content_ids: [contentId],
@@ -155,7 +178,7 @@ export const trackViewContent = (product) => {
     });
   }
 
-  if (isTikTokLoaded && window.ttq) {
+  if (window.ttq) {
     window.ttq.track('ViewContent', {
       content_id: contentId,
       content_type: 'product',
@@ -176,7 +199,7 @@ export const trackAddToCart = (product, quantity = 1, size = '', color = '') => 
   const unitPrice = Number(product.price || 0);
   const totalValue = unitPrice * quantity;
 
-  if (isMetaLoaded && window.fbq) {
+  if (window.fbq) {
     window.fbq('track', 'AddToCart', {
       content_name: product.name,
       content_ids: [contentId],
@@ -186,7 +209,7 @@ export const trackAddToCart = (product, quantity = 1, size = '', color = '') => 
     });
   }
 
-  if (isTikTokLoaded && window.ttq) {
+  if (window.ttq) {
     window.ttq.track('AddToCart', {
       content_id: contentId,
       content_type: 'product',
@@ -207,7 +230,7 @@ export const trackInitiateCheckout = (cart = [], subtotal = 0) => {
   const totalValue = Number(subtotal || 0);
   const numItems = cart.reduce((acc, i) => acc + Number(i.quantity || 1), 0);
 
-  if (isMetaLoaded && window.fbq) {
+  if (window.fbq) {
     window.fbq('track', 'InitiateCheckout', {
       content_ids: contentIds,
       num_items: numItems,
@@ -216,7 +239,7 @@ export const trackInitiateCheckout = (cart = [], subtotal = 0) => {
     });
   }
 
-  if (isTikTokLoaded && window.ttq) {
+  if (window.ttq) {
     window.ttq.track('InitiateCheckout', {
       contents: cart.map((i) => ({
         content_id: String(i.did || i.productDid || i.id || i.raw?.id || ''),
@@ -239,7 +262,7 @@ export const trackPurchase = ({ orderId, cart = [], grandTotal = 0 }) => {
   const contentIds = cart.map((i) => String(i.did || i.productDid || i.id || i.raw?.id || ''));
   const numItems = cart.reduce((acc, i) => acc + Number(i.quantity || 1), 0);
 
-  if (isMetaLoaded && window.fbq) {
+  if (window.fbq) {
     window.fbq(
       'track',
       'Purchase',
@@ -256,7 +279,7 @@ export const trackPurchase = ({ orderId, cart = [], grandTotal = 0 }) => {
     );
   }
 
-  if (isTikTokLoaded && window.ttq) {
+  if (window.ttq) {
     window.ttq.track(
       'CompletePayment',
       {
@@ -272,5 +295,51 @@ export const trackPurchase = ({ orderId, cart = [], grandTotal = 0 }) => {
       },
       { event_id: eventDeduplicationId }
     );
+  }
+};
+
+// Dispatches Search event across Meta and TikTok tracking engines
+export const trackSearch = (query) => {
+  if (typeof window === 'undefined' || !query) return;
+
+  if (window.fbq) {
+    window.fbq('track', 'Search', {
+      search_string: String(query),
+    });
+  }
+
+  if (window.ttq) {
+    window.ttq.track('Search', {
+      query: String(query),
+    });
+  }
+};
+
+// Dispatches AddToWishlist event across Meta and TikTok tracking engines
+export const trackAddToWishlist = (product) => {
+  if (typeof window === 'undefined' || !product) return;
+
+  const contentId = String(product.did || product.id || product.raw?.id || product.slug || '');
+  const price = Number(product.price || 0);
+
+  if (window.fbq) {
+    window.fbq('track', 'AddToWishlist', {
+      content_name: product.name,
+      content_ids: [contentId],
+      content_type: 'product',
+      value: price,
+      currency: 'BDT',
+    });
+  }
+
+  if (window.ttq) {
+    window.ttq.track('AddToWishlist', {
+      content_id: contentId,
+      content_type: 'product',
+      content_name: product.name,
+      price: price,
+      value: price,
+      currency: 'BDT',
+    });
   }
 };

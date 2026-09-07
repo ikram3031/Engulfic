@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { trackAddToWishlist } from '@/lib/tracking';
 
 export const useWishlistStore = create((set, get) => ({
   wishlist: [],
@@ -11,6 +12,7 @@ export const useWishlistStore = create((set, get) => ({
           wishlist: state.wishlist.filter((item) => item.id !== product.id),
         };
       } else {
+        trackAddToWishlist(product);
         return { wishlist: [...state.wishlist, product] };
       }
     });

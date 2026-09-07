@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProducts } from '@/lib/api';
+import { trackSearch } from '@/lib/tracking';
 import { X, Search, ArrowRight, Loader2, PackageX } from 'lucide-react';
 
-export default function SearchModal({ isOpen, onClose }) {
+// Product search overlay modal with debounced live query fetching
+export const SearchModal = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +28,7 @@ export default function SearchModal({ isOpen, onClose }) {
       try {
         const items = await fetchProducts({ q, limit: 12 });
         setResults(items.slice(0, 12));
+        trackSearch(q);
       } catch (err) {
         setError('Failed to load results');
       } finally {
@@ -123,4 +126,6 @@ export default function SearchModal({ isOpen, onClose }) {
       </div>
     </div>
   );
-}
+};
+
+export default SearchModal;
