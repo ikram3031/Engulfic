@@ -13,6 +13,7 @@ import { useAppStore } from '@/core/store/useAppStore';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { formatPrice } from '@/lib/utils';
+import { trackViewContent } from '@/lib/tracking';
 import {
   ShoppingCart,
   Heart,
@@ -102,6 +103,7 @@ export default function ProductDetailPage() {
         }
         metaDesc.content = product.metaData.metaDescription;
       }
+      trackViewContent(product);
     }
   }, [product]);
 

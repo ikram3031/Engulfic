@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { fetchCouponByCode } from '@/lib/api';
+import { trackAddToCart } from '@/lib/tracking';
 
 export const useCartStore = create((set, get) => ({
   cart: [],
@@ -51,6 +52,7 @@ export const useCartStore = create((set, get) => ({
 
       return { cart: updatedCart, isOpen: true };
     });
+    trackAddToCart(product, quantity, size, color);
     get().showToast(`Added ${quantity > 1 ? `${quantity}x ` : ''}"${product.name}" (${size}, ${color}) to Cart!`);
   },
 

@@ -19,11 +19,14 @@ import SizeGuide from './pages/SizeGuide';
 import Terms from './pages/Terms';
 import Wishlist from './pages/Wishlist';
 import ScrollToTopOnRouteChange from './components/ScrollToTopOnRouteChange';
+import PixelTracker from './components/PixelTracker';
 
-function App() {
+// Main application router and root provider layout
+const App = () => {
   return (
     <AppProvider>
       <BrowserRouter>
+        <PixelTracker />
         <ScrollToTopOnRouteChange />
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow pb-16 lg:pb-0">

@@ -12,6 +12,8 @@ import { useCartStore } from '@/store/useCartStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatPrice } from '@/lib/utils';
 import { createOrder } from '@/lib/api';
+import { trackInitiateCheckout, trackPurchase } from '@/lib/tracking';
+import Logo from '@/components/Logo';
 import {
   ShoppingCart,
   ShieldCheck,
@@ -185,6 +187,12 @@ export default function CheckoutPage() {
   const shippingCost = shippingInfo.cost;
   const grandTotal = Math.max(0, subtotal - discount + shippingCost);
 
+  useEffect(() => {
+    if (cart && cart.length > 0) {
+      trackInitiateCheckout(cart, subtotal);
+    }
+  }, []);
+
   const handleApplyPromo = (e) => {
     e.preventDefault();
     if (!promoInput.trim()) return;
@@ -273,6 +281,11 @@ export default function CheckoutPage() {
       setOrderId(generatedId);
       setOrderSummary(summaryData);
       setStep(2);
+      trackPurchase({
+        orderId: generatedId,
+        cart,
+        grandTotal
+      });
       clearCart();
     } catch (err) {
       setToastMessage(err.message || 'Failed to place order. Please try again.');
@@ -894,9 +907,8 @@ export default function CheckoutPage() {
                 {/* Invoice Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b border-slate-300 pb-8">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-xl font-black tracking-widest uppercase text-slate-900">
-                      <Sparkles className="w-5 h-5 text-orange-500 fill-orange-500" />
-                      <span>ENGULFIC</span>
+                    <div className="flex items-center gap-2">
+                      <Logo className="h-8 w-auto object-contain" alt="ENGULFIC" />
                     </div>
                     <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                       HIGH-DENSITY ARCHITECTURAL STREETWEAR

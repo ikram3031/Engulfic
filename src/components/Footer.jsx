@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Check, Instagram, Twitter, Globe } from 'lucide-react';
+import Logo from '@/components/Logo';
 
-export default function Footer() {
+// Site footer component with newsletter, policy links, and brand accreditation
+export const Footer = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -63,7 +65,9 @@ export default function Footer() {
         {/* Brand Grid Links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs">
           <div className="space-y-3">
-            <h4 className="font-bold text-white uppercase tracking-wider font-mono">ENGULFIC ATELIER</h4>
+            <Link to="/" className="inline-block">
+              <Logo className="h-7 w-auto object-contain" alt="ENGULFIC" />
+            </Link>
             <p className="text-slate-400 dark:text-white/60 leading-relaxed font-light">
               Pioneering architectural silhouettes, Japanese selvedge denim, and organic cotton foundations. Designed in Paris & Tokyo.
             </p>
@@ -124,4 +128,6 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;
