@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 
+// Theme state store with persistent local storage sync and document class toggling
 export const useThemeStore = create((set, get) => ({
-  theme: 'light', // Default view will be light as requested
+  theme: 'dark',
 
   initTheme: () => {
     if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('engulfic-theme') || 'light';
+      const savedTheme = localStorage.getItem('engulfic-theme') || 'dark';
       set({ theme: savedTheme });
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -17,7 +18,7 @@ export const useThemeStore = create((set, get) => ({
 
   toggleTheme: () => {
     const current = get().theme;
-    const next = current === 'light' ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
     set({ theme: next });
     if (typeof window !== 'undefined') {
       localStorage.setItem('engulfic-theme', next);
