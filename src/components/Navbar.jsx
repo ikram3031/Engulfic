@@ -26,8 +26,10 @@ import {
 } from 'lucide-react';
 import ProfileModal from '@/components/ProfileModal';
 import Toast from '@/components/Toast';
+import Logo from '@/components/Logo';
 
-function buildGroupedCategories(rawCategories) {
+// Builds grouped navigation categories from raw category list
+const buildGroupedCategories = (rawCategories) => {
   const defaultStructure = [
     {
       name: 'T-Shirt',
@@ -106,9 +108,10 @@ function buildGroupedCategories(rawCategories) {
       productCount: p.productCount || p.product_count || 0
     };
   }).filter(p => p.productCount > 0 || p.subcategories.length > 0);
-}
+};
 
-export default function Navbar({ onOpenSearch }) {
+// Main navigation header component with responsive tiers and drawer
+const Navbar = ({ onOpenSearch }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
@@ -199,9 +202,7 @@ export default function Navbar({ onOpenSearch }) {
           {/* Center: Mobile Logo */}
           <div className="text-center">
             <Link to="/" className="inline-block group">
-              <span className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase font-['Josefin_Sans']">
-                ENGULFIC
-              </span>
+              <Logo className="h-7 w-auto object-contain" alt="ENGULFIC" />
             </Link>
           </div>
 
@@ -281,11 +282,12 @@ export default function Navbar({ onOpenSearch }) {
             {/* Center Column: Logo */}
             <div className="flex items-center justify-center">
               <Link to="/" className="inline-block group">
-                <span className={`font-black tracking-tighter text-slate-900 dark:text-white uppercase font-['Josefin_Sans'] group-hover:text-orange-500 transition-all duration-300 ${
-                  isScrolled ? 'text-xl' : 'text-3xl'
-                }`}>
-                  ENGULFIC
-                </span>
+                <Logo
+                  className={`object-contain transition-all duration-300 ${
+                    isScrolled ? 'h-8' : 'h-10'
+                  } w-auto`}
+                  alt="ENGULFIC"
+                />
               </Link>
             </div>
 
@@ -726,4 +728,6 @@ export default function Navbar({ onOpenSearch }) {
       </div>
     </>
   );
-}
+};
+
+export default Navbar;

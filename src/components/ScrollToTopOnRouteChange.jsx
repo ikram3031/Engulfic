@@ -1,10 +1,14 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { trackPageView } from '@/lib/metaPixel';
+import { trackPageView, initTrackingPixels } from '@/lib/metaPixel';
 
-// Scrolls window to top and fires Meta Pixel PageView tracking on route transition
+// Scrolls window to top, initializes tracking pixels, and fires PageView on route transition
 const ScrollToTopOnRouteChange = () => {
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    initTrackingPixels();
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

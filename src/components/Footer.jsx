@@ -13,8 +13,10 @@ import {
 } from 'lucide-react';
 import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
 import { subscribeNewsletter } from '@/lib/api';
+import Logo from '@/components/Logo';
 
-export default function Footer() {
+// Site footer component with newsletter, policy links, and brand accreditation
+const Footer = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -105,9 +107,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-xs">
           {/* Col 1: ENGULFIC Heading & Description */}
           <div className="space-y-3">
-            <h2 className="text-2xl sm:text-3xl font-black text-orange-500 tracking-tight font-['Josefin_Sans'] uppercase">
-              ENGULFIC
-            </h2>
+            <Link to="/" className="inline-block">
+              <Logo className="h-8 w-auto object-contain" alt="ENGULFIC" />
+            </Link>
             <p className="text-slate-400 dark:text-white/60 leading-relaxed font-light text-xs">
               Explore Engulfic's contemporary collection of premium apparel including shirts, jeans, sweatshirts, baggy pants, and essential unisex streetwear tailored for effortless modern styling.
             </p>
@@ -188,4 +190,6 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;
