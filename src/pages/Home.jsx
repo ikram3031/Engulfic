@@ -11,7 +11,7 @@ import Footer from '@/components/Footer';
 import Toast from '@/components/Toast';
 import NewArrivalsSection from '@/components/NewArrivalsSection';
 import BestSellingProducts from '@/components/BestSellingProducts';
-import LookbookSection from '@/components/LookbookSection';
+import TestimonialsSection from '@/components/TestimonialsSection';
 import QuickViewModal from '@/components/QuickViewModal';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Truck, ShieldCheck, RefreshCw } from 'lucide-react';
@@ -63,8 +63,8 @@ export default function Home() {
       {/* Best Selling Products Section */}
       <BestSellingProducts onShowToast={showToast} />
 
-      {/* Interactive Lookbook Section */}
-      <LookbookSection onQuickView={setQuickViewProduct} />
+      {/* Customer Testimonials Carousel Section */}
+      <TestimonialsSection />
 
       {/* Footer with Policy & Info Links */}
       <Footer />
