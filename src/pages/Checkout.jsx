@@ -589,7 +589,9 @@ const CheckoutPage = () => {
                         ) : (
                           <form onSubmit={handleSignUpSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">First Name *</label>
+                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">
+                                First Name <span className="text-orange-500 font-bold">*</span>
+                              </label>
                               <input
                                 type="text"
                                 required
@@ -599,7 +601,9 @@ const CheckoutPage = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">Last Name *</label>
+                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">
+                                Last Name <span className="text-orange-500 font-bold">*</span>
+                              </label>
                               <input
                                 type="text"
                                 required
@@ -609,7 +613,9 @@ const CheckoutPage = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">Email Address *</label>
+                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">
+                                Email Address <span className="text-orange-500 font-bold">*</span>
+                              </label>
                               <input
                                 type="email"
                                 required
@@ -620,7 +626,9 @@ const CheckoutPage = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">Password *</label>
+                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">
+                                Password <span className="text-orange-500 font-bold">*</span>
+                              </label>
                               <input
                                 type="password"
                                 required
@@ -631,7 +639,9 @@ const CheckoutPage = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">Phone Number *</label>
+                              <label className="block text-[10px] font-mono text-slate-500 dark:text-white/40 uppercase mb-1">
+                                Phone Number <span className="text-orange-500 font-bold">*</span>
+                              </label>
                               <input
                                 type="tel"
                                 name="phone"
@@ -671,7 +681,9 @@ const CheckoutPage = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">First Name *</label>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                            First Name <span className="text-orange-500 font-bold">*</span>
+                          </label>
                           <input
                             type="text"
                             name="firstName"
@@ -682,7 +694,9 @@ const CheckoutPage = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Last Name *</label>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                            Last Name <span className="text-orange-500 font-bold">*</span>
+                          </label>
                           <input
                             type="text"
                             name="lastName"
@@ -693,7 +707,9 @@ const CheckoutPage = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Email Address *</label>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                            Email Address <span className="text-orange-500 font-bold">*</span>
+                          </label>
                           <input
                             type="email"
                             name="email"
@@ -704,7 +720,9 @@ const CheckoutPage = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Phone Number *</label>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                            Phone Number <span className="text-orange-500 font-bold">*</span>
+                          </label>
                           <input
                             type="tel"
                             name="phone"
@@ -716,7 +734,9 @@ const CheckoutPage = () => {
                           />
                         </div>
                         <div className="sm:col-span-2">
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Street Address *</label>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                            Street Address <span className="text-orange-500 font-bold">*</span>
+                          </label>
                           <input
                             type="text"
                             name="address"
@@ -728,7 +748,9 @@ const CheckoutPage = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">District *</label>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                            District <span className="text-orange-500 font-bold">*</span>
+                          </label>
                           <select
                             name="district"
                             value={billingForm.district}
@@ -736,6 +758,7 @@ const CheckoutPage = () => {
                             required
                             className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
                           >
+                            <option value="">Select District</option>
                             {BANGLADESH_DISTRICTS.map((dist) => (
                               <option key={dist} value={dist} className="text-slate-900 dark:text-white bg-white dark:bg-zinc-950">
                                 {dist}
@@ -746,7 +769,9 @@ const CheckoutPage = () => {
 
                         {['Dhaka', 'Gazipur', 'Narayanganj'].includes(billingForm.district) && (
                           <div className="animate-fadeIn">
-                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Thana *</label>
+                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                              Thana <span className="text-orange-500 font-bold">*</span>
+                            </label>
                             <select
                               name="thana"
                               value={billingForm.thana}
@@ -754,7 +779,7 @@ const CheckoutPage = () => {
                               required
                               className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
                             >
-                              <option value="" disabled>Select Thana / Upazila</option>
+                              <option value="">Select Thana / Upazila</option>
                               {(DISTRICT_THANAS[billingForm.district] || []).map((t) => (
                                 <option key={t.name} value={t.name} className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">
                                   {t.name} ({t.type} - {t.fee} Taka)
@@ -791,7 +816,9 @@ const CheckoutPage = () => {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">First Name *</label>
+                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                              First Name <span className="text-orange-500 font-bold">*</span>
+                            </label>
                             <input
                               type="text"
                               name="firstName"
@@ -802,7 +829,9 @@ const CheckoutPage = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Last Name *</label>
+                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                              Last Name <span className="text-orange-500 font-bold">*</span>
+                            </label>
                             <input
                               type="text"
                               name="lastName"
@@ -813,7 +842,9 @@ const CheckoutPage = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Email Address *</label>
+                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                              Email Address <span className="text-orange-500 font-bold">*</span>
+                            </label>
                             <input
                               type="email"
                               name="email"
@@ -824,7 +855,9 @@ const CheckoutPage = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Phone Number *</label>
+                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                              Phone Number <span className="text-orange-500 font-bold">*</span>
+                            </label>
                             <input
                               type="tel"
                               name="phone"
@@ -836,7 +869,9 @@ const CheckoutPage = () => {
                             />
                           </div>
                           <div className="sm:col-span-2">
-                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Street Address *</label>
+                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                              Street Address <span className="text-orange-500 font-bold">*</span>
+                            </label>
                             <input
                               type="text"
                               name="address"
@@ -848,7 +883,9 @@ const CheckoutPage = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">District *</label>
+                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                              District <span className="text-orange-500 font-bold">*</span>
+                            </label>
                             <select
                               name="district"
                               value={shippingForm.district}
@@ -856,6 +893,7 @@ const CheckoutPage = () => {
                               required={shipToDifferent}
                               className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
                             >
+                              <option value="">Select District</option>
                               {BANGLADESH_DISTRICTS.map((dist) => (
                                 <option key={dist} value={dist} className="text-slate-900 dark:text-white bg-white dark:bg-zinc-950">
                                   {dist}
@@ -866,7 +904,9 @@ const CheckoutPage = () => {
 
                           {['Dhaka', 'Gazipur', 'Narayanganj'].includes(shippingForm.district) && (
                             <div className="animate-fadeIn">
-                              <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Thana *</label>
+                              <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">
+                                Thana <span className="text-orange-500 font-bold">*</span>
+                              </label>
                               <select
                                 name="thana"
                                 value={shippingForm.thana}
@@ -874,7 +914,7 @@ const CheckoutPage = () => {
                                 required={shipToDifferent}
                                 className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
                               >
-                                <option value="" disabled>Select Thana / Upazila</option>
+                                <option value="">Select Thana / Upazila</option>
                                 {(DISTRICT_THANAS[shippingForm.district] || []).map((t) => (
                                   <option key={t.name} value={t.name} className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">
                                     {t.name} ({t.type} - {t.fee} Taka)
