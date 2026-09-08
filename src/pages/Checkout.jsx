@@ -53,6 +53,86 @@ const BANGLADESH_DISTRICTS = [
   'Tangail', 'Thakurgaon'
 ];
 
+const DISTRICT_THANAS = {
+  Dhaka: [
+    { name: 'Adabor', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Ashulia', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Badda', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Banani', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Bangshal', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Cantonment', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Chawkbazar', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Dakshinkhan', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Darussalam', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Demra', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Dhamrai', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Dhanmondi', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Dohar', fee: 120, type: 'Outside Dhaka' },
+    { name: 'Gendaria', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Gulshan', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Hazaribagh', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Jatrabari', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Kadamtali', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Kafrul', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Kalabagan', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Kamrangirchar', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Keraniganj', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Khilgaon', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Khilkhet', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Kotwali', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Lalbagh', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Mirpur', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Mohammadpur', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Motijheel', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Mugda', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Nawabganj', fee: 120, type: 'Outside Dhaka' },
+    { name: 'New Market', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Pallabi', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Paltan', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Ramna', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Rampura', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Sabujbagh', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Savar', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Shah Ali', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Shahbagh', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Sher-e-Bangla Nagar', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Shyampur', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Sutrapur', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Tejgaon', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Tejgaon Industrial Area', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Turag', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Uttara Paschim', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Uttara Purba', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Uttarkhan', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Vatara', fee: 70, type: 'Inside Dhaka' },
+    { name: 'Wari', fee: 70, type: 'Inside Dhaka' }
+  ],
+  Gazipur: [
+    { name: 'Gazipur Sadar', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Kaliakair', fee: 120, type: 'Outside Dhaka' },
+    { name: 'Kaliganj', fee: 120, type: 'Outside Dhaka' },
+    { name: 'Kapasia', fee: 120, type: 'Outside Dhaka' },
+    { name: 'Kashimpur', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Konabari', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Sreepur', fee: 120, type: 'Outside Dhaka' },
+    { name: 'Tongi', fee: 100, type: 'Dhaka Suburbs' }
+  ],
+  Narayanganj: [
+    { name: 'Araihazar', fee: 120, type: 'Outside Dhaka' },
+    { name: 'Bandar', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Fatullah', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Narayanganj Sadar', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Rupganj', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Siddhirganj', fee: 100, type: 'Dhaka Suburbs' },
+    { name: 'Sonargaon', fee: 100, type: 'Dhaka Suburbs' }
+  ]
+};
+
+// Sort all thanas alphabetically
+Object.keys(DISTRICT_THANAS).forEach((key) => {
+  DISTRICT_THANAS[key].sort((a, b) => a.name.localeCompare(b.name));
+});
+
 // Handles end-to-end checkout flow, address collection, order generation, and Meta Pixel Purchase tracking
 const CheckoutPage = () => {
   const router = useNavigate();
@@ -140,7 +220,8 @@ const CheckoutPage = () => {
     const { name, value, type, checked } = e.target;
     setBillingForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'district' ? { thana: '' } : {})
     }));
   };
 
@@ -148,7 +229,8 @@ const CheckoutPage = () => {
     const { name, value, type, checked } = e.target;
     setShippingForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'district' ? { thana: '' } : {})
     }));
   };
 
@@ -207,16 +289,39 @@ const CheckoutPage = () => {
       return { cost: 0, label: 'Delivery Charge' };
     }
 
-    if (activeDistrict.toLowerCase() === 'dhaka') {
-      if (activeThana === 'Savar') {
-        return { cost: 100, label: 'Delivery Charge (Dhaka Suburbs)' };
-      } else {
-        // Mohammadpur Thana or default Dhaka inside
-        return { cost: 70, label: 'Delivery Charge (Inside Dhaka)' };
+    const distLower = activeDistrict.toLowerCase().trim();
+
+    if (distLower === 'dhaka') {
+      const thanaObj = DISTRICT_THANAS.Dhaka.find(
+        (t) => t.name.toLowerCase() === (activeThana || '').toLowerCase()
+      );
+      if (thanaObj) {
+        return { cost: thanaObj.fee, label: `Delivery Charge (${thanaObj.type})` };
       }
-    } else {
-      return { cost: 120, label: 'Delivery Charge (Outside Dhaka)' };
+      return { cost: 70, label: 'Delivery Charge (Inside Dhaka)' };
     }
+
+    if (distLower === 'gazipur') {
+      const thanaObj = DISTRICT_THANAS.Gazipur.find(
+        (t) => t.name.toLowerCase() === (activeThana || '').toLowerCase()
+      );
+      if (thanaObj) {
+        return { cost: thanaObj.fee, label: `Delivery Charge (${thanaObj.type})` };
+      }
+      return { cost: 100, label: 'Delivery Charge (Dhaka Suburbs)' };
+    }
+
+    if (distLower === 'narayanganj') {
+      const thanaObj = DISTRICT_THANAS.Narayanganj.find(
+        (t) => t.name.toLowerCase() === (activeThana || '').toLowerCase()
+      );
+      if (thanaObj) {
+        return { cost: thanaObj.fee, label: `Delivery Charge (${thanaObj.type})` };
+      }
+      return { cost: 100, label: 'Delivery Charge (Dhaka Suburbs)' };
+    }
+
+    return { cost: 120, label: 'Delivery Charge (Outside Dhaka)' };
   };
 
   const shippingInfo = getCalculatedShipping();
@@ -250,9 +355,19 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (['Dhaka', 'Gazipur', 'Narayanganj'].includes(billingForm.district) && !billingForm.thana) {
+      setToastMessage('Please select a Thana / Upazila for your billing district.');
+      return;
+    }
+
     if (shipToDifferent) {
       if (!shippingForm.firstName || !shippingForm.lastName || !shippingForm.email || !shippingForm.phone || !shippingForm.address || !shippingForm.town || !shippingForm.district) {
         setToastMessage('Please fill in all mandatory shipping fields.');
+        return;
+      }
+
+      if (['Dhaka', 'Gazipur', 'Narayanganj'].includes(shippingForm.district) && !shippingForm.thana) {
+        setToastMessage('Please select a Thana / Upazila for your shipping destination.');
         return;
       }
     }
@@ -644,7 +759,7 @@ const CheckoutPage = () => {
                           </select>
                         </div>
 
-                        {billingForm.district.toLowerCase() === 'dhaka' && (
+                        {['Dhaka', 'Gazipur', 'Narayanganj'].includes(billingForm.district) && (
                           <div className="animate-fadeIn">
                             <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Thana *</label>
                             <select
@@ -654,8 +769,12 @@ const CheckoutPage = () => {
                               required
                               className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
                             >
-                              <option value="Mohammadpur" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Mohammadpur (Inside Dhaka - 70 Taka)</option>
-                              <option value="Savar" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Savar (Dhaka Suburbs - 100 Taka)</option>
+                              <option value="" disabled>Select Thana / Upazila</option>
+                              {(DISTRICT_THANAS[billingForm.district] || []).map((t) => (
+                                <option key={t.name} value={t.name} className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">
+                                  {t.name} ({t.type} - {t.fee} Taka)
+                                </option>
+                              ))}
                             </select>
                           </div>
                         )}
@@ -772,7 +891,7 @@ const CheckoutPage = () => {
                             </select>
                           </div>
 
-                          {shippingForm.district.toLowerCase() === 'dhaka' && (
+                          {['Dhaka', 'Gazipur', 'Narayanganj'].includes(shippingForm.district) && (
                             <div className="animate-fadeIn">
                               <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Thana *</label>
                               <select
@@ -782,8 +901,12 @@ const CheckoutPage = () => {
                                 required={shipToDifferent}
                                 className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
                               >
-                                <option value="Mohammadpur" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Mohammadpur (Inside Dhaka - 70 Taka)</option>
-                                <option value="Savar" className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">Savar (Dhaka Suburbs - 100 Taka)</option>
+                                <option value="" disabled>Select Thana / Upazila</option>
+                                {(DISTRICT_THANAS[shippingForm.district] || []).map((t) => (
+                                  <option key={t.name} value={t.name} className="bg-white dark:bg-zinc-950 text-slate-900 dark:text-white">
+                                    {t.name} ({t.type} - {t.fee} Taka)
+                                  </option>
+                                ))}
                               </select>
                             </div>
                           )}
