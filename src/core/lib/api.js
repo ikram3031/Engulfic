@@ -1,6 +1,6 @@
 export const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.NEXT_PUBLIC_API_URL || "";
-  return envUrl ? envUrl.replace(/\/$/, "") : "";
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.NEXT_PUBLIC_API_URL || "https://server.engulfic.com";
+  return envUrl ? envUrl.replace(/\/$/, "") : "https://server.engulfic.com";
 };
 
 export const getImageBaseUrl = () => {
