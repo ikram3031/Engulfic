@@ -170,7 +170,6 @@ const CheckoutPage = () => {
     email: '',
     phone: '',
     address: '',
-    town: '',
     district: '',
     thana: ''
   });
@@ -183,7 +182,6 @@ const CheckoutPage = () => {
     email: '',
     phone: '',
     address: '',
-    town: '',
     district: '',
     thana: ''
   });
@@ -200,7 +198,6 @@ const CheckoutPage = () => {
           email: user.email || '',
           phone: user.phone || '',
           address: user.address || '',
-          town: user.city || '',
           district: user.district || ''
         }));
       }, 0);
@@ -350,7 +347,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (!billingForm.firstName || !billingForm.lastName || !billingForm.email || !billingForm.phone || !billingForm.address || !billingForm.town || !billingForm.district) {
+    if (!billingForm.firstName || !billingForm.lastName || !billingForm.email || !billingForm.phone || !billingForm.address || !billingForm.district) {
       setToastMessage('Please fill in all mandatory billing fields.');
       return;
     }
@@ -361,7 +358,7 @@ const CheckoutPage = () => {
     }
 
     if (shipToDifferent) {
-      if (!shippingForm.firstName || !shippingForm.lastName || !shippingForm.email || !shippingForm.phone || !shippingForm.address || !shippingForm.town || !shippingForm.district) {
+      if (!shippingForm.firstName || !shippingForm.lastName || !shippingForm.email || !shippingForm.phone || !shippingForm.address || !shippingForm.district) {
         setToastMessage('Please fill in all mandatory shipping fields.');
         return;
       }
@@ -731,18 +728,6 @@ const CheckoutPage = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Town / City *</label>
-                          <input
-                            type="text"
-                            name="town"
-                            value={billingForm.town}
-                            onChange={handleBillingChange}
-                            required
-                            placeholder="e.g. Banani"
-                            className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
-                          />
-                        </div>
-                        <div>
                           <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">District *</label>
                           <select
                             name="district"
@@ -859,18 +844,6 @@ const CheckoutPage = () => {
                               onChange={handleShippingChange}
                               required={shipToDifferent}
                               placeholder="House No, Road No, Apartment, Block"
-                              className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[11px] font-mono text-slate-600 dark:text-white/50 mb-1">Town / City *</label>
-                            <input
-                              type="text"
-                              name="town"
-                              value={shippingForm.town}
-                              onChange={handleShippingChange}
-                              required={shipToDifferent}
-                              placeholder="e.g. Uttara"
                               className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-orange-500"
                             />
                           </div>
@@ -1182,7 +1155,7 @@ const CheckoutPage = () => {
                       {orderSummary?.billing?.firstName} {orderSummary?.billing?.lastName}
                     </p>
                     <p className="text-slate-700">{orderSummary?.billing?.address}</p>
-                    <p className="text-slate-700">{orderSummary?.billing?.town}, {orderSummary?.billing?.district} ({orderSummary?.billing?.thana || 'Central'})</p>
+                    <p className="text-slate-700">{orderSummary?.billing?.district} {orderSummary?.billing?.thana ? `(${orderSummary?.billing?.thana})` : ''}</p>
                     <p className="text-slate-700">Phone: {orderSummary?.billing?.phone}</p>
                     <p className="text-slate-700">Email: {orderSummary?.billing?.email}</p>
                   </div>
@@ -1195,7 +1168,7 @@ const CheckoutPage = () => {
                       {orderSummary?.shipping?.firstName} {orderSummary?.shipping?.lastName}
                     </p>
                     <p className="text-slate-700">{orderSummary?.shipping?.address}</p>
-                    <p className="text-slate-700">{orderSummary?.shipping?.town}, {orderSummary?.shipping?.district}</p>
+                    <p className="text-slate-700">{orderSummary?.shipping?.district} {orderSummary?.shipping?.thana ? `(${orderSummary?.shipping?.thana})` : ''}</p>
                     <p className="text-slate-700">Phone: {orderSummary?.shipping?.phone}</p>
                     <p className="text-slate-700 font-bold text-emerald-600">Method: Home Delivery (24-48 Hrs)</p>
                   </div>
