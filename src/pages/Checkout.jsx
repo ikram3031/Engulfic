@@ -1260,15 +1260,7 @@ const CheckoutPage = () => {
                 </div>
 
                 {/* Financial Summary Calculation */}
-                <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-t border-slate-300 pt-6">
-                  <div className="space-y-2 text-[11px] text-slate-600 max-w-xs">
-                    <span className="font-bold text-slate-900 uppercase block">TERMS & GUARANTEE</span>
-                    <p>
-                      • Garments are backed by Engulfic 7-day hassle-free replacement policy.<br />
-                      • Please retain this official invoice for returns or exchanges.<br />
-                      • Sealed in anti-static biodegradable packaging.
-                    </p>
-                  </div>
+                <div className="flex flex-col sm:flex-row justify-end items-start gap-6 border-t border-slate-300 pt-6">
 
                   <div className="w-full sm:w-72 space-y-2 text-xs">
                     <div className="flex justify-between text-slate-600">
