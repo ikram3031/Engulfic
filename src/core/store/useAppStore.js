@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { fetchProducts as apiFetchProducts, fetchCombos as apiFetchCombos, fetchCategories as apiFetchCategories, fetchProductDetails as apiFetchProductDetails, fetchCouponByCode as apiFetchCouponByCode } from "../../lib/api";
+import { safeStorage } from "../../lib/safeStorage";
 
 // The main Zustand store for the application state
 export const useAppStore = create((set, get) => ({
@@ -69,7 +70,7 @@ export const useAppStore = create((set, get) => ({
       set({ categories: cats, isCategoriesLoading: false });
       // Cache the categories inside localStorage for instant load on refresh
       // This is used by productHelpers.js to resolve category IDs to names
-      localStorage.setItem("luxury_categories", JSON.stringify(cats));
+      safeStorage.setItem("luxury_categories", cats);
       return cats;
     } catch (err) {
       set({ isCategoriesLoading: false });
@@ -82,11 +83,11 @@ export const useAppStore = create((set, get) => ({
   // ---------------------------------------------------------
   
   // Load cart from localStorage or default to empty array
-  cart: JSON.parse(localStorage.getItem("luxury_cart") || "[]"),
+  cart: safeStorage.getJSON("luxury_cart", []),
   
   // Syncs the cart state to localStorage after any modification
   _syncCart: (newCart) => {
-    localStorage.setItem("luxury_cart", JSON.stringify(newCart));
+    safeStorage.setItem("luxury_cart", newCart);
     set({ cart: newCart });
   },
 
@@ -108,11 +109,11 @@ export const useAppStore = create((set, get) => ({
   // ---------------------------------------------------------
   
   // Load wishlist from localStorage or default to empty array
-  wishlist: JSON.parse(localStorage.getItem("luxury_wishlist") || "[]"),
+  wishlist: safeStorage.getJSON("luxury_wishlist", []),
 
   // Syncs the wishlist state to localStorage
   _syncWishlist: (newWishlist) => {
-    localStorage.setItem("luxury_wishlist", JSON.stringify(newWishlist));
+    safeStorage.setItem("luxury_wishlist", newWishlist);
     set({ wishlist: newWishlist });
   },
 
@@ -132,14 +133,14 @@ export const useAppStore = create((set, get) => ({
   // ---------------------------------------------------------
   
   // Load user from localStorage or default to null
-  user: JSON.parse(localStorage.getItem("luxury_user") || "null"),
+  user: safeStorage.getJSON("luxury_user", null),
 
   // Update user state and sync to localStorage
   setUser: (userData) => {
     if (userData) {
-      localStorage.setItem("luxury_user", JSON.stringify(userData));
+      safeStorage.setItem("luxury_user", userData);
     } else {
-      localStorage.removeItem("luxury_user");
+      safeStorage.removeItem("luxury_user");
     }
     set({ user: userData });
   },

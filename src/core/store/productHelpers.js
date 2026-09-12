@@ -1,3 +1,5 @@
+import { safeStorage } from "../../lib/safeStorage";
+
 const API_BASE = (
   import.meta.env?.VITE_IMAGE_BASE_URL ||
   import.meta.env?.NEXT_PUBLIC_IMAGE_BASE_URL ||
@@ -52,15 +54,10 @@ export const resolveCategoryInfo = (categoryId, productName = '', categoriesList
     }
   }
 
-  // Check passed categories list or localStorage cache dynamically
+  // Check passed categories list or safeStorage cache dynamically
   let pool = Array.isArray(categoriesList) && categoriesList.length > 0 ? categoriesList : [];
   if (pool.length === 0) {
-    try {
-      const cached = localStorage.getItem("luxury_categories");
-      if (cached) {
-        pool = JSON.parse(cached);
-      }
-    } catch (_) {}
+    pool = safeStorage.getJSON("luxury_categories", []);
   }
 
   const targetId = typeof categoryId === 'object' ? (categoryId._id || categoryId.id || categoryId.slug) : categoryId;

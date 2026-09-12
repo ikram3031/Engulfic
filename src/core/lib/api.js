@@ -8,24 +8,26 @@ export const getImageBaseUrl = () => {
   return envImgUrl ? envImgUrl.replace(/\/$/, "") : getApiBaseUrl();
 };
 
+import { safeStorage } from "../../lib/safeStorage";
+
 export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getStoredMemberTokens = () => {
   return {
-    accessToken: localStorage.getItem("luxury_access_token"),
-    refreshToken: localStorage.getItem("luxury_refresh_token")
+    accessToken: safeStorage.getItem("luxury_access_token", null),
+    refreshToken: safeStorage.getItem("luxury_refresh_token", null)
   };
 };
 
 export const clearStoredMemberTokens = () => {
-  localStorage.removeItem("luxury_access_token");
-  localStorage.removeItem("luxury_refresh_token");
-  localStorage.removeItem("luxury_user");
+  safeStorage.removeItem("luxury_access_token");
+  safeStorage.removeItem("luxury_refresh_token");
+  safeStorage.removeItem("luxury_user");
 };
 
 export const setStoredMemberTokens = (access, refresh) => {
-  if (access) localStorage.setItem("luxury_access_token", access);
-  if (refresh) localStorage.setItem("luxury_refresh_token", refresh);
+  if (access) safeStorage.setItem("luxury_access_token", access);
+  if (refresh) safeStorage.setItem("luxury_refresh_token", refresh);
 };
 
 const fetchWithTimeout = async (url, options = {}, timeout = 10000) => {

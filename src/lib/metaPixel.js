@@ -28,7 +28,12 @@ export const sha256Hash = async (value) => {
   if (!cleanVal) return '';
 
   try {
-    if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+    if (
+      typeof window !== 'undefined' &&
+      window.crypto &&
+      window.crypto.subtle &&
+      typeof TextEncoder !== 'undefined'
+    ) {
       const msgBuffer = new TextEncoder().encode(cleanVal);
       const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -170,7 +175,19 @@ export const initTrackingPixels = async () => {
   isInitializing = true;
 
   try {
-    const [metaRes, tiktokRes] = await Promise.allSettled([
+    const safeAllSettled = typeof Promise.allSettled === 'function'
+      ? Promise.allSettled.bind(Promise)
+      : (promises) =>
+          Promise.all(
+            promises.map((p) =>
+              Promise.resolve(p).then(
+                (value) => ({ status: 'fulfilled', value }),
+                (reason) => ({ status: 'rejected', reason })
+              )
+            )
+          );
+
+    const [metaRes, tiktokRes] = await safeAllSettled([
       fetch(`${BASE_URL}/api/v1/settings/public/meta-pixel`).then((r) => (r.ok ? r.json() : null)),
       fetch(`${BASE_URL}/api/v1/settings/public/tiktok-pixel`).then((r) => (r.ok ? r.json() : null)),
     ]);

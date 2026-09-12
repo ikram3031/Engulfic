@@ -4,11 +4,15 @@
     <meta charset="UTF-8" />
     <script>
       (function() {
-        var theme = localStorage.getItem('engulfic-theme') || 'dark';
-        if (theme === 'dark') {
+        try {
+          var theme = (window.localStorage && localStorage.getItem('engulfic-theme')) || 'dark';
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {
           document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
         }
       })();
     </script>
@@ -33,8 +37,10 @@
       t.src=v;s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '881944871465552');
-      fbq('track', 'PageView');
+      try {
+        fbq('init', '881944871465552');
+        fbq('track', 'PageView');
+      } catch (_) {}
     </script>
     <!-- End Meta Pixel Code -->
     <!-- Google tag (gtag.js) -->
@@ -43,16 +49,70 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-V2H268T9Q5');
     </script>
+    <!-- TikTok Pixel Code Start -->
+    <script>
+      !function (w, d, t) {
+        w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+        var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+        ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+        try {
+          ttq.load('DAF742BC77U208ULDD0G');
+          ttq.page();
+        } catch (_) {}
+      }(window, document, 'ttq');
+    </script>
+    <!-- TikTok Pixel Code End -->
+    <!-- Asset Load Protection -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+          console.warn('[Asset Load Error]', e.target.src || e.target.href);
+          var hint = document.getElementById('preloader-slow-hint');
+          if (hint) {
+            hint.style.display = 'block';
+            hint.innerHTML = '<p style="font-size:11px;color:#f97316;margin-bottom:10px;">Update detected. Tap to refresh view.</p><button onclick="window.location.reload(true)" style="background:#f97316;color:#fff;border:none;padding:8px 18px;border-radius:999px;font-size:11px;font-weight:bold;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;">Reload Page</button>';
+          }
+        }
+      }, true);
+    </script>
   </head>
-  <body>
+  <body class="bg-[#050505] text-white">
     <noscript>
       <img height="1" width="1" style="display:none"
            src="https://www.facebook.com/tr?id=881944871465552&ev=PageView&noscript=1" alt=""/>
     </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Dark luxury initial splash preloader shown instantly while JavaScript loads -->
+      <div id="app-preloader" style="position:fixed;inset:0;background:#050505;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;user-select:none;">
+        <div style="text-align:center;padding:24px;max-width:320px;width:100%;">
+          <div style="font-size:26px;font-weight:900;letter-spacing:0.35em;text-transform:uppercase;color:#fff;margin-bottom:8px;">ENGULFIC</div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:0.45em;text-transform:uppercase;color:#f97316;margin-bottom:28px;">HAUTE STREETWEAR &bull; DHAKA</div>
+          <div style="width:110px;height:2px;background:rgba(255,255,255,0.1);border-radius:999px;margin:0 auto;overflow:hidden;position:relative;">
+            <div style="position:absolute;top:0;bottom:0;width:40%;background:#f97316;border-radius:999px;animation:engulficPreload 1.2s infinite ease-in-out;"></div>
+          </div>
+          <div id="preloader-slow-hint" style="display:none;margin-top:28px;">
+            <p style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Taking longer than expected to load?</p>
+            <button onclick="window.location.reload(true)" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:7px 16px;border-radius:999px;font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;">Tap to Reload</button>
+          </div>
+        </div>
+      </div>
+      <style>
+        @keyframes engulficPreload {
+          0% { left: -40%; width: 30%; }
+          50% { left: 35%; width: 50%; }
+          100% { left: 100%; width: 30%; }
+        }
+      </style>
+      <script>
+        setTimeout(function() {
+          var hint = document.getElementById('preloader-slow-hint');
+          if (hint) hint.style.display = 'block';
+        }, 7000);
+      </script>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
